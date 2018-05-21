@@ -1,0 +1,4 @@
+/phpbb/cache/*
+!/phpbb/cache/.htaccess
+!/phpbb/cache/index.html
+config.php
