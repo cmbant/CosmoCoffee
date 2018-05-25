@@ -1,0 +1,28 @@
+{
+	"name": "phpbbworld/snow",
+	"type": "phpbb-extension",
+	"description": "Расширение добавляет снегопад на ваш форум",
+	"homepage": "http://phpbbworld.ru/viewtopic.php?f=6&t=14",
+	"version": "0.1.0",
+	"time": "2014-06-28",
+	"license": "GPL-2.0",
+	"authors": [{
+			"name": "DeaDRoMeO",
+			"homepage": "http://phpbbworld.ru",
+			"role": "Developer"
+		}],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"extra": {
+      "display-name": "Снегопад",
+      "soft-require": {
+         "phpbb/phpbb": ">=3.1.0"
+      },
+		 "version-check": {
+            "host": "phpbbworld.ru",
+            "directory": "/versions",
+            "filename": "snow.json"
+        }
+   }
+}
