@@ -113,3 +113,7 @@ abbr[title] {
 	text-decoration: none;
 }
 
+.key {
+    font-weight: 600;
+    color: maroon;
+}
