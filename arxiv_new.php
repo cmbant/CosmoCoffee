@@ -99,6 +99,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
     $links .= '[<A HREF="/search.php?search_id=unanswered">Unanswered posts</A>]';
     $links .= '</span></p>';
 }
+$links .= "</p>";
 
 $text .= $links;
 
@@ -163,7 +164,7 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives) 
             </TR>
         </TABLE>
     <?php    
-        $linksHtml .= ob_get_clean();
+        $linksHtml = ob_get_clean();
     }
     
     return $linksHtml;
