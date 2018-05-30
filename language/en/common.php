@@ -1426,4 +1426,26 @@ $lang = array_merge($lang, array(
 	// Translators should change this if a the usual date format is different
 	'default_dateformat'	=> 'D M d, Y g:i a', // Mon Jan 01, 2007 1:37 pm
 
+    //CosmoCoffee
+    'arxives'	=> array(
+        'arxiv.org' => 'Default (Cornell)',
+        'au.arxiv.org' => 'Australia',
+        'br.arxiv.org' => 'Brazil',
+        'cn.arxiv.org' => 'China',
+        'fr.arxiv.org' => 'France',
+        'de.arxiv.org' => 'Germany',
+        'in.arxiv.org' => 'India',
+        'il.arxiv.org' => 'Israel',
+        'it.arxiv.org' => 'Italy',
+        'jp.arxiv.org' => 'Japan',
+        'ru.arxiv.org' => 'Russia',
+        'za.arxiv.org' => 'South Africa',
+        'kr.arxiv.org' => 'South Korea',
+        'es.arxiv.org' => 'Spain',
+        'tw.arxiv.org' => 'Taiwan',
+        'uk.arxiv.org' => 'UK',
+        'aps.arxiv.org' => 'US mirror (aps)',
+        'lanl.arxiv.org' => 'US mirror (lanl)',
+	),
+
 ));

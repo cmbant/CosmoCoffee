@@ -21,6 +21,18 @@ if (strpos($request->server('REQUEST_URI'), "eval(") ||
 $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
+$user->get_profile_fields($user->data['user_id']);
+
+//var_dump($user->profile_fields['pf_user_arxives']);
+//var_dump($user->profile_fields['pf_user_keywords']);
+//var_dump($user->profile_fields['pf_user_mirror']);
+
+//echo "<pre>";
+//phpbb\language\language::lang();
+var_dump($user->lang['arxives']);
+
+
+exit;
 
 page_header('Arxiv New');
 
@@ -37,10 +49,10 @@ if ($user->data['user_id'] == ANONYMOUS) { // something from old logic
 
 $starttime = microtime_float();
 
-$arxivesString = ($user->data['user_arxives']) ? $user->data['user_arxives'] : $config['default_arxives'];
+$arxivesString = ($user->profile_fields['pf_user_arxives']) ? $user->profile_fields['pf_user_arxives'] : $config['default_arxives'];
 $arxives = to_array($arxivesString);
 
-$keywords = ($user->data['user_keywords']) ? $user->data['user_keywords'] : $config['default_arxiv_keys'];
+$keywords = ($user->profile_fields['pf_user_keywords']) ? $user->profile_fields['pf_user_keywords'] : $config['default_arxiv_keys'];
 $keywords = to_array($keywords);
 
 $date = ($request->is_set('d')) ? $request->variable('d', '') : '';
@@ -58,7 +70,7 @@ $latestArxiv = new DateTime($config['arxiv_new_date']);
 
 $text = '';
 
-if(!$user->data['user_arxives']) {
+if(!$user->profile_fields['pf_user_arxives']) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
 }
 
