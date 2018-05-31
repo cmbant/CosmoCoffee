@@ -701,8 +701,24 @@ switch ($mode)
 		{
 			$member['posts_in_queue'] = 0;
 		}
+        
+        // CosmoCofee
+        $fullname = $member['username'];
+        preg_match('/^(.).* ([^\s]*)$/', $fullname, $parts);
+        $search_name = $parts[1] . ' ' . $parts[2];
+
+        preg_match('/^(.*)[ \.](.* )*([^\s]*)$/', $fullname, $parts);
+        $first = $parts[1];
+        $last = $parts[3];
+        // CosmoCofee
 
 		$template->assign_vars(array(
+            // CosmoCofee
+            'FIRST' => $first,
+            'LAST' => $last, 
+            'SEARCHNAME' => $search_name,
+            // CosmoCofee
+            
 			'L_POSTS_IN_QUEUE'	=> $user->lang('NUM_POSTS_IN_QUEUE', $member['posts_in_queue']),
 
 			'POSTS_DAY'			=> $user->lang('POST_DAY', $posts_per_day),
