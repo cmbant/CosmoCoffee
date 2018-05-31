@@ -23,29 +23,12 @@ $auth->acl($user->data);
 $user->setup();
 $user->get_profile_fields($user->data['user_id']);
 
-//var_dump($user->profile_fields['pf_user_arxives']);
-//var_dump($user->profile_fields['pf_user_keywords']);
-//var_dump($user->profile_fields['pf_user_mirror']);
-
-//echo "<pre>";
-//phpbb\language\language::lang();
-var_dump($user->lang['arxives']);
-
-
-exit;
+//var_dump($user->lang['arxives']);
 
 page_header('Arxiv New');
-
 $template->set_filenames(array(
     'body' => 'message_body.html',
 ));
-
-
-if ($user->data['user_id'] == ANONYMOUS) { // something from old logic
-//cache the un-logged-in version
-//  include($phpbb_root_path . 'cache/latest_arxiv_new.html');
-//  exit;
-}
 
 $starttime = microtime_float();
 
@@ -107,7 +90,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
     $links .= '<p><span class ="genmed">';
     $links .= '[<A HREF="/">CosmoCofee Home</A>] ';
     $links .= '[<A HREF="' . BOOKMARK_LINK . '">Bookmarks</A>] ';
-    $links .= '<A HREF="/search.php?search_id=newposts">New posts</A>] ';
+    $links .= '[<A HREF="/search.php?search_id=newposts">New posts</A>] ';
     $links .= '[<A HREF="/search.php?search_id=unanswered">Unanswered posts</A>]';
     $links .= '</span></p>';
 }
@@ -256,7 +239,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
     $text = '';
     
     $match_strings = get_match_strings($keywords);  
-    $mirror = ($user->data['user_mirror']) ? $user->data['user_mirror'] : $config['default_mirror']; 
+    $mirror = ($user->profile_fields['pf_user_mirror']) ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror']; 
 
     $title = preg_replace($match_strings['match_str'], '\rm{<span class="key">\\0</span>}', $row['title']);
     $authors = preg_replace($match_strings['match_str'], '\rm{<span class="key">\\0</span>}', $row['authors']);
