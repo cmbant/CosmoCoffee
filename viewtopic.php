@@ -1939,7 +1939,7 @@ for ($i = 0, $end = count($post_list); $i < $end; ++$i)
 
 		'POST_DATE'			=> $user->format_date($row['post_time'], false, ($view == 'print') ? true : false),
 		'POST_SUBJECT'		=> $row['post_subject'],
-		'MESSAGE'			=> $message,
+		'MESSAGE'			=> make_clickable($message),
 		'SIGNATURE'			=> ($row['enable_sig']) ? $user_cache[$poster_id]['sig'] : '',
 		'EDITED_MESSAGE'	=> $l_edited_by,
 		'EDIT_REASON'		=> $row['post_edit_reason'],
