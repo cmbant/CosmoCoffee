@@ -989,7 +989,7 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 		}
 	}
 
-	return $text;
+    return make_clickable_cosmocoffee($text);
 }
 
 /**
