@@ -9,15 +9,8 @@ $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 
-if (strpos($request->server('REQUEST_URI'), "eval(") ||      
-  strpos($request->server('REQUEST_URI'), "CONCAT") ||
-  strpos($request->server('REQUEST_URI'), "UNION+SELECT") ||
-  strpos($request->server('REQUEST_URI'), "base64"))
-{ 
-    redirect(append_sid("/index.$phpEx"));
-}
+anti_hack($phpEx);
 
-// Start session management
 $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
