@@ -22,8 +22,6 @@ function get_username_by_id($user_id) {
     return ($row) ? $row['username'] : false;
 }
 
-
-
 /**
  * - Goes through the given string, and replaces xxxx://yyyy with an HTML <a> tag linking
  * 	to that URL
@@ -233,7 +231,22 @@ function to_array($string, $delimiter = ',') {
     }, $array);
 }
 
+function get_url( $url ) {
+	$user_agent = 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/125.5 (KHTML, like Gecko) Safari/125.9';
 
+	$ch = curl_init(); 
+	//curl_setopt( $ch, CURLOPT_PROXY, $proxy );
+	curl_setopt( $ch, CURLOPT_URL, $url );
+	curl_setopt( $ch, CURLOPT_USERAGENT, $user_agent );
+	//curl_setopt( $ch, CURLOPT_COOKIEJAR, "c:\cookie.txt" );
+	curl_setopt( $ch, CURLOPT_HEADER, 1 ); 
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 ); 
+	curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
+	curl_setopt( $ch, CURLOPT_TIMEOUT, 120 );
+	$result = curl_exec( $ch );
+	curl_close( $ch );
+	return $result;
+}
 
 
 
