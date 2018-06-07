@@ -184,7 +184,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
                     order by 
                         c.manager DESC,u.username";
             if ($u = $db->sql_query($sql)) {
-                $managetxt .= '<ol>';                
+                $managetxt .= '<ol style="list-style-position: inside;">';                
                 while ($urow = $db->sql_fetchrow($u)) {
                     $id = $urow['user_id'];
                     $auser = $urow['username'];
