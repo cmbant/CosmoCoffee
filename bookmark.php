@@ -526,9 +526,7 @@ if(!$result = $db->sql_query($sql)) {
 $rows = $db->sql_fetchrowset($result);
 $db->sql_freeresult($result);
 
-foreach($rows as $row) {
-    $row4[]=$row;
-    
+foreach($rows as $row) {    
     $count = $row['ac'];
     $tag = $row['arxiv_tag'];
     $date = $row['date'];
@@ -706,7 +704,7 @@ $text .= '</td>';
 $text .= '</tr>';
 $text .= '</table>';
 
-$text .= '</p></TD></TR></TABLE>';
+
 
 
 
