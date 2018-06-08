@@ -1,5 +1,7 @@
 <?php
 
+mail('lae@tangramltd.com', 'cron job CosmoCoffee', 'start', 'header');
+
 define('IN_PHPBB', true);
 
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
@@ -164,3 +166,4 @@ function doclean($text) {
     return $text;
 }
 
+mail('lae@tangramltd.com', 'cron job CosmoCoffee', 'end', 'header');
