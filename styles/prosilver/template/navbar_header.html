@@ -98,6 +98,20 @@
 				</a>
 			</li>
 		<!-- ENDIF -->
+        
+        
+        <!--CosmoCoffee-->
+        <li data-last-responsive="true">
+            <a href="/arxiv_new.php" title="Arxiv New Filter" role="menuitem">
+                <i class="icon fa-archive fa-fw" aria-hidden="true"></i><span>Arxiv New Filter</span>
+            </a>
+        </li>
+        <li data-last-responsive="true" style="margin-right: 5px;">
+            <a href="/bookmark.php" title="Bookmarks &amp; clubs" role="menuitem">
+                <i class="icon fa-bookmark fa-fw" aria-hidden="true"></i><span>Bookmarks &amp; clubs</span>
+            </a>
+        </li>        
+        <!--CosmoCoffee-->
 
 	<!-- IF S_REGISTERED_USER -->
 		<!-- EVENT navbar_header_user_profile_prepend -->
@@ -173,6 +187,16 @@
 		<!-- ENDIF -->
 		<!-- EVENT navbar_header_logged_out_content -->
 	<!-- ENDIF -->
+    
+        <!--CosmoCoffee-->
+        <li data-last-responsive="true" style="text-align: center; margin-right: 15%;" class="rightside">
+            <form method="get" action="/arxivjump.pl" TARGET="_top">
+                <span>Arxiv ref/author: </span>
+                <input type="text" name="r" size="12" maxlength="40" style="height: 18px;" value=""> 
+                <input type="submit" value="Go" class="button">
+            </form>
+        </li>
+        <!--CosmoCoffee-->
 	</ul>
 
 	<ul id="nav-breadcrumbs" class="nav-breadcrumbs linklist navlinks" role="menubar">

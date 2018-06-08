@@ -250,24 +250,38 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
 \t\t";
         }
         // line 101
-        echo "
+        echo "        
+        
+        <!--CosmoCoffee-->
+        <li data-last-responsive=\"true\">
+            <a href=\"/arxiv_new.php\" title=\"Arxiv New Filter\" role=\"menuitem\">
+                <i class=\"icon fa-archive fa-fw\" aria-hidden=\"true\"></i><span>Arxiv New Filter</span>
+            </a>
+        </li>
+        <li data-last-responsive=\"true\" style=\"margin-right: 5px;\">
+            <a href=\"/bookmark.php\" title=\"Bookmarks &amp; clubs\" role=\"menuitem\">
+                <i class=\"icon fa-bookmark fa-fw\" aria-hidden=\"true\"></i><span>Bookmarks &amp; clubs</span>
+            </a>
+        </li>        
+        <!--CosmoCoffee-->
+
 \t";
-        // line 102
+        // line 116
         if ((isset($context["S_REGISTERED_USER"]) ? $context["S_REGISTERED_USER"] : null)) {
-            // line 103
+            // line 117
             echo "\t\t";
-            // line 104
+            // line 118
             echo "\t\t<li id=\"username_logged_in\" class=\"rightside ";
             if ((isset($context["CURRENT_USER_AVATAR"]) ? $context["CURRENT_USER_AVATAR"] : null)) {
                 echo " no-bulletin";
             }
             echo "\" data-skip-responsive=\"true\">
 \t\t\t";
-            // line 105
-            // line 106
+            // line 119
+            // line 120
             echo "\t\t\t<div class=\"header-profile dropdown-container\">
 \t\t\t\t<a href=\"";
-            // line 107
+            // line 121
             echo (isset($context["U_PROFILE"]) ? $context["U_PROFILE"] : null);
             echo "\" class=\"header-avatar dropdown-trigger\">";
             if ((isset($context["CURRENT_USER_AVATAR"]) ? $context["CURRENT_USER_AVATAR"] : null)) {
@@ -281,69 +295,69 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
 \t\t\t\t\t<div class=\"pointer\"><div class=\"pointer-inner\"></div></div>
 \t\t\t\t\t<ul class=\"dropdown-contents\" role=\"menu\">
 \t\t\t\t\t\t";
-            // line 111
+            // line 125
             if ((isset($context["U_RESTORE_PERMISSIONS"]) ? $context["U_RESTORE_PERMISSIONS"] : null)) {
-                // line 112
+                // line 126
                 echo "\t\t\t\t\t\t\t<li>
 \t\t\t\t\t\t\t\t<a href=\"";
-                // line 113
+                // line 127
                 echo (isset($context["U_RESTORE_PERMISSIONS"]) ? $context["U_RESTORE_PERMISSIONS"] : null);
                 echo "\">
 \t\t\t\t\t\t\t\t\t<i class=\"icon fa-refresh fa-fw\" aria-hidden=\"true\"></i><span>";
-                // line 114
+                // line 128
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("RESTORE_PERMISSIONS");
                 echo "</span>
 \t\t\t\t\t\t\t\t</a>
 \t\t\t\t\t\t\t</li>
 \t\t\t\t\t\t";
             }
-            // line 118
+            // line 132
             echo "
 \t\t\t\t\t";
-            // line 119
-            // line 120
+            // line 133
+            // line 134
             echo "
 \t\t\t\t\t\t<li>
 \t\t\t\t\t\t\t<a href=\"";
-            // line 122
+            // line 136
             echo (isset($context["U_PROFILE"]) ? $context["U_PROFILE"] : null);
             echo "\" title=\"";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("PROFILE");
             echo "\" role=\"menuitem\">
 \t\t\t\t\t\t\t\t<i class=\"icon fa-sliders fa-fw\" aria-hidden=\"true\"></i><span>";
-            // line 123
+            // line 137
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("PROFILE");
             echo "</span>
 \t\t\t\t\t\t\t</a>
 \t\t\t\t\t\t</li>
 \t\t\t\t\t\t<li>
 \t\t\t\t\t\t\t<a href=\"";
-            // line 127
+            // line 141
             echo (isset($context["U_USER_PROFILE"]) ? $context["U_USER_PROFILE"] : null);
             echo "\" title=\"";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("READ_PROFILE");
             echo "\" role=\"menuitem\">
 \t\t\t\t\t\t\t\t<i class=\"icon fa-user fa-fw\" aria-hidden=\"true\"></i><span>";
-            // line 128
+            // line 142
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("READ_PROFILE");
             echo "</span>
 \t\t\t\t\t\t\t</a>
 \t\t\t\t\t\t</li>
 
 \t\t\t\t\t\t";
-            // line 132
-            // line 133
+            // line 146
+            // line 147
             echo "
 \t\t\t\t\t\t<li class=\"separator\"></li>
 \t\t\t\t\t\t<li>
 \t\t\t\t\t\t\t<a href=\"";
-            // line 136
+            // line 150
             echo (isset($context["U_LOGIN_LOGOUT"]) ? $context["U_LOGIN_LOGOUT"] : null);
             echo "\" title=\"";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
             echo "\" accesskey=\"x\" role=\"menuitem\">
 \t\t\t\t\t\t\t\t<i class=\"icon fa-power-off fa-fw\" aria-hidden=\"true\"></i><span>";
-            // line 137
+            // line 151
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
             echo "</span>
 \t\t\t\t\t\t\t</a>
@@ -352,20 +366,20 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
 \t\t\t\t</div>
 \t\t\t</div>
 \t\t\t";
-            // line 143
-            // line 144
+            // line 157
+            // line 158
             echo "\t\t</li>
 \t\t";
-            // line 145
+            // line 159
             if ((isset($context["S_DISPLAY_PM"]) ? $context["S_DISPLAY_PM"] : null)) {
-                // line 146
+                // line 160
                 echo "\t\t\t<li class=\"rightside\" data-skip-responsive=\"true\">
 \t\t\t\t<a href=\"";
-                // line 147
+                // line 161
                 echo (isset($context["U_PRIVATEMSGS"]) ? $context["U_PRIVATEMSGS"] : null);
                 echo "\" role=\"menuitem\">
 \t\t\t\t\t<i class=\"icon fa-inbox fa-fw\" aria-hidden=\"true\"></i><span>";
-                // line 148
+                // line 162
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("PRIVATE_MESSAGES");
                 echo " </span><strong class=\"badge";
                 if ( !(isset($context["PRIVATE_MESSAGE_COUNT"]) ? $context["PRIVATE_MESSAGE_COUNT"] : null)) {
@@ -378,19 +392,19 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
 \t\t\t</li>
 \t\t";
             }
-            // line 152
+            // line 166
             echo "\t\t";
             if ((isset($context["S_NOTIFICATIONS_DISPLAY"]) ? $context["S_NOTIFICATIONS_DISPLAY"] : null)) {
-                // line 153
+                // line 167
                 echo "\t\t\t<li class=\"dropdown-container dropdown-";
                 echo (isset($context["S_CONTENT_FLOW_END"]) ? $context["S_CONTENT_FLOW_END"] : null);
                 echo " rightside\" data-skip-responsive=\"true\">
 \t\t\t\t<a href=\"";
-                // line 154
+                // line 168
                 echo (isset($context["U_VIEW_ALL_NOTIFICATIONS"]) ? $context["U_VIEW_ALL_NOTIFICATIONS"] : null);
                 echo "\" id=\"notification_list_button\" class=\"dropdown-trigger\">
 \t\t\t\t\t<i class=\"icon fa-bell fa-fw\" aria-hidden=\"true\"></i><span>";
-                // line 155
+                // line 169
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("NOTIFICATIONS");
                 echo " </span><strong class=\"badge";
                 if ( !(isset($context["NOTIFICATIONS_COUNT"]) ? $context["NOTIFICATIONS_COUNT"] : null)) {
@@ -401,7 +415,7 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
                 echo "</strong>
 \t\t\t\t</a>
 \t\t\t\t";
-                // line 157
+                // line 171
                 $location = "notification_dropdown.html";
                 $namespace = false;
                 if (strpos($location, '@') === 0) {
@@ -409,71 +423,81 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
                     $previous_look_up_order = $this->env->getNamespaceLookUpOrder();
                     $this->env->setNamespaceLookUpOrder(array($namespace, '__main__'));
                 }
-                $this->loadTemplate("notification_dropdown.html", "navbar_header.html", 157)->display($context);
+                $this->loadTemplate("notification_dropdown.html", "navbar_header.html", 171)->display($context);
                 if ($namespace) {
                     $this->env->setNamespaceLookUpOrder($previous_look_up_order);
                 }
-                // line 158
+                // line 172
                 echo "\t\t\t</li>
-\t\t";
-            }
-            // line 160
-            echo "\t\t";
-            // line 161
-            echo "\t";
-        } else {
-            // line 162
-            echo "\t\t<li class=\"rightside\"  data-skip-responsive=\"true\">
-\t\t\t<a href=\"";
-            // line 163
-            echo (isset($context["U_LOGIN_LOGOUT"]) ? $context["U_LOGIN_LOGOUT"] : null);
-            echo "\" title=\"";
-            echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
-            echo "\" accesskey=\"x\" role=\"menuitem\">
-\t\t\t\t<i class=\"icon fa-power-off fa-fw\" aria-hidden=\"true\"></i><span>";
-            // line 164
-            echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
-            echo "</span>
-\t\t\t</a>
-\t\t</li>
-\t\t";
-            // line 167
-            if (((isset($context["S_REGISTER_ENABLED"]) ? $context["S_REGISTER_ENABLED"] : null) &&  !((isset($context["S_SHOW_COPPA"]) ? $context["S_SHOW_COPPA"] : null) || (isset($context["S_REGISTRATION"]) ? $context["S_REGISTRATION"] : null)))) {
-                // line 168
-                echo "\t\t\t<li class=\"rightside\" data-skip-responsive=\"true\">
-\t\t\t\t<a href=\"";
-                // line 169
-                echo (isset($context["U_REGISTER"]) ? $context["U_REGISTER"] : null);
-                echo "\" role=\"menuitem\">
-\t\t\t\t\t<i class=\"icon fa-pencil-square-o  fa-fw\" aria-hidden=\"true\"></i><span>";
-                // line 170
-                echo $this->env->getExtension('phpbb\template\twig\extension')->lang("REGISTER");
-                echo "</span>
-\t\t\t\t</a>
-\t\t\t</li>
 \t\t";
             }
             // line 174
             echo "\t\t";
             // line 175
             echo "\t";
+        } else {
+            // line 176
+            echo "\t\t<li class=\"rightside\"  data-skip-responsive=\"true\">
+\t\t\t<a href=\"";
+            // line 177
+            echo (isset($context["U_LOGIN_LOGOUT"]) ? $context["U_LOGIN_LOGOUT"] : null);
+            echo "\" title=\"";
+            echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
+            echo "\" accesskey=\"x\" role=\"menuitem\">
+\t\t\t\t<i class=\"icon fa-power-off fa-fw\" aria-hidden=\"true\"></i><span>";
+            // line 178
+            echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LOGIN_LOGOUT");
+            echo "</span>
+\t\t\t</a>
+\t\t</li>
+\t\t";
+            // line 181
+            if (((isset($context["S_REGISTER_ENABLED"]) ? $context["S_REGISTER_ENABLED"] : null) &&  !((isset($context["S_SHOW_COPPA"]) ? $context["S_SHOW_COPPA"] : null) || (isset($context["S_REGISTRATION"]) ? $context["S_REGISTRATION"] : null)))) {
+                // line 182
+                echo "\t\t\t<li class=\"rightside\" data-skip-responsive=\"true\">
+\t\t\t\t<a href=\"";
+                // line 183
+                echo (isset($context["U_REGISTER"]) ? $context["U_REGISTER"] : null);
+                echo "\" role=\"menuitem\">
+\t\t\t\t\t<i class=\"icon fa-pencil-square-o  fa-fw\" aria-hidden=\"true\"></i><span>";
+                // line 184
+                echo $this->env->getExtension('phpbb\template\twig\extension')->lang("REGISTER");
+                echo "</span>
+\t\t\t\t</a>
+\t\t\t</li>
+\t\t";
+            }
+            // line 188
+            echo "\t\t";
+            // line 189
+            echo "\t";
         }
-        // line 176
-        echo "\t</ul>
+        // line 190
+        echo "    
+        <!--CosmoCoffee-->
+        <li data-last-responsive=\"true\" style=\"text-align: center; margin-right: 15%;\" class=\"rightside\">
+            <form method=\"get\" action=\"/arxivjump.pl\" TARGET=\"_top\">
+                <span>Arxiv ref/author: </span>
+                <input type=\"text\" name=\"r\" size=\"12\" maxlength=\"40\" style=\"height: 18px;\" value=\"\"> 
+                <input type=\"submit\" value=\"Go\" class=\"button\">
+            </form>
+        </li>
+        <!--CosmoCoffee-->
+\t</ul>
 
 \t<ul id=\"nav-breadcrumbs\" class=\"nav-breadcrumbs linklist navlinks\" role=\"menubar\">
 \t\t";
-        // line 179
+        // line 203
         $value = " itemtype=\"http://data-vocabulary.org/Breadcrumb\" itemscope=\"\"";
         $context['definition']->set('MICRODATA', $value);
-        // line 180
+        // line 204
         echo "\t\t";
-        // line 181
+        // line 205
         echo "\t\t<li class=\"breadcrumbs\">
 \t\t\t";
-        // line 182
+        // line 206
         if ((isset($context["U_SITE_HOME"]) ? $context["U_SITE_HOME"] : null)) {
-            // line 183
+            // line 207
             echo "\t\t\t\t<span class=\"crumb\" ";
             echo $this->getAttribute((isset($context["definition"]) ? $context["definition"] : null), "MICRODATA", array());
             echo "><a href=\"";
@@ -483,9 +507,9 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
             echo "</span></a></span>
 \t\t\t";
         }
-        // line 185
+        // line 209
         echo "\t\t\t";
-        // line 186
+        // line 210
         echo "\t\t\t\t<span class=\"crumb\" ";
         echo $this->getAttribute((isset($context["definition"]) ? $context["definition"] : null), "MICRODATA", array());
         echo "><a href=\"";
@@ -499,13 +523,13 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
         echo "</span></a></span>
 
 \t\t\t";
-        // line 188
+        // line 212
         $context['_parent'] = $context;
         $context['_seq'] = twig_ensure_traversable($this->getAttribute((isset($context["loops"]) ? $context["loops"] : null), "navlinks", array()));
         foreach ($context['_seq'] as $context["_key"] => $context["navlinks"]) {
-            // line 189
+            // line 213
             echo "\t\t\t\t";
-            // line 190
+            // line 214
             echo "\t\t\t\t<span class=\"crumb\" ";
             echo $this->getAttribute((isset($context["definition"]) ? $context["definition"] : null), "MICRODATA", array());
             if ($this->getAttribute($context["navlinks"], "MICRODATA", array())) {
@@ -518,41 +542,41 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
             echo $this->getAttribute($context["navlinks"], "FORUM_NAME", array());
             echo "</span></a></span>
 \t\t\t\t";
-            // line 191
-            // line 192
+            // line 215
+            // line 216
             echo "\t\t\t";
         }
         $_parent = $context['_parent'];
         unset($context['_seq'], $context['_iterated'], $context['_key'], $context['navlinks'], $context['_parent'], $context['loop']);
         $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 193
+        // line 217
         echo "\t\t\t";
-        // line 194
+        // line 218
         echo "\t\t</li>
 \t\t";
-        // line 195
-        // line 196
+        // line 219
+        // line 220
         echo "
 \t\t";
-        // line 197
+        // line 221
         if (((isset($context["S_DISPLAY_SEARCH"]) ? $context["S_DISPLAY_SEARCH"] : null) &&  !(isset($context["S_IN_SEARCH"]) ? $context["S_IN_SEARCH"] : null))) {
-            // line 198
+            // line 222
             echo "\t\t\t<li class=\"rightside responsive-search\">
 \t\t\t\t<a href=\"";
-            // line 199
+            // line 223
             echo (isset($context["U_SEARCH"]) ? $context["U_SEARCH"] : null);
             echo "\" title=\"";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SEARCH_ADV_EXPLAIN");
             echo "\" role=\"menuitem\">
 \t\t\t\t\t<i class=\"icon fa-search fa-fw\" aria-hidden=\"true\"></i><span class=\"sr-only\">";
-            // line 200
+            // line 224
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SEARCH");
             echo "</span>
 \t\t\t\t</a>
 \t\t\t</li>
 \t\t";
         }
-        // line 204
+        // line 228
         echo "\t</ul>
 
 \t</div>
@@ -572,7 +596,7 @@ class __TwigTemplate_1b61ca283b649ffa9ccdf1ee315c44193cf2625613dfec505d739c35894
 
     public function getDebugInfo()
     {
-        return array (  556 => 204,  549 => 200,  543 => 199,  540 => 198,  538 => 197,  535 => 196,  534 => 195,  531 => 194,  529 => 193,  523 => 192,  522 => 191,  509 => 190,  507 => 189,  503 => 188,  489 => 186,  487 => 185,  477 => 183,  475 => 182,  472 => 181,  470 => 180,  467 => 179,  462 => 176,  459 => 175,  457 => 174,  450 => 170,  446 => 169,  443 => 168,  441 => 167,  435 => 164,  429 => 163,  426 => 162,  423 => 161,  421 => 160,  417 => 158,  405 => 157,  394 => 155,  390 => 154,  385 => 153,  382 => 152,  369 => 148,  365 => 147,  362 => 146,  360 => 145,  357 => 144,  356 => 143,  347 => 137,  341 => 136,  336 => 133,  335 => 132,  328 => 128,  322 => 127,  315 => 123,  309 => 122,  305 => 120,  304 => 119,  301 => 118,  294 => 114,  290 => 113,  287 => 112,  285 => 111,  271 => 107,  268 => 106,  267 => 105,  260 => 104,  258 => 103,  256 => 102,  253 => 101,  246 => 97,  240 => 96,  237 => 95,  234 => 94,  227 => 90,  221 => 89,  218 => 88,  215 => 87,  214 => 86,  208 => 83,  202 => 82,  193 => 81,  192 => 80,  186 => 76,  185 => 75,  181 => 73,  178 => 72,  171 => 68,  167 => 67,  164 => 66,  161 => 65,  154 => 61,  150 => 60,  147 => 59,  145 => 58,  142 => 57,  140 => 56,  137 => 55,  130 => 51,  126 => 50,  118 => 45,  114 => 44,  107 => 40,  103 => 39,  100 => 38,  93 => 34,  89 => 33,  86 => 32,  83 => 31,  76 => 27,  72 => 26,  69 => 25,  66 => 24,  59 => 20,  55 => 19,  52 => 18,  50 => 17,  47 => 16,  45 => 15,  42 => 14,  41 => 13,  33 => 8,  26 => 6,  19 => 1,);
+        return array (  580 => 228,  573 => 224,  567 => 223,  564 => 222,  562 => 221,  559 => 220,  558 => 219,  555 => 218,  553 => 217,  547 => 216,  546 => 215,  533 => 214,  531 => 213,  527 => 212,  513 => 210,  511 => 209,  501 => 207,  499 => 206,  496 => 205,  494 => 204,  491 => 203,  476 => 190,  473 => 189,  471 => 188,  464 => 184,  460 => 183,  457 => 182,  455 => 181,  449 => 178,  443 => 177,  440 => 176,  437 => 175,  435 => 174,  431 => 172,  419 => 171,  408 => 169,  404 => 168,  399 => 167,  396 => 166,  383 => 162,  379 => 161,  376 => 160,  374 => 159,  371 => 158,  370 => 157,  361 => 151,  355 => 150,  350 => 147,  349 => 146,  342 => 142,  336 => 141,  329 => 137,  323 => 136,  319 => 134,  318 => 133,  315 => 132,  308 => 128,  304 => 127,  301 => 126,  299 => 125,  285 => 121,  282 => 120,  281 => 119,  274 => 118,  272 => 117,  270 => 116,  253 => 101,  246 => 97,  240 => 96,  237 => 95,  234 => 94,  227 => 90,  221 => 89,  218 => 88,  215 => 87,  214 => 86,  208 => 83,  202 => 82,  193 => 81,  192 => 80,  186 => 76,  185 => 75,  181 => 73,  178 => 72,  171 => 68,  167 => 67,  164 => 66,  161 => 65,  154 => 61,  150 => 60,  147 => 59,  145 => 58,  142 => 57,  140 => 56,  137 => 55,  130 => 51,  126 => 50,  118 => 45,  114 => 44,  107 => 40,  103 => 39,  100 => 38,  93 => 34,  89 => 33,  86 => 32,  83 => 31,  76 => 27,  72 => 26,  69 => 25,  66 => 24,  59 => 20,  55 => 19,  52 => 18,  50 => 17,  47 => 16,  45 => 15,  42 => 14,  41 => 13,  33 => 8,  26 => 6,  19 => 1,);
     }
 
     /** @deprecated since 1.27 (to be removed in 2.0). Use getSourceContext() instead */

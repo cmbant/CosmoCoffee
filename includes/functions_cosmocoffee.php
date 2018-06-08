@@ -250,3 +250,23 @@ function get_url($url) {
 function clean_sql($str) {
     return addslashes(trim($str));
 }
+
+function coffee_validate_email($email) {
+    global $db;
+
+    $sql = "SELECT valid_domain FROM VALID_DOMAINS";
+    if ($result = $db->sql_query($sql)) {
+        if ($row = $db->sql_fetchrow($result)) {
+            do {
+                $match_email = str_replace('*', '.*?', $row['valid_domain']);
+                if (preg_match('/^' . $match_email . '$/is', $email)) {
+                    $db->sql_freeresult($result);
+                    return false;
+                }
+            } while ($row = $db->sql_fetchrow($result));
+        }
+    }
+    $db->sql_freeresult($result);
+
+    return 'EMAIL_INVALID';
+}

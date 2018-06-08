@@ -84,15 +84,22 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
         }
         // line 21
         echo "
-                <dl class=\"left-box details profile-details\">
-                    <dt>";
+            ";
+        // line 22
+        $context["S_ZEBRA"] = 0;
         // line 23
+        echo "            ";
+        $context["S_GROUP_OPTIONS"] = false;
+        // line 24
+        echo "                <dl class=\"left-box details profile-details\">
+                    <dt>";
+        // line 25
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("USERNAME");
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
         echo "</dt>
                     <dd>
                         ";
-        // line 25
+        // line 27
         if ((isset($context["USER_COLOR"]) ? $context["USER_COLOR"] : null)) {
             echo "<span style=\"color: ";
             echo (isset($context["USER_COLOR"]) ? $context["USER_COLOR"] : null);
@@ -103,7 +110,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
         echo (isset($context["USERNAME"]) ? $context["USERNAME"] : null);
         echo "</span>
                         ";
-        // line 26
+        // line 28
         if ((isset($context["U_EDIT_SELF"]) ? $context["U_EDIT_SELF"] : null)) {
             echo " [ <a href=\"";
             echo (isset($context["U_EDIT_SELF"]) ? $context["U_EDIT_SELF"] : null);
@@ -111,7 +118,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("EDIT_PROFILE");
             echo "</a> ]";
         }
-        // line 27
+        // line 29
         echo "                        ";
         if ((isset($context["U_USER_ADMIN"]) ? $context["U_USER_ADMIN"] : null)) {
             echo " [ <a href=\"";
@@ -120,7 +127,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("USER_ADMIN");
             echo "</a> ]";
         }
-        // line 28
+        // line 30
         echo "                        ";
         if ((isset($context["U_USER_BAN"]) ? $context["U_USER_BAN"] : null)) {
             echo " [ <a href=\"";
@@ -129,7 +136,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("USER_BAN");
             echo "</a> ]";
         }
-        // line 29
+        // line 31
         echo "                        ";
         if ((isset($context["U_SWITCH_PERMISSIONS"]) ? $context["U_SWITCH_PERMISSIONS"] : null)) {
             echo " [ <a href=\"";
@@ -138,14 +145,14 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("USE_PERMISSIONS");
             echo "</a> ]";
         }
-        // line 30
+        // line 32
         echo "                    </dd>
                     ";
-        // line 31
+        // line 33
         if ( !(isset($context["AVATAR_IMG"]) ? $context["AVATAR_IMG"] : null)) {
-            // line 32
+            // line 34
             echo "                        ";
-            // line 33
+            // line 35
             echo "                        ";
             if ((isset($context["RANK_TITLE"]) ? $context["RANK_TITLE"] : null)) {
                 echo "<dt>";
@@ -155,7 +162,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                 echo (isset($context["RANK_TITLE"]) ? $context["RANK_TITLE"] : null);
                 echo "</dd>";
             }
-            // line 34
+            // line 36
             echo "                        ";
             if ((isset($context["RANK_IMG"]) ? $context["RANK_IMG"] : null)) {
                 echo "<dt>";
@@ -169,12 +176,12 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                 echo (isset($context["RANK_IMG"]) ? $context["RANK_IMG"] : null);
                 echo "</dd>";
             }
-            // line 35
+            // line 37
             echo "                        ";
-            // line 36
+            // line 38
             echo "                    ";
         }
-        // line 37
+        // line 39
         echo "                    ";
         if ((isset($context["S_USER_INACTIVE"]) ? $context["S_USER_INACTIVE"] : null)) {
             echo "<dt>";
@@ -184,7 +191,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo (isset($context["USER_INACTIVE_REASON"]) ? $context["USER_INACTIVE_REASON"] : null);
             echo "</dd>";
         }
-        // line 38
+        // line 40
         echo "                    ";
         if (((isset($context["AGE"]) ? $context["AGE"] : null) !== "")) {
             echo "<dt>";
@@ -194,7 +201,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo (isset($context["AGE"]) ? $context["AGE"] : null);
             echo "</dd>";
         }
-        // line 39
+        // line 41
         echo "                    ";
         if ((isset($context["S_GROUP_OPTIONS"]) ? $context["S_GROUP_OPTIONS"] : null)) {
             echo "<dt>";
@@ -206,17 +213,17 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("GO");
             echo "\" class=\"button2\" /></dd>";
         }
-        // line 40
+        // line 42
         echo "                    ";
-        // line 41
+        // line 43
         echo "                    ";
         $context['_parent'] = $context;
         $context['_seq'] = twig_ensure_traversable($this->getAttribute((isset($context["loops"]) ? $context["loops"] : null), "custom_fields", array()));
         foreach ($context['_seq'] as $context["_key"] => $context["custom_fields"]) {
-            // line 42
+            // line 44
             echo "                        ";
             if ( !$this->getAttribute($context["custom_fields"], "S_PROFILE_CONTACT", array())) {
-                // line 43
+                // line 45
                 echo "                            <dt>";
                 echo $this->getAttribute($context["custom_fields"], "PROFILE_FIELD_NAME", array());
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
@@ -225,32 +232,32 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                 echo "</dd>
                         ";
             }
-            // line 45
+            // line 47
             echo "                    ";
         }
         $_parent = $context['_parent'];
         unset($context['_seq'], $context['_iterated'], $context['_key'], $context['custom_fields'], $context['_parent'], $context['loop']);
         $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 46
-        echo "                    ";
-        // line 47
-        echo "                    ";
         // line 48
         echo "                    ";
+        // line 49
+        echo "                    ";
+        // line 50
+        echo "                    ";
         if (((isset($context["S_USER_LOGGED_IN"]) ? $context["S_USER_LOGGED_IN"] : null) && (isset($context["S_ZEBRA"]) ? $context["S_ZEBRA"] : null))) {
-            // line 49
+            // line 51
             echo "                        ";
             if ((isset($context["U_REMOVE_FRIEND"]) ? $context["U_REMOVE_FRIEND"] : null)) {
-                // line 50
+                // line 52
                 echo "                            <dt>&nbsp;</dt> <dd class=\"zebra\"><a href=\"";
                 echo (isset($context["U_REMOVE_FRIEND"]) ? $context["U_REMOVE_FRIEND"] : null);
                 echo "\" data-ajax=\"zebra\"><strong>";
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("REMOVE_FRIEND");
                 echo "</strong></a></dd>
                         ";
-            } elseif (            // line 51
+            } elseif (            // line 53
 (isset($context["U_REMOVE_FOE"]) ? $context["U_REMOVE_FOE"] : null)) {
-                // line 52
+                // line 54
                 echo "                            <dt>&nbsp;</dt> <dd class=\"zebra\"><a href=\"";
                 echo (isset($context["U_REMOVE_FOE"]) ? $context["U_REMOVE_FOE"] : null);
                 echo "\" data-ajax=\"zebra\"><strong>";
@@ -258,10 +265,10 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                 echo "</strong></a></dd>
                         ";
             } else {
-                // line 54
+                // line 56
                 echo "                            ";
                 if ((isset($context["U_ADD_FRIEND"]) ? $context["U_ADD_FRIEND"] : null)) {
-                    // line 55
+                    // line 57
                     echo "                                <dt>&nbsp;</dt> <dd class=\"zebra\"><a href=\"";
                     echo (isset($context["U_ADD_FRIEND"]) ? $context["U_ADD_FRIEND"] : null);
                     echo "\" data-ajax=\"zebra\"><strong>";
@@ -269,10 +276,10 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                     echo "</strong></a></dd>
                             ";
                 }
-                // line 57
+                // line 59
                 echo "                            ";
                 if ((isset($context["U_ADD_FOE"]) ? $context["U_ADD_FOE"] : null)) {
-                    // line 58
+                    // line 60
                     echo "                                <dt>&nbsp;</dt> <dd class=\"zebra\"><a href=\"";
                     echo (isset($context["U_ADD_FOE"]) ? $context["U_ADD_FOE"] : null);
                     echo "\" data-ajax=\"zebra\"><strong>";
@@ -280,15 +287,15 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                     echo "</strong></a></dd>
                             ";
                 }
-                // line 60
+                // line 62
                 echo "                        ";
             }
-            // line 61
+            // line 63
             echo "                    ";
         }
-        // line 62
+        // line 64
         echo "                    ";
-        // line 63
+        // line 65
         echo "                </dl>
             </form>
         </div>
@@ -302,7 +309,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                     <input type=\"hidden\" name=\"archive\" value=\"astro-ph\">
                     <input type=\"hidden\" name=\"field_1\" value='au'>
                     <input type=\"hidden\" name=\"query_1\" value=\"";
-        // line 75
+        // line 77
         echo (isset($context["SEARCHNAME"]) ? $context["SEARCHNAME"] : null);
         echo "\">
                     <input type=\"hidden\" name=\"per_page\" value=100>
@@ -315,7 +322,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                     <input type=\"hidden\" name=\"archive\" value=\"grp_physics\">
                     <input type=\"hidden\" name=\"field_1\" value='au'>
                     <input type=\"hidden\" name=\"query_1\" value=\"";
-        // line 85
+        // line 87
         echo (isset($context["SEARCHNAME"]) ? $context["SEARCHNAME"] : null);
         echo "\">
                     <input type=\"hidden\" name=\"per_page\" value=100>
@@ -325,7 +332,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
 
                 <span class=\"gen\">
                     <a href=\"http://www.slac.stanford.edu/spires/find/wwwhepau/wwwscan?rawcmd=fin+";
-        // line 92
+        // line 94
         echo (isset($context["LAST"]) ? $context["LAST"] : null);
         echo ",+";
         echo (isset($context["FIRST"]) ? $context["FIRST"] : null);
@@ -338,20 +345,20 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
 </div>
 
 ";
-        // line 100
-        // line 101
+        // line 102
+        // line 103
         echo "<div class=\"panel bg2\">
 \t<div class=\"inner\">
 
 \t<div class=\"column1\">
 \t\t<h3>";
-        // line 105
+        // line 107
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("CONTACT_USER");
         echo "</h3>
 
 \t\t<dl class=\"details\">
 \t\t";
-        // line 108
+        // line 110
         if ((isset($context["U_EMAIL"]) ? $context["U_EMAIL"] : null)) {
             echo "<dt>";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("EMAIL_ADDRESS");
@@ -362,7 +369,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SEND_EMAIL_USER");
             echo "</a></dd>";
         }
-        // line 109
+        // line 111
         echo "\t\t";
         if ((isset($context["U_PM"]) ? $context["U_PM"] : null)) {
             echo "<dt>";
@@ -374,7 +381,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SEND_PRIVATE_MESSAGE");
             echo "</a></dd>";
         }
-        // line 110
+        // line 112
         echo "\t\t";
         if (((isset($context["U_JABBER"]) ? $context["U_JABBER"] : null) && (isset($context["S_JABBER_ENABLED"]) ? $context["S_JABBER_ENABLED"] : null))) {
             echo "<dt>";
@@ -393,25 +400,25 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo (isset($context["USER_JABBER"]) ? $context["USER_JABBER"] : null);
             echo "</dd>";
         }
-        // line 111
+        // line 113
         echo "\t\t";
-        // line 112
+        // line 114
         echo "\t\t";
         $context['_parent'] = $context;
         $context['_seq'] = twig_ensure_traversable($this->getAttribute((isset($context["loops"]) ? $context["loops"] : null), "custom_fields", array()));
         foreach ($context['_seq'] as $context["_key"] => $context["custom_fields"]) {
-            // line 113
+            // line 115
             echo "\t\t\t";
             if ($this->getAttribute($context["custom_fields"], "S_PROFILE_CONTACT", array())) {
-                // line 114
+                // line 116
                 echo "\t\t\t\t<dt>";
                 echo $this->getAttribute($context["custom_fields"], "PROFILE_FIELD_NAME", array());
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
                 echo "</dt>
 \t\t\t\t";
-                // line 115
+                // line 117
                 if ($this->getAttribute($context["custom_fields"], "PROFILE_FIELD_CONTACT", array())) {
-                    // line 116
+                    // line 118
                     echo "\t\t\t\t\t<dd><a href=\"";
                     echo $this->getAttribute($context["custom_fields"], "PROFILE_FIELD_CONTACT", array());
                     echo "\">";
@@ -419,30 +426,30 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
                     echo "</a></dd>
 \t\t\t\t";
                 } else {
-                    // line 118
+                    // line 120
                     echo "\t\t\t\t\t<dd>";
                     echo $this->getAttribute($context["custom_fields"], "PROFILE_FIELD_VALUE", array());
                     echo "</dd>
 \t\t\t\t";
                 }
-                // line 120
+                // line 122
                 echo "\t\t\t";
             }
-            // line 121
+            // line 123
             echo "\t\t";
         }
         $_parent = $context['_parent'];
         unset($context['_seq'], $context['_iterated'], $context['_key'], $context['custom_fields'], $context['_parent'], $context['loop']);
         $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 122
+        // line 124
         echo "\t\t";
-        // line 123
+        // line 125
         echo "\t\t";
         if ((isset($context["S_PROFILE_FIELD1"]) ? $context["S_PROFILE_FIELD1"] : null)) {
-            // line 124
+            // line 126
             echo "\t\t\t<!-- NOTE: Use a construct like this to include admin defined profile fields. Replace FIELD1 with the name of your field. -->
 \t\t\t<dt>";
-            // line 125
+            // line 127
             echo (isset($context["PROFILE_FIELD1_NAME"]) ? $context["PROFILE_FIELD1_NAME"] : null);
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
             echo "</dt> <dd>";
@@ -450,19 +457,19 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo "</dd>
 \t\t";
         }
-        // line 127
+        // line 129
         echo "\t\t</dl>
 \t</div>
 
 \t<div class=\"column2\">
 \t\t<h3>";
-        // line 131
+        // line 133
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("USER_FORUM");
         echo "</h3>
 \t\t<dl class=\"details\">
 \t\t\t";
-        // line 133
-        // line 134
+        // line 135
+        // line 136
         echo "\t\t\t<dt>";
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("JOINED");
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
@@ -470,22 +477,22 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
         echo (isset($context["JOINED"]) ? $context["JOINED"] : null);
         echo "</dd>
 \t\t\t<dt>";
-        // line 135
+        // line 137
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("LAST_ACTIVE");
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
         echo "</dt> <dd>";
         echo (isset($context["LAST_ACTIVE"]) ? $context["LAST_ACTIVE"] : null);
         echo "</dd>
 \t\t\t";
-        // line 136
+        // line 138
         if ((isset($context["S_WARNINGS"]) ? $context["S_WARNINGS"] : null)) {
-            // line 137
+            // line 139
             echo "\t\t\t<dt>";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("WARNINGS");
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
             echo " </dt>
 \t\t\t<dd><strong>";
-            // line 138
+            // line 140
             echo (isset($context["WARNINGS"]) ? $context["WARNINGS"] : null);
             echo "</strong>";
             if (((isset($context["U_NOTES"]) ? $context["U_NOTES"] : null) || (isset($context["U_WARN"]) ? $context["U_WARN"] : null))) {
@@ -513,13 +520,13 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo "</dd>
 \t\t\t";
         }
-        // line 140
+        // line 142
         echo "\t\t\t<dt>";
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("TOTAL_POSTS");
         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
         echo "</dt>
 \t\t\t\t<dd>";
-        // line 141
+        // line 143
         echo (isset($context["POSTS"]) ? $context["POSTS"] : null);
         echo " ";
         if ((isset($context["S_DISPLAY_SEARCH"]) ? $context["S_DISPLAY_SEARCH"] : null)) {
@@ -529,7 +536,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SEARCH_USER_POSTS");
             echo "</a></strong>";
         }
-        // line 142
+        // line 144
         echo "\t\t\t\t\t";
         if ((isset($context["POSTS_PCT"]) ? $context["POSTS_PCT"] : null)) {
             echo "<br />(";
@@ -538,7 +545,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo (isset($context["POSTS_DAY"]) ? $context["POSTS_DAY"] : null);
             echo ")";
         }
-        // line 143
+        // line 145
         echo "\t\t\t\t\t";
         if (((isset($context["POSTS_IN_QUEUE"]) ? $context["POSTS_IN_QUEUE"] : null) && (isset($context["U_MCP_QUEUE"]) ? $context["U_MCP_QUEUE"] : null))) {
             echo "<br />(<a href=\"";
@@ -551,12 +558,12 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("POSTS_IN_QUEUE");
             echo ")";
         }
-        // line 144
+        // line 146
         echo "\t\t\t\t</dd>
 \t\t\t";
-        // line 145
+        // line 147
         if (((isset($context["S_SHOW_ACTIVITY"]) ? $context["S_SHOW_ACTIVITY"] : null) && (isset($context["POSTS"]) ? $context["POSTS"] : null))) {
-            // line 146
+            // line 148
             echo "\t\t\t\t<dt>";
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("ACTIVE_IN_FORUM");
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
@@ -576,7 +583,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             }
             echo "</dd>
 \t\t\t\t<dt>";
-            // line 147
+            // line 149
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("ACTIVE_IN_TOPIC");
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
             echo "</dt> <dd>";
@@ -596,32 +603,32 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             echo "</dd>
 \t\t\t";
         }
-        // line 149
+        // line 151
         echo "\t\t\t";
-        // line 150
+        // line 152
         echo "\t\t</dl>
 \t</div>
 
 \t</div>
 </div>
 ";
-        // line 155
-        // line 156
+        // line 157
+        // line 158
         echo "
 ";
-        // line 157
+        // line 159
         if ((isset($context["SIGNATURE"]) ? $context["SIGNATURE"] : null)) {
-            // line 158
+            // line 160
             echo "<div class=\"panel bg1\">
 \t<div class=\"inner\">
 
 \t\t<h3>";
-            // line 161
+            // line 163
             echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SIGNATURE");
             echo "</h3>
 
 \t\t<div class=\"postbody\"><div class=\"signature standalone\">";
-            // line 163
+            // line 165
             echo (isset($context["SIGNATURE"]) ? $context["SIGNATURE"] : null);
             echo "</div></div>
 
@@ -629,16 +636,16 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
 </div>
 ";
         }
-        // line 168
+        // line 170
         echo "
 
 
-";
-        // line 171
-        // line 172
-        echo "
 ";
         // line 173
+        // line 174
+        echo "
+";
+        // line 175
         $location = "jumpbox.html";
         $namespace = false;
         if (strpos($location, '@') === 0) {
@@ -646,14 +653,14 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             $previous_look_up_order = $this->env->getNamespaceLookUpOrder();
             $this->env->setNamespaceLookUpOrder(array($namespace, '__main__'));
         }
-        $this->loadTemplate("jumpbox.html", "memberlist_view.html", 173)->display($context);
+        $this->loadTemplate("jumpbox.html", "memberlist_view.html", 175)->display($context);
         if ($namespace) {
             $this->env->setNamespaceLookUpOrder($previous_look_up_order);
         }
-        // line 174
+        // line 176
         echo "
 ";
-        // line 175
+        // line 177
         $location = "overall_footer.html";
         $namespace = false;
         if (strpos($location, '@') === 0) {
@@ -661,7 +668,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
             $previous_look_up_order = $this->env->getNamespaceLookUpOrder();
             $this->env->setNamespaceLookUpOrder(array($namespace, '__main__'));
         }
-        $this->loadTemplate("overall_footer.html", "memberlist_view.html", 175)->display($context);
+        $this->loadTemplate("overall_footer.html", "memberlist_view.html", 177)->display($context);
         if ($namespace) {
             $this->env->setNamespaceLookUpOrder($previous_look_up_order);
         }
@@ -679,7 +686,7 @@ class __TwigTemplate_2e7b5071479b77454f22e9cd1a746ae6d398d3818aa2d887e34463b4e65
 
     public function getDebugInfo()
     {
-        return array (  657 => 175,  654 => 174,  642 => 173,  639 => 172,  638 => 171,  633 => 168,  625 => 163,  620 => 161,  615 => 158,  613 => 157,  610 => 156,  609 => 155,  602 => 150,  600 => 149,  580 => 147,  560 => 146,  558 => 145,  555 => 144,  542 => 143,  533 => 142,  523 => 141,  517 => 140,  489 => 138,  483 => 137,  481 => 136,  474 => 135,  466 => 134,  465 => 133,  460 => 131,  454 => 127,  446 => 125,  443 => 124,  440 => 123,  438 => 122,  432 => 121,  429 => 120,  423 => 118,  415 => 116,  413 => 115,  407 => 114,  404 => 113,  399 => 112,  397 => 111,  378 => 110,  366 => 109,  355 => 108,  349 => 105,  343 => 101,  342 => 100,  329 => 92,  319 => 85,  306 => 75,  292 => 63,  290 => 62,  287 => 61,  284 => 60,  276 => 58,  273 => 57,  265 => 55,  262 => 54,  254 => 52,  252 => 51,  245 => 50,  242 => 49,  239 => 48,  237 => 47,  235 => 46,  229 => 45,  220 => 43,  217 => 42,  212 => 41,  210 => 40,  198 => 39,  188 => 38,  178 => 37,  175 => 36,  173 => 35,  159 => 34,  149 => 33,  147 => 32,  145 => 31,  142 => 30,  133 => 29,  124 => 28,  115 => 27,  107 => 26,  96 => 25,  90 => 23,  86 => 21,  82 => 19,  80 => 18,  73 => 17,  66 => 16,  65 => 15,  61 => 14,  58 => 13,  56 => 12,  52 => 11,  44 => 8,  40 => 6,  39 => 5,  34 => 3,  31 => 2,  19 => 1,);
+        return array (  664 => 177,  661 => 176,  649 => 175,  646 => 174,  645 => 173,  640 => 170,  632 => 165,  627 => 163,  622 => 160,  620 => 159,  617 => 158,  616 => 157,  609 => 152,  607 => 151,  587 => 149,  567 => 148,  565 => 147,  562 => 146,  549 => 145,  540 => 144,  530 => 143,  524 => 142,  496 => 140,  490 => 139,  488 => 138,  481 => 137,  473 => 136,  472 => 135,  467 => 133,  461 => 129,  453 => 127,  450 => 126,  447 => 125,  445 => 124,  439 => 123,  436 => 122,  430 => 120,  422 => 118,  420 => 117,  414 => 116,  411 => 115,  406 => 114,  404 => 113,  385 => 112,  373 => 111,  362 => 110,  356 => 107,  350 => 103,  349 => 102,  336 => 94,  326 => 87,  313 => 77,  299 => 65,  297 => 64,  294 => 63,  291 => 62,  283 => 60,  280 => 59,  272 => 57,  269 => 56,  261 => 54,  259 => 53,  252 => 52,  249 => 51,  246 => 50,  244 => 49,  242 => 48,  236 => 47,  227 => 45,  224 => 44,  219 => 43,  217 => 42,  205 => 41,  195 => 40,  185 => 39,  182 => 38,  180 => 37,  166 => 36,  156 => 35,  154 => 34,  152 => 33,  149 => 32,  140 => 31,  131 => 30,  122 => 29,  114 => 28,  103 => 27,  97 => 25,  94 => 24,  91 => 23,  89 => 22,  86 => 21,  82 => 19,  80 => 18,  73 => 17,  66 => 16,  65 => 15,  61 => 14,  58 => 13,  56 => 12,  52 => 11,  44 => 8,  40 => 6,  39 => 5,  34 => 3,  31 => 2,  19 => 1,);
     }
 
     /** @deprecated since 1.27 (to be removed in 2.0). Use getSourceContext() instead */
