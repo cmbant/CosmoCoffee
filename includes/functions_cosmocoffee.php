@@ -55,7 +55,8 @@ function make_clickable_cosmocoffee($text) {
     // matches an email@domain type address at the start of a line, or after a space.
     // Note: Only the followed chars are valid; alphanums, "-", "_" and or ".".
     if ($user->data['user_id'] == ANONYMOUS) {
-        $ret = preg_replace("#(^|[\n ])([a-z0-9&\-_.]+?)@([\w\-]+\.([\w\-\.]+\.)*[\w]+)#i", "\\1[<FONT COLOR=\"FF0000\">Log in to view email</FONT>]", $ret);
+        $ret = preg_replace("~<a .*?href=[\'|\"]mailto:(.*?)[\'|\"].*?>.*?</a>~", "[<FONT COLOR=\"FF0000\">Log in to view email</FONT>]", $ret);
+//        $ret = preg_replace("#(^|[\n ])([a-z0-9&\-_.]+?)@([\w\-]+\.([\w\-\.]+\.)*[\w]+)#i", "\\1[<FONT COLOR=\"FF0000\">Log in to view email</FONT>]", $ret);
     } else {
         $ret = preg_replace("#(^|[\n ])([a-z0-9&\-_.]+?)@([\w\-]+\.([\w\-\.]+\.)*[\w]+)#i", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>", $ret);
     }
