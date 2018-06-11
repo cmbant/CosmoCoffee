@@ -70,7 +70,7 @@ function make_clickable_cosmocoffee($text) {
     // Remove our padding..
     $ret = substr($ret, 1);
 
-    return($ret);
+    return simpletex($ret);
 }
 
 function microtime_float() {
@@ -133,7 +133,6 @@ function arxiv_tex($text) {
     return $text;
 }
 
-// from /var/www/phpBB/test.cosmocoffee.loc/includes/Math.php
 function simpletex_noBB($text, $realtex = false) {
     //Replace A_a, \greek etc with html
     //Remove things that look like URLs, input_parameters, etc
@@ -212,6 +211,30 @@ function simpletex_noBB($text, $realtex = false) {
     return $text;
 }
 
+function simpletex($text) {
+
+//Coffee: first remove all [] tags..
+//       $match_count = preg_match_all("#(\[tex.*?\[/tex.*?\])#si", $text, $matches);
+    $match_count = preg_match_all("#\[(?!quote)([^\s]*?)(\=|\]).*?\[/\\1\]#s", $text, $matches);
+
+
+    for ($i2 = 0; $i2 < $match_count; $i2++) {
+        $str_to_match = $matches[0][$i2];
+        $text = str_replace($str_to_match, 'ZTTEX' . $i2 . 'TEX', $text);
+    }
+
+    $text = simpletex_noBB($text);
+
+//Put [tex] etc back
+
+    for ($i2 = 0; $i2 < $match_count; $i2++) {
+        $str_to_match = $matches[0][$i2];
+        $text = str_replace('ZTTEX' . $i2 . 'TEX', $str_to_match, $text);
+    }
+
+    return $text;
+}
+
 function tex_accents($text) {
     $texstrs = array('\"' => 'uml', '`' => 'grave', '\'' => 'acute', '^' => 'circ', '~' => 'tilde', '&quot;' => 'uml');
     $text = preg_replace('/\\\([\'\"\`\^\~]|&quot;)[\{]?([oeaUOAINEuni])[\}]?/e', "'&\\2'.\$texstrs['\\1'].';'", $text);
@@ -267,6 +290,6 @@ function coffee_validate_email($email) {
         }
     }
     $db->sql_freeresult($result);
-    
+
     return 'EMAIL_INVALID';
 }
