@@ -978,6 +978,8 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 			'',
 		);
 	}
+    
+    return $text;
 
 	foreach ($magic_url_match_args[$server_url] as $magic_args)
 	{
