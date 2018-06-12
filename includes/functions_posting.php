@@ -1857,6 +1857,10 @@ function submit_post($mode, $subject, $username, $topic_type, &$poll_ary, &$data
 	unset($poll);
 	unset($data);
 
+    // CosmoCoffee
+    $sql_data[TOPICS_TABLE]['sql']['paper_id'] = $data_ary['paper_id'];
+    // CosmoCoffee
+
 	// Submit new topic
 	if ($post_mode == 'post')
 	{

@@ -294,3 +294,132 @@ function coffee_validate_email($email) {
 
     return 'EMAIL_INVALID';
 }
+
+// 1403.3985
+function prepare_post_subject_cosmocoffee($subject, $save_to_db = false) {
+    $result = array(
+        'subject' => $subject,
+        'paper_id' => NULL
+    );
+
+    if (is_arxiv_tag($subject)) {
+        $arxiv_info = get_arxiv_paper_info($subject);
+        if ($arxiv_info) {
+            $result['subject'] = '[' . $arxiv_info['tag'] . '] ' . $arxiv_info['title'];
+            if ($save_to_db) {
+                $result['paper_id'] = add_arxiv_paper_to_db($arxiv_info);
+            }
+        }
+    }
+    return $result;
+}
+
+function is_arxiv_tag($str) {
+    if (preg_match('|^[a-z][a-zA-Z\.\-]{3,}/[0-9v]{6,}$|', $str) == 1 ||
+        preg_match('|^(arxiv:)?[0-9]{4,4}\.[0-9]{4,4}(v.)?$|i', $str))
+        return TRUE;
+    else
+        return FALSE;
+}
+
+function get_arxiv_paper_info($arxiv_in) {
+
+    $arxiv_tag = str_replace('arxiv:', '', $arxiv_in);
+    $arxiv_tag = preg_replace("'arxiv\:'si", "", $arxiv_tag);
+    $arxiv_tag = preg_replace("'v[1-9]'si", "", $arxiv_tag);
+
+    $url = 'http://arxiv.org/abs/' . $arxiv_tag;
+    $html = get_url($url);
+    $info = array('url' => $url, 'tag' => $arxiv_tag, 'html' => $html);
+
+    $found = preg_match('|Title:</span>(.*)<|sUi', $html, $matches);
+    if (!$found)
+        return FALSE;
+    $info['title'] = $matches[1];
+
+    $found = preg_match('|Authors:.*>(.*)<\/div>|isU', $html, $matches);
+    if (!$found) {
+#		$found = preg_match( '|Authors:(.*)<BLOCKQUOTE>|isU',
+#			$html, $matches );
+        if (!$found)
+            return FALSE;
+    }
+    $raw_authors = $matches[1];
+    // remove html tags
+    $authors = preg_replace("'<[\/\!]*?[^<>]*?>'si", "", $raw_authors);
+    $info['authors'] = $authors;
+
+    $found = preg_match('|Abstract:.*>(.*)<\/BLOCKQUOTE>|isU', $html, $matches);
+
+    if (!$found)
+        return FALSE;
+    $info['abstract'] = $matches[1];
+
+    $found = preg_match('|Comments:.*/div>.*<div.*>(.*)<\/div|isU', $html, $matches);
+    //if ( !$found ) return FALSE;
+    $info['comments'] = $matches[1];
+
+    return $info;
+}
+
+function add_arxiv_paper_to_db($arxiv_info) {
+    global $db;
+    $paper_id = false;
+
+    $arxiv_tag = clean_sql($arxiv_info['tag']);
+    $paper_authors = clean_sql(str_replace("\n", " ", $arxiv_info['authors']));
+    $paper_title = clean_sql($arxiv_info['title']);
+    $paper_url = clean_sql($arxiv_info['url']);
+    $paper_abstract = clean_sql($arxiv_info['abstract']);
+    $paper_comments = clean_sql($arxiv_info['comments']);
+
+    if ($result = $db->sql_query("SELECT paper_id FROM phpbb_papers where arxiv_tag='$arxiv_tag'")) {
+        if ($row = $db->sql_fetchrow($result)) {
+            $sql = "UPDATE
+                        phpbb_papers 
+                    SET  
+                        paper_authors = '$paper_authors', 
+                        paper_title = '$paper_title', 
+                        paper_url = '$paper_url', 
+                        paper_abstract = '$paper_abstract', 
+                        paper_comments = '$paper_comments'
+                    WHERE 
+                        paper_id = {$row['paper_id']}";
+        } else {
+            $sql = "INSERT INTO
+                        phpbb_papers (arxiv_tag, paper_authors, paper_title, paper_url, paper_abstract, paper_comments) 
+                    VALUES 
+                        ('$arxiv_tag', '$paper_authors', '$paper_title', '$paper_url', '$paper_abstract', '$paper_comments')";
+        }
+        $db->sql_freeresult($result);
+        if (!$result = $db->sql_query($sql)) {
+            trigger_error('Error in saving paper to db');
+        } else {
+            $paper_id = isset($row['paper_id']) ? $row['paper_id'] : $db->sql_nextid();
+        }
+    }
+    $db->sql_freeresult($result);
+
+////////////////////////////////////////
+//    arxiv_traceback($arxiv_tag);
+////////////////////////////////////////
+
+    return $paper_id;
+}
+
+function arxiv_traceback($arxiv) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'http://arxiv.org/trackback/' . $arxiv);
+//        $header[] = "Content-Type: application/x-www-form-urlencoded; charset=utf-8";
+    $urlstring = "title=Discussion&url=http://cosmocoffee.info/discuss/" . $arxiv . "&blog_name=CosmoCoffee";
+//        curl_setopt( $ch, CURLOPT_HEADER, $header );
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'CosmoCoffee');
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $urlstring);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    curl_setopt($ch, CURLOPT_REFERER, "http://CosmoCoffee.info");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+    $result = curl_exec($ch);
+    curl_close($ch);
+}
