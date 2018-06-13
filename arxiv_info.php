@@ -1,83 +1,67 @@
-<?php 
+<?php
 
-// standard hack prevent 
-define('IN_PHPBB', true); 
-$phpbb_root_path = './'; 
-include($phpbb_root_path . 'extension.inc'); 
-include($phpbb_root_path . 'common.'.$phpEx); 
-include($phpbb_root_path . 'includes/functions_arxiv.'.$phpEx);
-include($phpbb_root_path . 'includes/bbcode.'.$phpEx);
+define('IN_PHPBB', true);
 
-function microtime_float() 
-{ 
-   list($usec, $sec) = explode(" ", microtime()); 
-   return ((float)$usec + (float)$sec); 
-} 
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
+$phpEx = substr(strrchr(__FILE__, '.'), 1);
+include($phpbb_root_path . 'common.' . $phpEx);
 
-$date = '';
-$interval = 1;
-$starttime = microtime_float();
+anti_hack($phpEx);
 
-if ( isset($HTTP_GET_VARS['d']) || isset($HTTP_POST_VARS['d']) )
-{
-        $date  = ( isset($HTTP_GET_VARS['d']) ) ? $HTTP_GET_VARS['d'] : $HTTP_POST_VARS['d'];
-}
-
-if ( isset($HTTP_GET_VARS['i']) ) {$interval = $HTTP_GET_VARS['i']; }
- else if (isset($HTTP_POST_VARS['i']) ) {$interval = $HTTP_POST_VARS['i'];}
-
-$interval = min(30,$interval);
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup();
+$user->get_profile_fields($user->data['user_id']);
 
 
-// standard session management 
-$userdata = session_pagestart($user_ip, PAGE_TEMPLATE); 
-init_userprefs($userdata); 
+$sql = "SELECT
+            `user_id`, `pf_user_arxives`, `pf_user_keywords`
+        FROM 
+            phpbb_profile_fields_data
+        WHERE 
+            `pf_user_keywords` IS NOT NULL 
+        AND
+            `pf_user_keywords` != ''";
 
-// set page title 
-$page_title = 'Arxiv New Keywords'; 
-$text = '';
-
-// standard page header 
-include($phpbb_root_path . 'includes/page_header.'.$phpEx); 
-
-$match_str = '';
-$neg_match = '';
-
-
-function array_trim($arr){
-   foreach($arr as $key => $value){
-       if (is_array($value)) $result[$key] = array_trim($value);
-       else $result[$key] = trim($value);
-   }
-   return $result;
-} 
-
-$sql = "SELECT username,user_arxives,user_keywords FROM phpbb_users where user_keywords <> ''";
-if( !($result = $db->sql_query($sql)) )
-{
-        message_die(CRITICAL_ERROR, "Could not query new paper information", "", __LINE__, __FILE__, $sql);
+if (!($result = $db->sql_query($sql))) {
+    trigger_error('Could not query new paper information');
 }
 
 $text = '<span class="maintitle">Arxiv New keyword strings</span>';
+$text .= '<table border=1 cellpadding = 2 class = "table-arxiv-info">';
 
-$text .='<P><TABLE border=1 cellpadding = 2 class = "genmed">';
+$text .= '<tr>';
+$text .=    "<td> Default </td>";
+$text .=    "<td>{$config['default_arxives']}</td>";
+$text .=    "<td>{$config['default_arxiv_keys']}</td>";
+$text .= '</tr>';
 
-$text .=  '<TR><TD> Default </TD><TD>' . $board_config['default_arxives'] .
- '</TD><TD>' . $board_config['default_arxiv_keys'] . '</TD></TR>';
-
-while ( $row = $db->sql_fetchrow($result) )
-{
-  $text .= '<TR><TD>' . $row['username'] . '</TD><TD>' . $row['user_arxives'] . '</TD><TD>' . $row['user_keywords'] .
-   '</TD></TR>'; 
-
+while ($row = $db->sql_fetchrow($result)) {
+    $text .= '<tr>';
+    $text .=    "<td>" . get_username_by_id($row['user_id']) . "</td>";
+    $text .=    "<td>{$row['pf_user_arxives']}</td>";
+    $text .=    "<td>{$row['pf_user_keywords']}</td>";
+    $text .= '</tr>';
 }
 
+$text .= '</table>';
 
-$text .= '</TABLE><HR>';
 
-echo $text;
+page_header('Arxiv New Keywords');
+$template->set_filenames(array(
+    'body' => 'message_body.html',
+));
 
-// standard page footer 
-include($phpbb_root_path . 'includes/page_tail.'.$phpEx); 
+$template->assign_vars(array(
+    'MESSAGE_TEXT'	=> $text,
+    'MESSAGE_TITLE'	=> 'Arxiv New Keywords'
+));
 
-?>
+make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
+page_footer();
+
+
+
+
+
+

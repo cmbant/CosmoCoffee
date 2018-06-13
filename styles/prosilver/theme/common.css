@@ -1276,3 +1276,20 @@ ul.linklist:after,
 .dropdown .clone.hidden + li {
 	border-top: none;
 }
+
+.table-arxiv-info {
+    table-layout: fixed; 
+    width: 100%;
+}
+
+.table-arxiv-info td {
+    word-wrap: break-word;
+}
+
+.table-arxiv-info td:first-child {
+    width: 10%;
+}
+
+.table-arxiv-info td:last-child {
+    width: 70%;
+}
