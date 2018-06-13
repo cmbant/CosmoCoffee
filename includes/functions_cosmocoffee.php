@@ -423,3 +423,15 @@ function arxiv_traceback($arxiv) {
     $result = curl_exec($ch);
     curl_close($ch);
 }
+
+function get_arxiv_view_links($ref) {
+    if (!$ref) return false;
+    
+    $links = "<center>[<a target='_top' href='/arxiv_start.pl?$ref'>Discuss $ref</a>]&nbsp;&nbsp;";
+    if ($user->data['user_id'] != ANONYMOUS) {
+        $links .= "[<a target='_top' href='/bookmark.php?add=$ref'>Bookmark $ref</a>]&nbsp;&nbsp;";
+    }
+    $links .= "[<a target='_top' href='/bibtex.php?arxiv=$ref'>BibTex</a>]</center>";
+
+    return $links;
+}
