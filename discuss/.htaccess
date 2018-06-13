@@ -1,0 +1,4 @@
+RewriteEngine on
+rewritebase /
+#RewriteRule ^(.+/.+) /arxivref.pl?$1 [L]
+RewriteRule ^(.*) /arxivref.php?a=$1 [L]

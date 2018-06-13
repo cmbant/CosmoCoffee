@@ -400,33 +400,35 @@ function add_arxiv_paper_to_db($arxiv_info) {
     }
     $db->sql_freeresult($result);
 
-////////////////////////////////////////
-//    arxiv_traceback($arxiv_tag);
-////////////////////////////////////////
+    arxiv_traceback($arxiv_tag);
 
     return $paper_id;
 }
 
-function arxiv_traceback($arxiv) {
+function arxiv_traceback($arxiv) {        
+    $cosmoCoffeeUrl = 'http://cosmocoffee.info';
+    
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'http://arxiv.org/trackback/' . $arxiv);
-//        $header[] = "Content-Type: application/x-www-form-urlencoded; charset=utf-8";
-    $urlstring = "title=Discussion&url=http://cosmocoffee.info/discuss/" . $arxiv . "&blog_name=CosmoCoffee";
-//        curl_setopt( $ch, CURLOPT_HEADER, $header );
+    curl_setopt($ch, CURLOPT_URL, 'https://arxiv.org/trackback/' . $arxiv);
+//    $header[] = "Content-Type: application/x-www-form-urlencoded; charset=utf-8";
+    $urlstring = "title=Discussion&url=$cosmoCoffeeUrl/discuss/$arxiv&blog_name=CosmoCoffee";
+//    curl_setopt($ch, CURLOPT_HEADER, $header);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_USERAGENT, 'CosmoCoffee');
     curl_setopt($ch, CURLOPT_POSTFIELDS, $urlstring);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-    curl_setopt($ch, CURLOPT_REFERER, "http://CosmoCoffee.info");
+    curl_setopt($ch, CURLOPT_REFERER, "$cosmoCoffeeUrl");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
     $result = curl_exec($ch);
     curl_close($ch);
 }
 
 function get_arxiv_view_links($ref) {
-    if (!$ref) return false;
-    
+    if (!$ref)
+        return false;
+
     $links = "<center>[<a target='_top' href='/arxiv_start.pl?$ref'>Discuss $ref</a>]&nbsp;&nbsp;";
     if ($user->data['user_id'] != ANONYMOUS) {
         $links .= "[<a target='_top' href='/bookmark.php?add=$ref'>Bookmark $ref</a>]&nbsp;&nbsp;";
