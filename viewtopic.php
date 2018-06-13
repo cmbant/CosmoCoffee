@@ -649,7 +649,7 @@ $vars = array(
 extract($phpbb_dispatcher->trigger_event('core.viewtopic_assign_template_vars_before', compact($vars)));
 
 $pagination->generate_template_pagination($base_url, 'pagination', 'start', $total_posts, $config['posts_per_page'], $start);
-
+    
 // Send vars to template
 $template->assign_vars(array(
     'FORUM_ID' => $forum_id,
@@ -657,6 +657,7 @@ $template->assign_vars(array(
     'FORUM_DESC' => generate_text_for_display($topic_data['forum_desc'], $topic_data['forum_desc_uid'], $topic_data['forum_desc_bitfield'], $topic_data['forum_desc_options']),
     'TOPIC_ID' => $topic_id,
     'TOPIC_TITLE' => $topic_data['topic_title'],
+    'TOPIC_TITLE_COSMOCOFFEE' => make_clickable($topic_data['topic_title']),
     'TOPIC_POSTER' => $topic_data['topic_poster'],
     'TOPIC_AUTHOR_FULL' => get_username_string('full', $topic_data['topic_poster'], $topic_data['topic_first_poster_name'], $topic_data['topic_first_poster_colour']),
     'TOPIC_AUTHOR_COLOUR' => get_username_string('colour', $topic_data['topic_poster'], $topic_data['topic_first_poster_name'], $topic_data['topic_first_poster_colour']),
