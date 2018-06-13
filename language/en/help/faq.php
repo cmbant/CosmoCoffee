@@ -25,6 +25,34 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
+// CosmoCoffee
+    'HELP_FAQ_BLOCK_INTRODUCTION' => 'CosmoCoffee Introduction',
+    
+    'HELP_FAQ_INTRODUCTION_WHAT_IS_COSMOCOFFEE_QUESTION' => 'What is CosmoCoffee?',
+    'HELP_FAQ_INTRODUCTION_WHAT_IS_COSMOCOFFEE_ANSWER' => "Daily we discuss work and new papers with colleagues, either at our local coffee break or via email with colleagues all over the world. This discussion can be an extremely effective way to understand things better.<BR><BR>As such, it seemed to make sense that those discussions be shared with others and be public.  Our belief is that we would all learn even more if these discussions were shared publicly. Therefore we set up cosmocoffee.info as an attempt to facilitate this.<UL><LI>This forum is intended for authorised arxiv authors and students.<LI>Comments and criticisms should be constructive and polite.<LI>The administrators reserve the right to remove any inappropriate post or user without any notice.</UL><br /><br />Ultimately we hope that it can also become a useful reference resource, complementing the arxiv itself with additional material not appropriate for traditional formal paper publication. <br /><br />Now, let us read, learn and share!<BR><BR>The administrators are currently Sarah Bridle, Olivier Dore, Antony Lewis and Mike Nolta.",
+    'HELP_FAQ_INTRODUCTION_COSMOLOGO_QUESTION' => 'Where do the images in the logo come from?',
+    'HELP_FAQ_INTRODUCTION_COSMOLOGO_ANSWER' => "Background: WMAP team.<br>Coffee cup image from www.cs.umass.edu/~gradweb/mmc.html <br>Galaxy M 109 Credit : National Optical Astronomy Observatory / Association of Universities for Research in Astronomy / National Science Foundation.<br>Combined using the GIMP",
+    
+    'HELP_FAQ_USERSETTINGS_ARXIV_NEW_QUESTION' => 'How does the Arxiv New page work?',
+    'HELP_FAQ_USERSETTINGS_ARXIV_NEW_ANSWER' => "The <A HREF=\"/arxiv_new.php\">Arxiv New</A> page shows a customized filtered list of papers from a set of Arxiv groups. By default it includes astro-ph, hep-ph, hep-th and gr-qc, filtered by a small list of cosmology keywords.
+        <br />
+        <br />When you have registered and logged on you can change your settings in your profile. You can change the set of arxives that are searched (and in what order), and also specify your own set of keywords.
+        <br />
+        <br />Result are presented sorted by the number of matches to your keywords and your arxive sorting order. Words in the title and author fields are weighted more strongly than the abstract.
+        <br />
+        <br />The keyword strings are a list of characters that start a word or phrase you are interested in. So <B>inflat</B> will match both <B>inflation</B> and <B>inflaton</B>, but not <B>reinflate</B>. You can include negative keywords by prefixing the words with a minus sign, so <B>-cosmic ray</B> will not show any posts with a match to 'cosmic ray' (or 'cosmic rays'). They are not case sensitive.
+        <br />
+        <br />You can include perl <A TARGET=\"_blank\" HREF=\"http://www.cs.tut.fi/~jkorpela/perl/regexp.html\">regular expressions</A>, however please ensure that they are fast to execute if you do. For example <B>cosmic(?!= ray)</B> is a way to match <B>cosmic censorship</B> (etc), but not <B>cosmic ray</B>. (note this is different from using a negative keyword as posts containing <B>cosmic ray</B> will still be included if they match other keywords). 
+        <br />
+        <br />You can see a <A HREF=\"/arxiv_info.php\">list</A> of other people's keywords (and the current default).
+        <br />
+        <br />Note that Arxiv New does not include cross-listings, because generally it will get posts from selected arxives on the day they come out. This means you may miss some cross-listings when you first start using Arxiv New.
+        <br />
+        <br />The currently supported arxives include: physics, quant-ph, math-ph, math, astro-ph, hep-th, hep-ph, gr-qc, math.PR, math.ST.",
+    
+    'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> "You can view posts without registering, however if you register the site will remember what you have already viewed, making it much easier to identify new content. You can also watch topics (be notified by email when a new message is posted), see people's email addresses, and customize the <A HREF='/arxiv_new.php'>Arxiv New</A> keyword filder.<br /><br />Also we hope that you would like to post something. To encourage responsible usage only registered users are allowed to post. (with the exception of the Management forum, where you can report issues related to not being able to register).",
+// CosmoCoffee
+    
 	'HELP_FAQ_ATTACHMENTS_ALLOWED_ANSWER'	=> 'Each board administrator can allow or disallow certain attachment types. If you are unsure what is allowed to be uploaded, contact the board administrator for assistance.',
 	'HELP_FAQ_ATTACHMENTS_ALLOWED_QUESTION'	=> 'What attachments are allowed on this board?',
 	'HELP_FAQ_ATTACHMENTS_OWN_ANSWER'	=> 'To find your list of attachments that you have uploaded, go to your User Control Panel and follow the links to the attachments section.',
@@ -115,7 +143,7 @@ $lang = array_merge($lang, array(
 	'HELP_FAQ_LOGIN_DELETE_COOKIES_QUESTION'	=> 'What does the “Delete all board cookies” do?',
 	'HELP_FAQ_LOGIN_LOST_PASSWORD_ANSWER'	=> 'Don’t panic! While your password cannot be retrieved, it can easily be reset. Visit the login page and click <em>I forgot my password</em>. Follow the instructions and you should be able to log in again shortly.<br />However, if you are not able to reset your password, contact a board administrator.',
 	'HELP_FAQ_LOGIN_LOST_PASSWORD_QUESTION'	=> 'I’ve lost my password!',
-	'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> 'You may not have to, it is up to the administrator of the board as to whether you need to register in order to post messages. However; registration will give you access to additional features not available to guest users such as definable avatar images, private messaging, emailing of fellow users, usergroup subscription, etc. It only takes a few moments to register so it is recommended you do so.',
+	//'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> 'You may not have to, it is up to the administrator of the board as to whether you need to register in order to post messages. However; registration will give you access to additional features not available to guest users such as definable avatar images, private messaging, emailing of fellow users, usergroup subscription, etc. It only takes a few moments to register so it is recommended you do so.',
 	'HELP_FAQ_LOGIN_REGISTER_CONFIRM_ANSWER'	=> 'First, check your username and password. If they are correct, then one of two things may have happened. If COPPA support is enabled and you specified being under 13 years old during registration, you will have to follow the instructions you received. Some boards will also require new registrations to be activated, either by yourself or by an administrator before you can logon; this information was present during registration. If you were sent an email, follow the instructions. If you did not receive an email, you may have provided an incorrect email address or the email may have been picked up by a spam filer. If you are sure the email address you provided is correct, try contacting an administrator.',
 	'HELP_FAQ_LOGIN_REGISTER_CONFIRM_QUESTION'	=> 'I registered but cannot login!',
 	'HELP_FAQ_LOGIN_REGISTER_QUESTION'	=> 'Why do I need to register?',
