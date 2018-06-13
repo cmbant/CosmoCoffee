@@ -51,6 +51,9 @@ class __TwigTemplate_26200bc67350372861a7eadda905425a5b2508b548693ec228d73343a4f
 \t<div class=\"inner\">
 \t<h2 class=\"message-title\">";
         // line 9
+        if ((isset($context["ARXIV_LINKS"]) ? $context["ARXIV_LINKS"] : null)) {
+            echo (isset($context["ARXIV_LINKS"]) ? $context["ARXIV_LINKS"] : null);
+        }
         echo (isset($context["MESSAGE_TITLE"]) ? $context["MESSAGE_TITLE"] : null);
         echo "</h2>
 \t<p>";
@@ -127,7 +130,7 @@ class __TwigTemplate_26200bc67350372861a7eadda905425a5b2508b548693ec228d73343a4f
 
     public function getDebugInfo()
     {
-        return array (  103 => 24,  89 => 22,  87 => 21,  82 => 18,  73 => 14,  67 => 13,  64 => 12,  62 => 11,  58 => 10,  54 => 9,  49 => 6,  35 => 4,  21 => 2,  19 => 1,);
+        return array (  106 => 24,  92 => 22,  90 => 21,  85 => 18,  76 => 14,  70 => 13,  67 => 12,  65 => 11,  61 => 10,  54 => 9,  49 => 6,  35 => 4,  21 => 2,  19 => 1,);
     }
 
     /** @deprecated since 1.27 (to be removed in 2.0). Use getSourceContext() instead */
