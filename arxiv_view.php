@@ -18,14 +18,8 @@ $template->set_filenames(array(
 
 $ref = $request->variable('r', '');
 
-$links = "<center>[<a target='_top' href='/arxiv_start.pl?$ref'>Discuss $ref</a>]&nbsp;&nbsp;";
-if ($user->data['user_id'] != ANONYMOUS) {
-    $links .= "[<a target='_top' href='/bookmark.php?add=$ref'>Bookmark $ref</a>]&nbsp;&nbsp;";
-}
-$links .= "[<a target='_top' href='/bibtex.php?arxiv=$ref'>BibTex</a>]</center>";
-
 $template->assign_vars(array(
-    'ARXIV_LINKS' => $links
+    'ARXIV_LINKS' => get_arxiv_view_links($ref)
 ));
 
 make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
