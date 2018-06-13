@@ -260,7 +260,7 @@ class __TwigTemplate_01fb1008dc48e64b2e6fe64d511483e08cc8b21a2dcbea93707526a6a99
         $this->env->loadTemplate('@marcovo_mathjax/event/overall_header_stylesheets_after.html')->display($context);
         $this->env->setNamespaceLookUpOrder($previous_look_up_order);
         // line 73
-        echo "
+        echo "<!--<link rel=\"shortcut icon\" href=\"/favicon.ico\" type=\"image/x-icon\">-->
 </head>
 <body id=\"phpbb\" class=\"nojs notouch section-";
         // line 75
