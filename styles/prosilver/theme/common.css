@@ -177,8 +177,10 @@ a:hover	{ text-decoration: underline; }
 
 .site_logo {
 	display: inline-block;
-	width: 149px;
-	height: 52px;
+	width: 102px;
+    height: 52px;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 /* Site description and logo */
