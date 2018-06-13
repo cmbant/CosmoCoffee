@@ -27,8 +27,7 @@ if (!($result = $db->sql_query($sql))) {
     trigger_error('Could not query new paper information');
 }
 
-$text = '<span class="maintitle">Arxiv New keyword strings</span>';
-$text .= '<table border=1 cellpadding = 2 class = "table-arxiv-info">';
+$text = '<table border=1 cellpadding = 2 class = "table-arxiv-info">';
 
 $text .= '<tr>';
 $text .=    "<td> Default </td>";
