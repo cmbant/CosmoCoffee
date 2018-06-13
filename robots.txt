@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /faq.php
+Disallow: /memberlist.php
+Disallow: /posting.php
+Disallow: /arxiv_new.php
+Disallow: /discuss
+Disallow: /arxivref.php
+Disallow: /arxiv_view.php
+Disallow: /search.php
+Disallow: /bibtex.php
+Disallow: /bookmark.php
