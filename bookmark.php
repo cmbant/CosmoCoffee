@@ -20,7 +20,7 @@ $fname = $this_page = basename($request->server('SCRIPT_NAME'));
 $fullfname = makeUrl($fname, $request->server('QUERY_STRING'), "deltag=&book_id=&paper=");
 
 $page_title = 'Paper bookmarks';
-$inner_page_title = '';
+$inner_page_title = 'Paper bookmarks';
 $canchange = 1;
 $status = '';
 $status_read = 1;
