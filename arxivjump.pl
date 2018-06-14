@@ -37,14 +37,14 @@ $ref = $variable{'r'};
 
 
 if ($ref =~ m/.+\/([0-9v]{3,})|new/){
-print "Location: http://cosmocoffee.info/discuss/$ref\n\n"; 
+print "Location: ./discuss/$ref\n\n"; 
 } elsif ($ref =~ m/([0-9v]{3,}\.[0-9v]{3,})/){
 
-    print "Location: http://cosmocoffee.info/discuss/$ref\n\n";
+    print "Location: ./discuss/$ref\n\n";
 
 } elsif ($ref =~ m/([0-9v]{3,})/){
 
-    print "Location: http://cosmocoffee.info/discuss/astro-ph/$ref\n\n";
+    print "Location: ./discuss/astro-ph/$ref\n\n";
 } elsif(1) { 
  
 if ($ref =~ m/(.+)\/(.+)/){

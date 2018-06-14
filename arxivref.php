@@ -21,10 +21,10 @@ $file = $request->is_set('file') ? $request->variable('file', '') : null;
 $mirror = ($user->profile_fields['pf_user_mirror']) ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror'];
 
 if (!empty($file)) {
-    header('Location: ' . "http://$mirror/$file");
+    header('Location: ' . "https://$mirror/$file");
     exit;
 } elseif (!empty($abs)) {
-    header('Location: ' . "http://$mirror/abs/$abs");
+    header('Location: ' . "https://$mirror/abs/$abs");
     exit;
 }
 
@@ -46,9 +46,9 @@ if ($row = $db->sql_fetchrow($result)) {
 }
 
 if (strpos($data, 'new')) {
-    $arxiv = "http://$mirror/list/$data";
+    $arxiv = "https://$mirror/list/$data";
 } else {
-    $arxiv = "http://$mirror/abs/$data";
+    $arxiv = "https://$mirror/abs/$data";
 }
 
 $alternative_text = "Your browser doesn't support frames: Click on the link below to proceed to the<br><a href='$arxiv'>Arxiv</a>";
