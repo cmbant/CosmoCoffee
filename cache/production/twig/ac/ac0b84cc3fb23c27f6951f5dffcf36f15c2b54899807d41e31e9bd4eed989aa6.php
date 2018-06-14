@@ -148,7 +148,7 @@ class __TwigTemplate_9b5d76e33c2e8c3e545fa179b1b4a9145f3db3d9be1ce0a1c17591e060c
                 $local_file = $this->getEnvironment()->findTemplate($asset_path);
                 $asset->set_path($local_file, true);
             }
-            $asset->add_assets_version('8');
+            $asset->add_assets_version('18');
         }
         $this->getEnvironment()->get_assets_bag()->add_script($asset);        // line 47
         $asset_file = "ajax.js";
@@ -159,7 +159,7 @@ class __TwigTemplate_9b5d76e33c2e8c3e545fa179b1b4a9145f3db3d9be1ce0a1c17591e060c
                 $local_file = $this->getEnvironment()->findTemplate($asset_path);
                 $asset->set_path($local_file, true);
             }
-            $asset->add_assets_version('8');
+            $asset->add_assets_version('18');
         }
         $this->getEnvironment()->get_assets_bag()->add_script($asset);        // line 48
         if ((isset($context["S_ALLOW_CDN"]) ? $context["S_ALLOW_CDN"] : null)) {
@@ -266,8 +266,8 @@ class __TwigTemplate_9b5d76e33c2e8c3e545fa179b1b4a9145f3db3d9be1ce0a1c17591e060c
         },
     
   });
-</script>
-<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script>
+</script><!--
+<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script>-->
 
 ";
         // line 106

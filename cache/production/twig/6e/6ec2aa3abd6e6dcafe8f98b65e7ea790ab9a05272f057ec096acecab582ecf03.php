@@ -157,7 +157,7 @@ class __TwigTemplate_b0a01b12580e133627bdb67b522791cf36f047687ef2c57dea95999bd52
                 $local_file = $this->getEnvironment()->findTemplate($asset_path);
                 $asset->set_path($local_file, true);
             }
-            $asset->add_assets_version('8');
+            $asset->add_assets_version('18');
         }
         $this->getEnvironment()->get_assets_bag()->add_script($asset);        // line 53
         echo "

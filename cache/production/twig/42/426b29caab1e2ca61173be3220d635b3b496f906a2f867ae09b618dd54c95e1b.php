@@ -237,7 +237,7 @@ phpbb.plupload = {
                 $local_file = $this->getEnvironment()->findTemplate($asset_path);
                 $asset->set_path($local_file, true);
             }
-            $asset->add_assets_version('8');
+            $asset->add_assets_version('18');
         }
         $this->getEnvironment()->get_assets_bag()->add_script($asset);        // line 69
         $asset_file = (("" . (isset($context["T_ASSETS_PATH"]) ? $context["T_ASSETS_PATH"] : null)) . "/javascript/plupload.js");
@@ -248,7 +248,7 @@ phpbb.plupload = {
                 $local_file = $this->getEnvironment()->findTemplate($asset_path);
                 $asset->set_path($local_file, true);
             }
-            $asset->add_assets_version('8');
+            $asset->add_assets_version('18');
         }
         $this->getEnvironment()->get_assets_bag()->add_script($asset);    }
 
