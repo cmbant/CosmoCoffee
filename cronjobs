@@ -1,5 +1,6 @@
 cd /var/www/phpBB/cosmocoffee.loc
 /home/administrator/.phpbrew/php/php-5.6.29/bin/php arxiv_cron.php
+/home/administrator/.phpbrew/php/php-5.6.29/bin/php test_insert.php
 
 #cd /usr/home/cosmocoffee/public_html/cosmocoffee_info
 #/usr/local/bin/php arxiv_cron.php
