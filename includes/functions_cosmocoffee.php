@@ -138,7 +138,17 @@ function simpletex_noBB($text, $realtex = false) {
     //Replace A_a, \greek etc with html
     //Remove things that look like URLs, input_parameters, etc
     // \sch\"odinger etc
-
+    
+    if (
+        preg_match('/\[latex\]/', $text) ||
+        preg_match('/\[math\]/', $text) ||
+        preg_match('/\\\\begin{equation}/', $text) ||
+        preg_match('/\\\\end{equation}/', $text) ||
+        preg_match('/\\\\label{[0-1]+}/', $text)
+    ) {
+        return $text;
+    }
+    
     $text = tex_accents($text);
 
     $specs = array('\\\\', '\\{', '\\}', '\\^', '\\_', '\\$', '^\\circ', '^{\\circ}', '\Lambda CDM');
