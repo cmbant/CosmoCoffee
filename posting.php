@@ -1794,4 +1794,10 @@ if ($mode == 'reply' || $mode == 'quote') {
     }
 }
 
+//CosmoCoffee
+if ($preview) {
+    $template->assign_var('S_DISPLAY_SUBMIT_CC', true);
+}
+//CosmoCoffee
+
 page_footer();

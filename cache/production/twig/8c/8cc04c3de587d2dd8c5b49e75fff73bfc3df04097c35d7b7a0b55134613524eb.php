@@ -377,23 +377,30 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo " onclick=\"document.getElementById('postform').action += '#preview';\"";
                 }
                 echo " />&nbsp;
-\t\t\t<input type=\"submit\" accesskey=\"s\" tabindex=\"6\" name=\"post\" value=\"";
-                // line 100
-                echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SUBMIT");
-                echo "\" class=\"button1 default-submit-action\" />&nbsp;
 
+            ";
+                // line 101
+                if ((isset($context["S_DISPLAY_SUBMIT_CC"]) ? $context["S_DISPLAY_SUBMIT_CC"] : null)) {
+                    // line 102
+                    echo "            <input type=\"submit\" accesskey=\"s\" tabindex=\"6\" name=\"post\" value=\"";
+                    echo $this->env->getExtension('phpbb\template\twig\extension')->lang("SUBMIT");
+                    echo "\" class=\"button1 default-submit-action\" />&nbsp;
+            ";
+                }
+                // line 104
+                echo "
 \t\t</fieldset>
 
 \t\t</div>
 \t</div>
 \t";
             }
-            // line 107
+            // line 110
             echo "
 \t";
-            // line 108
+            // line 111
             if ((( !(isset($context["S_PRIVMSGS"]) ? $context["S_PRIVMSGS"] : null) &&  !(isset($context["S_SHOW_DRAFTS"]) ? $context["S_SHOW_DRAFTS"] : null)) && ( !$this->getAttribute((isset($context["definition"]) ? $context["definition"] : null), "SIG_EDIT", array()) == 1))) {
-                // line 109
+                // line 112
                 echo "\t\t<div id=\"tabs\" class=\"tabs sub-panels\" data-show-panel=\"";
                 if ((isset($context["SHOW_PANEL"]) ? $context["SHOW_PANEL"] : null)) {
                     echo (isset($context["SHOW_PANEL"]) ? $context["SHOW_PANEL"] : null);
@@ -403,58 +410,58 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                 echo "\" role=\"tablist\">
 \t\t\t<ul>
 \t\t\t\t<li id=\"options-panel-tab\" class=\"tab activetab\"><a href=\"#tabs\" data-subpanel=\"options-panel\" role=\"tab\" aria-controls=\"options-panel\"><span>";
-                // line 111
+                // line 114
                 echo $this->env->getExtension('phpbb\template\twig\extension')->lang("OPTIONS");
                 echo "</span></a></li>
 \t\t\t\t";
-                // line 112
+                // line 115
                 if ((isset($context["S_SHOW_ATTACH_BOX"]) ? $context["S_SHOW_ATTACH_BOX"] : null)) {
-                    // line 113
+                    // line 116
                     echo "\t\t\t\t\t<li id=\"attach-panel-tab\" class=\"tab\">
 \t\t\t\t\t\t<a href=\"#tabs\" data-subpanel=\"attach-panel\" role=\"tab\" aria-controls=\"attach-panel\">
 \t\t\t\t\t\t\t";
-                    // line 115
+                    // line 118
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("ATTACHMENTS");
                     echo " <strong id=\"file-total-progress\" class=\"file-total-progress\"><strong id=\"file-total-progress-bar\" class=\"file-total-progress-bar\"></strong></strong>
 \t\t\t\t\t\t</a>
 \t\t\t\t\t</li>
 \t\t\t\t";
                 }
-                // line 119
+                // line 122
                 echo "\t\t\t\t";
                 if (((isset($context["S_SHOW_POLL_BOX"]) ? $context["S_SHOW_POLL_BOX"] : null) || (isset($context["S_POLL_DELETE"]) ? $context["S_POLL_DELETE"] : null))) {
-                    // line 120
+                    // line 123
                     echo "\t\t\t\t\t<li id=\"poll-panel-tab\" class=\"tab\">
 \t\t\t\t\t\t<a href=\"#tabs\" data-subpanel=\"poll-panel\" role=\"tab\" aria-controls=\"poll-panel\">";
-                    // line 121
+                    // line 124
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("ADD_POLL");
                     echo "</a>
 \t\t\t\t\t</li>
 \t\t\t\t";
                 }
-                // line 124
+                // line 127
                 echo "\t\t\t\t";
-                // line 125
+                // line 128
                 echo "\t\t\t</ul>
 \t\t</div>
 \t";
             }
-            // line 128
+            // line 131
             echo "
 \t";
-            // line 129
+            // line 132
             if (( !(isset($context["S_SHOW_DRAFTS"]) ? $context["S_SHOW_DRAFTS"] : null) && ( !$this->getAttribute((isset($context["definition"]) ? $context["definition"] : null), "SIG_EDIT", array()) == 1))) {
-                // line 130
+                // line 133
                 echo "\t<div class=\"panel bg3\" id=\"options-panel\">
 \t\t<div class=\"inner\">
 
 \t\t<fieldset class=\"fields1\">
 \t\t\t";
-                // line 134
-                // line 135
+                // line 137
+                // line 138
                 echo "\t\t\t";
                 if ((isset($context["S_BBCODE_ALLOWED"]) ? $context["S_BBCODE_ALLOWED"] : null)) {
-                    // line 136
+                    // line 139
                     echo "\t\t\t\t<div><label for=\"disable_bbcode\"><input type=\"checkbox\" name=\"disable_bbcode\" id=\"disable_bbcode\"";
                     echo (isset($context["S_BBCODE_CHECKED"]) ? $context["S_BBCODE_CHECKED"] : null);
                     echo " /> ";
@@ -462,10 +469,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 138
+                // line 141
                 echo "\t\t\t";
                 if ((isset($context["S_SMILIES_ALLOWED"]) ? $context["S_SMILIES_ALLOWED"] : null)) {
-                    // line 139
+                    // line 142
                     echo "\t\t\t\t<div><label for=\"disable_smilies\"><input type=\"checkbox\" name=\"disable_smilies\" id=\"disable_smilies\"";
                     echo (isset($context["S_SMILIES_CHECKED"]) ? $context["S_SMILIES_CHECKED"] : null);
                     echo " /> ";
@@ -473,10 +480,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 141
+                // line 144
                 echo "\t\t\t";
                 if ((isset($context["S_LINKS_ALLOWED"]) ? $context["S_LINKS_ALLOWED"] : null)) {
-                    // line 142
+                    // line 145
                     echo "\t\t\t\t<div><label for=\"disable_magic_url\"><input type=\"checkbox\" name=\"disable_magic_url\" id=\"disable_magic_url\"";
                     echo (isset($context["S_MAGIC_URL_CHECKED"]) ? $context["S_MAGIC_URL_CHECKED"] : null);
                     echo " /> ";
@@ -484,10 +491,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 144
+                // line 147
                 echo "\t\t\t";
                 if ((isset($context["S_SIG_ALLOWED"]) ? $context["S_SIG_ALLOWED"] : null)) {
-                    // line 145
+                    // line 148
                     echo "\t\t\t\t<div><label for=\"attach_sig\"><input type=\"checkbox\" name=\"attach_sig\" id=\"attach_sig\"";
                     echo (isset($context["S_SIGNATURE_CHECKED"]) ? $context["S_SIGNATURE_CHECKED"] : null);
                     echo " /> ";
@@ -495,10 +502,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 147
+                // line 150
                 echo "\t\t\t";
                 if ((isset($context["S_NOTIFY_ALLOWED"]) ? $context["S_NOTIFY_ALLOWED"] : null)) {
-                    // line 148
+                    // line 151
                     echo "\t\t\t\t<div><label for=\"notify\"><input type=\"checkbox\" name=\"notify\" id=\"notify\"";
                     echo (isset($context["S_NOTIFY_CHECKED"]) ? $context["S_NOTIFY_CHECKED"] : null);
                     echo " /> ";
@@ -506,10 +513,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 150
+                // line 153
                 echo "\t\t\t";
                 if ((isset($context["S_LOCK_TOPIC_ALLOWED"]) ? $context["S_LOCK_TOPIC_ALLOWED"] : null)) {
-                    // line 151
+                    // line 154
                     echo "\t\t\t\t<div><label for=\"lock_topic\"><input type=\"checkbox\" name=\"lock_topic\" id=\"lock_topic\"";
                     echo (isset($context["S_LOCK_TOPIC_CHECKED"]) ? $context["S_LOCK_TOPIC_CHECKED"] : null);
                     echo " /> ";
@@ -517,10 +524,10 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "</label></div>
 \t\t\t";
                 }
-                // line 153
+                // line 156
                 echo "\t\t\t";
                 if ((isset($context["S_LOCK_POST_ALLOWED"]) ? $context["S_LOCK_POST_ALLOWED"] : null)) {
-                    // line 154
+                    // line 157
                     echo "\t\t\t\t<div><label for=\"lock_post\"><input type=\"checkbox\" name=\"lock_post\" id=\"lock_post\"";
                     echo (isset($context["S_LOCK_POST_CHECKED"]) ? $context["S_LOCK_POST_CHECKED"] : null);
                     echo " /> ";
@@ -530,24 +537,24 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo "]</label></div>
 \t\t\t";
                 }
-                // line 156
+                // line 159
                 echo "
 \t\t\t";
-                // line 157
+                // line 160
                 if ((((isset($context["S_TYPE_TOGGLE"]) ? $context["S_TYPE_TOGGLE"] : null) || (isset($context["S_TOPIC_TYPE_ANNOUNCE"]) ? $context["S_TOPIC_TYPE_ANNOUNCE"] : null)) || (isset($context["S_TOPIC_TYPE_STICKY"]) ? $context["S_TOPIC_TYPE_STICKY"] : null))) {
-                    // line 158
+                    // line 161
                     echo "\t\t\t<hr class=\"dashed\" />
 \t\t\t";
                 }
-                // line 160
+                // line 163
                 echo "
 \t\t\t";
-                // line 161
+                // line 164
                 if ((isset($context["S_TYPE_TOGGLE"]) ? $context["S_TYPE_TOGGLE"] : null)) {
-                    // line 162
+                    // line 165
                     echo "\t\t\t<dl>
 \t\t\t\t<dt><label for=\"topic_type-0\">";
-                    // line 163
+                    // line 166
                     if ((isset($context["S_EDIT_POST"]) ? $context["S_EDIT_POST"] : null)) {
                         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("CHANGE_TOPIC_TO");
                     } else {
@@ -556,7 +563,7 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
                     echo "</label></dt>
 \t\t\t\t<dd>";
-                    // line 164
+                    // line 167
                     $context['_parent'] = $context;
                     $context['_seq'] = twig_ensure_traversable($this->getAttribute((isset($context["loops"]) ? $context["loops"] : null), "topic_type", array()));
                     foreach ($context['_seq'] as $context["_key"] => $context["topic_type"]) {
@@ -579,87 +586,87 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
 \t\t\t</dl>
 \t\t\t";
                 }
-                // line 167
+                // line 170
                 echo "
 \t\t\t";
-                // line 168
+                // line 171
                 if (((isset($context["S_TOPIC_TYPE_ANNOUNCE"]) ? $context["S_TOPIC_TYPE_ANNOUNCE"] : null) || (isset($context["S_TOPIC_TYPE_STICKY"]) ? $context["S_TOPIC_TYPE_STICKY"] : null))) {
-                    // line 169
+                    // line 172
                     echo "\t\t\t<dl>
 \t\t\t\t<dt><label for=\"topic_time_limit\">";
-                    // line 170
+                    // line 173
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("STICK_TOPIC_FOR");
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
                     echo "</label></dt>
 \t\t\t\t<dd><label for=\"topic_time_limit\"><input type=\"number\" min=\"0\" max=\"999\" name=\"topic_time_limit\" id=\"topic_time_limit\" value=\"";
-                    // line 171
+                    // line 174
                     echo (isset($context["TOPIC_TIME_LIMIT"]) ? $context["TOPIC_TIME_LIMIT"] : null);
                     echo "\" class=\"inputbox autowidth\" /> ";
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("DAYS");
                     echo "</label></dd>
 \t\t\t\t<dd>";
-                    // line 172
+                    // line 175
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("STICK_TOPIC_FOR_EXPLAIN");
                     echo "</dd>
 \t\t\t</dl>
 \t\t\t";
                 }
-                // line 175
+                // line 178
                 echo "
 \t\t\t";
-                // line 176
+                // line 179
                 if (((isset($context["S_SOFTDELETE_ALLOWED"]) ? $context["S_SOFTDELETE_ALLOWED"] : null) || (isset($context["S_DELETE_ALLOWED"]) ? $context["S_DELETE_ALLOWED"] : null))) {
-                    // line 177
+                    // line 180
                     echo "\t\t\t\t<hr class=\"dashed\" />
 \t\t\t\t<dl>
 \t\t\t\t\t<dt><label for=\"delete\">";
-                    // line 179
+                    // line 182
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("DELETE_POST");
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
                     echo "</label></dt>
 \t\t\t\t\t<dd><label for=\"delete\"><input type=\"checkbox\" name=\"delete\" id=\"delete\" ";
-                    // line 180
+                    // line 183
                     echo (isset($context["S_SOFTDELETE_CHECKED"]) ? $context["S_SOFTDELETE_CHECKED"] : null);
                     echo " /> ";
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("DELETE_POST_WARN");
                     echo "</label></dd>
 \t\t\t\t\t";
-                    // line 181
+                    // line 184
                     if (((isset($context["S_DELETE_ALLOWED"]) ? $context["S_DELETE_ALLOWED"] : null) && (isset($context["S_SOFTDELETE_ALLOWED"]) ? $context["S_SOFTDELETE_ALLOWED"] : null))) {
-                        // line 182
+                        // line 185
                         echo "\t\t\t\t\t\t<dd><label for=\"delete_permanent\"><input type=\"checkbox\" name=\"delete_permanent\" id=\"delete_permanent\" /> ";
                         echo $this->env->getExtension('phpbb\template\twig\extension')->lang("DELETE_POST_PERMANENTLY");
                         echo "</label></dd>
 \t\t\t\t\t";
                     }
-                    // line 184
+                    // line 187
                     echo "\t\t\t\t</dl>
 \t\t\t";
                 }
-                // line 186
+                // line 189
                 echo "
 \t\t\t";
-                // line 187
+                // line 190
                 if ((isset($context["S_EDIT_REASON"]) ? $context["S_EDIT_REASON"] : null)) {
-                    // line 188
+                    // line 191
                     echo "\t\t\t<dl>
 \t\t\t\t<dt><label for=\"edit_reason\">";
-                    // line 189
+                    // line 192
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("EDIT_REASON");
                     echo $this->env->getExtension('phpbb\template\twig\extension')->lang("COLON");
                     echo "</label></dt>
 \t\t\t\t<dd><input type=\"text\" name=\"edit_reason\" id=\"edit_reason\" value=\"";
-                    // line 190
+                    // line 193
                     echo (isset($context["EDIT_REASON"]) ? $context["EDIT_REASON"] : null);
                     echo "\" class=\"inputbox\" /></dd>
 \t\t\t</dl>
 \t\t\t";
                 }
-                // line 193
+                // line 196
                 echo "\t\t</fieldset>
 \t\t";
             }
-            // line 195
+            // line 198
             echo "
 ";
         }
@@ -677,7 +684,7 @@ class __TwigTemplate_c8766c57aae4241b727318d7da56e1a24c24cfe35f2a9da428e310c6d38
 
     public function getDebugInfo()
     {
-        return array (  663 => 195,  659 => 193,  653 => 190,  648 => 189,  645 => 188,  643 => 187,  640 => 186,  636 => 184,  630 => 182,  628 => 181,  622 => 180,  617 => 179,  613 => 177,  611 => 176,  608 => 175,  602 => 172,  596 => 171,  591 => 170,  588 => 169,  586 => 168,  583 => 167,  560 => 164,  551 => 163,  548 => 162,  546 => 161,  543 => 160,  539 => 158,  537 => 157,  534 => 156,  524 => 154,  521 => 153,  513 => 151,  510 => 150,  502 => 148,  499 => 147,  491 => 145,  488 => 144,  480 => 142,  477 => 141,  469 => 139,  466 => 138,  458 => 136,  455 => 135,  454 => 134,  448 => 130,  446 => 129,  443 => 128,  438 => 125,  436 => 124,  430 => 121,  427 => 120,  424 => 119,  417 => 115,  413 => 113,  411 => 112,  407 => 111,  397 => 109,  395 => 108,  392 => 107,  382 => 100,  373 => 99,  366 => 98,  359 => 97,  358 => 96,  354 => 95,  350 => 94,  345 => 91,  343 => 90,  340 => 89,  335 => 86,  333 => 85,  330 => 84,  328 => 83,  324 => 81,  323 => 80,  309 => 77,  305 => 75,  304 => 74,  300 => 72,  297 => 71,  290 => 70,  281 => 69,  276 => 68,  273 => 67,  271 => 66,  264 => 63,  259 => 61,  255 => 60,  250 => 59,  248 => 58,  243 => 57,  239 => 56,  236 => 55,  233 => 54,  231 => 53,  223 => 51,  220 => 50,  217 => 49,  198 => 47,  194 => 46,  189 => 45,  186 => 44,  185 => 43,  181 => 41,  169 => 40,  166 => 39,  165 => 38,  162 => 37,  159 => 36,  156 => 35,  143 => 34,  139 => 33,  137 => 32,  133 => 30,  132 => 29,  120 => 28,  119 => 27,  113 => 25,  110 => 24,  108 => 23,  105 => 22,  104 => 21,  101 => 20,  95 => 17,  90 => 16,  87 => 15,  85 => 14,  82 => 13,  77 => 10,  50 => 9,  42 => 8,  36 => 6,  33 => 5,  31 => 4,  28 => 3,  22 => 2,  19 => 1,);
+        return array (  670 => 198,  666 => 196,  660 => 193,  655 => 192,  652 => 191,  650 => 190,  647 => 189,  643 => 187,  637 => 185,  635 => 184,  629 => 183,  624 => 182,  620 => 180,  618 => 179,  615 => 178,  609 => 175,  603 => 174,  598 => 173,  595 => 172,  593 => 171,  590 => 170,  567 => 167,  558 => 166,  555 => 165,  553 => 164,  550 => 163,  546 => 161,  544 => 160,  541 => 159,  531 => 157,  528 => 156,  520 => 154,  517 => 153,  509 => 151,  506 => 150,  498 => 148,  495 => 147,  487 => 145,  484 => 144,  476 => 142,  473 => 141,  465 => 139,  462 => 138,  461 => 137,  455 => 133,  453 => 132,  450 => 131,  445 => 128,  443 => 127,  437 => 124,  434 => 123,  431 => 122,  424 => 118,  420 => 116,  418 => 115,  414 => 114,  404 => 112,  402 => 111,  399 => 110,  391 => 104,  385 => 102,  383 => 101,  373 => 99,  366 => 98,  359 => 97,  358 => 96,  354 => 95,  350 => 94,  345 => 91,  343 => 90,  340 => 89,  335 => 86,  333 => 85,  330 => 84,  328 => 83,  324 => 81,  323 => 80,  309 => 77,  305 => 75,  304 => 74,  300 => 72,  297 => 71,  290 => 70,  281 => 69,  276 => 68,  273 => 67,  271 => 66,  264 => 63,  259 => 61,  255 => 60,  250 => 59,  248 => 58,  243 => 57,  239 => 56,  236 => 55,  233 => 54,  231 => 53,  223 => 51,  220 => 50,  217 => 49,  198 => 47,  194 => 46,  189 => 45,  186 => 44,  185 => 43,  181 => 41,  169 => 40,  166 => 39,  165 => 38,  162 => 37,  159 => 36,  156 => 35,  143 => 34,  139 => 33,  137 => 32,  133 => 30,  132 => 29,  120 => 28,  119 => 27,  113 => 25,  110 => 24,  108 => 23,  105 => 22,  104 => 21,  101 => 20,  95 => 17,  90 => 16,  87 => 15,  85 => 14,  82 => 13,  77 => 10,  50 => 9,  42 => 8,  36 => 6,  33 => 5,  31 => 4,  28 => 3,  22 => 2,  19 => 1,);
     }
 
     /** @deprecated since 1.27 (to be removed in 2.0). Use getSourceContext() instead */
