@@ -404,7 +404,7 @@ if($user_id == 'all') {
 
 if($club > 0) {
     $text .= $clubtxt;
-} elseif ($user_id > 0) {
+} elseif ($user_id > 1) {
     $inner_page_title = "$username's Bookmarks";
     
     if($canchange && $user_id != 'all'){
