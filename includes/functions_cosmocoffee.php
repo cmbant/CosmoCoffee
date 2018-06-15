@@ -70,6 +70,9 @@ function make_clickable_cosmocoffee($text) {
 
     // Remove our padding..
     $ret = substr($ret, 1);
+    
+    // http://cosmocoffee.info/files/Antony_Lewis/nT.png
+    $ret = preg_replace('/http:\/\/cosmocoffee.info\/files\/(.[^\'"]+)/', '/cosmo_files.php?file=\\1', $ret);
 
     return simpletex($ret);
 }

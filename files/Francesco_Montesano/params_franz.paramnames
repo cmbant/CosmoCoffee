@@ -1,0 +1,44 @@
+omegabh2 	\omega_{\mathrm(b)}					#physical baryon density
+omegadmh2	\omega_{\mathrm{DM}}					#physical dark matter density, including CDM and massive neutrinos
+theta		100\Theta						#100 times the ratio of the angular diameter distance to the LSS sound horizon (approx)
+tau		\tau
+omegak		\Omega_{\mathrm{k}}
+fnu		f_\nu							#neutrino energy density as fraction of omegadmh2
+w		w_{\mathrm{DE}}						#constant equation of state parameter for scalar field dark energy
+wa		w_{\mathrm{a}}						#franz: derivative of the equation of state parameter for scalar field dark energy
+nnu		n_{\nu}	#franz: number of neutrino species
+alens		A_{lens}						#franz: from Ariel amplitude of lensing power spectrum
+ns		n_{\mathrm{s}}						#beware that pivot scale can change in .ini file
+nt		n_{\mathrm{t}}
+nrun		n_{\mathrm{run}}
+kstar1		k_{1\,\star}						#franz: damping scale of the propagator. Lower redshift
+amc1		A_{\mathrm{1\,MC}}					#franz: amplitude of the 1 loop contribution. Lower redshift
+bias1		b_{1}							#franz: large scale linear bias of the power spectrum. Lower redshift
+kstar2		k_{2\,\star}						#franz: damping scale of the propagator. increasing redshift
+amc2		A_{\mathrm{2\,MC}}					#franz: amplitude of the 1 loop contribution. increasing redshift
+bias2		b_{2}							#franz: large scale linear bias of the power spectrum. increasing redshift
+kstar3		k_{3\,\star}						#franz: damping scale of the propagator. increasing redshift
+amc3		A_{\mathrm{3\,MC}}					#franz: amplitude of the 1 loop contribution. increasing redshift
+bias3		b_{3}							#franz: large scale linear bias of the power spectrum. increasing redshift
+logA		\log[10^{10}A_{\mathrm{s}}]
+r		r							#ratio of tensor to scalar primordial amplitudes at pivot scale
+d3000_sz	D_{3000}^{SZ}						#franz: from Ariel D3000 of tSZ+kSZ, in uK^2.
+d3000_ps	D_{3000}^{PS}						#franz: from Ariel D3000 of Poisson/shot-noise from point sources, in uK^2.
+d3000_cl	D_{3000}^{CL}						#franz: from Ariel D3000 of clustering of point sources, in uK^2.
+alpha		\alpha							#franz: SNLS model parameter
+beta		\beta							#franz: SNLS model parameter
+omegal*		\Omega_{\mathrm{DE}}
+age*		Age\,[Gyr]
+omegam*		\Omega_{\mathrm{M}}
+sigma8*		\sigma_8
+zrei*		z_{\mathrm{re}}
+r10*		r_{10}							#tensor-scalar C_l amplitude at l=10
+H0*		H_0\,[\mathrm{km\,s^{-1}\,Mpc^{-1}}]			#hubble parameter is H0 km/s/Mpc
+zd*		z_{\mathrm{d}}						#franz: drag redshift
+rszd*		r_{\mathrm{s}}(z_{\mathrm{d}})				#franz: sound horizon at drag redshift
+dv1*		D_{\mathrm(V)}(z_1)					#franz: effective distance to the mean redshift of the LSS dataset. Lower redshift
+rsodv1*		r_{\mathrm{s}}(z_{\mathrm{d}})/D_{\mathrm(V)}(z_1)	#franz: ratio of the sound horizon and effective distance
+dv2*		D_{\mathrm(V)}(z_2)					#franz: effective distance to the mean redshift of the LSS dataset. Lower redshift
+rsodv2*		r_{\mathrm{s}}(z_{\mathrm{d}})/D_{\mathrm(V)}(z_2)	#franz: ratio of the sound horizon and effective distance
+dv3*		D_{\mathrm(V)}(z_3)					#franz: effective distance to the mean redshift of the LSS dataset. Lower redshift
+rsodv3*		r_{\mathrm{s}}(z_{\mathrm{d}})/D_{\mathrm(V)}(z_3)	#franz:	ratio of the sound horizon and effective distance

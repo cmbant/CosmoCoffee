@@ -1,0 +1,114 @@
+# this code cannot be run directly
+# do 'source /gpfs1m/projects/uoa00518/plc-2.0/bin/clik_profile.sh' from your sh shell or put it in your profile
+
+function addvar () {
+local tmp="${!1}" ;
+tmp="${tmp//:${2}:/:}" ; tmp="${tmp/#${2}:/}" ; tmp="${tmp/%:${2}/}" ;
+export $1="${2}:${tmp}" ;
+} 
+
+if [ -z "${PATH}" ]; then 
+PATH=/gpfs1m/projects/uoa00518/plc-2.0/bin
+export PATH
+else
+addvar PATH /gpfs1m/projects/uoa00518/plc-2.0/bin
+fi
+if [ -z "${PYTHONPATH}" ]; then 
+PYTHONPATH=/gpfs1m/projects/uoa00518/plc-2.0/lib/python2.7/site-packages
+export PYTHONPATH
+else
+addvar PYTHONPATH /gpfs1m/projects/uoa00518/plc-2.0/lib/python2.7/site-packages
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/lib/intel64/
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/lib/intel64/
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/gpfs1m/projects/uoa00518/plc-2.0/lib
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /gpfs1m/projects/uoa00518/plc-2.0/lib
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64/
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64/
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/lib/intel64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/lib/intel64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/lib
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /lib
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/lib64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /lib64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64/
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64/
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/lib/intel64/
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/icc/2017.1.132-GCC-5.4.0/lib/intel64/
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/lib/intel64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/lib/intel64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/imkl/2017.1.132-iimpi-2017a/lib/intel64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/imkl/2017.1.132-iimpi-2017a/lib/intel64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/gpfs1m/apps/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64_lin
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /gpfs1m/apps/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64_lin
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/ifort/2017.1.132-GCC-5.4.0/compilers_and_libraries_2017.1.132/linux/compiler/lib/intel64
+fi
+if [ -z "${LD_LIBRARY_PATH}" ]; then 
+LD_LIBRARY_PATH=/share/easybuild/RHEL6.3/westmere/software/imkl/2017.1.132-iimpi-2017a/lib/intel64/
+export LD_LIBRARY_PATH
+else
+addvar LD_LIBRARY_PATH /share/easybuild/RHEL6.3/westmere/software/imkl/2017.1.132-iimpi-2017a/lib/intel64/
+fi
+CLIK_PATH=/gpfs1m/projects/uoa00518/plc-2.0
+export CLIK_PATH
+
+CLIK_DATA=/gpfs1m/projects/uoa00518/plc-2.0/share/clik
+export CLIK_DATA
+
+CLIK_PLUGIN=rel2015
+export CLIK_PLUGIN
+
