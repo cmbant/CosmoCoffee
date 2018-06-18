@@ -46,6 +46,10 @@ class ucp_activate
 		{
 			trigger_error('NO_USER');
 		}
+        
+        // CosmoCoffee
+        $config['require_activation'] = (coffee_validate_email($user_row['user_email'])) ? USER_ACTIVATION_ADMIN : USER_ACTIVATION_SELF;
+        // CosmoCoffee
 
 		if ($user_row['user_type'] <> USER_INACTIVE && !$user_row['user_newpasswd'])
 		{
