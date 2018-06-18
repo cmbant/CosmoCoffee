@@ -1875,7 +1875,7 @@ function phpbb_validate_email($email, $config = null)
 		}
 	}
 
-	return coffee_validate_email($email);
+    return false;
 }
 
 /**
