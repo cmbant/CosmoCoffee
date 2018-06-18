@@ -307,7 +307,7 @@ function coffee_validate_email($email) {
     }
     $db->sql_freeresult($result);
 
-    return 'EMAIL_INVALID';
+    return true;
 }
 
 // 1403.3985
