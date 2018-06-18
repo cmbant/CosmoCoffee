@@ -253,6 +253,11 @@ class ucp_register
 			'lang'				=> basename($request->variable('lang', $user->lang_name)),
 			'tz'				=> $request->variable('tz', $timezone),
 		);
+        
+// CosmoCoffee
+        $config['require_activation'] = (coffee_validate_email($data['email'])) ? USER_ACTIVATION_ADMIN : USER_ACTIVATION_SELF;
+// CosmoCoffee
+        
 		/**
 		* Add UCP register data before they are assigned to the template or submitted
 		*
