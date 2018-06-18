@@ -143,6 +143,8 @@ function simpletex_noBB($text, $realtex = false) {
     // \sch\"odinger etc
     
     if (
+        preg_match('/\$/', $text) ||
+        preg_match('/\[tex\]/', $text) ||
         preg_match('/\[latex\]/', $text) ||
         preg_match('/\[math\]/', $text) ||
         preg_match('/\\\\begin{equation}/', $text) ||
