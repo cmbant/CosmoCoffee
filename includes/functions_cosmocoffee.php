@@ -309,6 +309,7 @@ function coffee_validate_email($email) {
 }
 
 // 1403.3985
+// 1806.05022
 function prepare_post_subject_cosmocoffee($subject, $save_to_db = false) {
     $result = array(
         'subject' => $subject,
@@ -329,7 +330,7 @@ function prepare_post_subject_cosmocoffee($subject, $save_to_db = false) {
 
 function is_arxiv_tag($str) {
     if (preg_match('|^[a-z][a-zA-Z\.\-]{3,}/[0-9v]{6,}$|', $str) == 1 ||
-        preg_match('|^(arxiv:)?[0-9]{4,4}\.[0-9]{4,4}(v.)?$|i', $str))
+        preg_match('|^(arxiv:)?[0-9]{4,4}\.[0-9]{4,5}(v.)?$|i', $str))
         return TRUE;
     else
         return FALSE;
