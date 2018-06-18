@@ -165,5 +165,3 @@ function doclean($text) {
 }
 
 
-
-mail('lae@tangramltd.com', 'cron job CosmoCoffee', 'end: ' . date("d.m.Y H:i:s"), 'header');

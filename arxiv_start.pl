@@ -24,10 +24,14 @@ if ($data =~ m/new/){
     $subject=$data;
 
 use DBI;
-$database = "wordweb1_coffee";
-$username = "wordweb1_cosmo";
-$password = "SD3FJFr9fVA";
+$database = "site296_cosmocoffee_db";
+$username = "site296_db_user";
+$password = "zAEQpb6X";
 $hostname = "localhost";
+#$database = "wordweb1_coffee";
+#$username = "wordweb1_cosmo";
+#$password = "SD3FJFr9fVA";
+#$hostname = "localhost";
 $db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password); 
     $sql = "select arxiv from ARXIV_NEW where arxiv_tag = '$data'";
   $query = $db->prepare($sql);
@@ -43,6 +47,6 @@ $db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password);
 }
 
 
-print "Location: http://cosmocoffee.info/posting.php?mode=newtopic&f=$f&subject=$subject\n\n"; 
+print "Location: ./posting.php?mode=newtopic&f=$f&subject=$subject\n\n"; 
 
 exit;
