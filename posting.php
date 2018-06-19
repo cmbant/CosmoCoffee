@@ -1620,7 +1620,7 @@ $page_data = array(
     'TOPIC_TITLE' => censor_text($post_data['topic_title']),
     'MODERATORS' => (count($moderators)) ? implode($user->lang['COMMA_SEPARATOR'], $moderators[$forum_id]) : '',
     'USERNAME' => ((!$preview && $mode != 'quote') || $preview) ? $post_data['username'] : '',
-    'SUBJECT' => $post_data['post_subject'],
+    'SUBJECT' => ($post_data['post_subject']) ? $post_data['post_subject'] : $request->variable('subject', '', true),
     'MESSAGE' => $post_data['post_text'],
     'BBCODE_STATUS' => $user->lang(($bbcode_status ? 'BBCODE_IS_ON' : 'BBCODE_IS_OFF'), '<a href="' . $controller_helper->route('phpbb_help_bbcode_controller') . '">', '</a>'),
     'IMG_STATUS' => ($img_status) ? $user->lang['IMAGES_ARE_ON'] : $user->lang['IMAGES_ARE_OFF'],
