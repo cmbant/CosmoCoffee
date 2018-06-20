@@ -92,7 +92,7 @@ $submit = (isset($_POST['submit'])) ? true : false;
 
 $default_key = 'c';
 $sort_key = $request->variable('sk', $default_key);
-$sort_dir = $request->variable('sd', 'a');
+$sort_dir = $request->variable('sd', 'd');
 
 $user_types = array(USER_NORMAL, USER_FOUNDER);
 if ($auth->acl_get('a_user'))
@@ -1274,7 +1274,7 @@ switch ($mode)
 		$check_params = array(
 			'g'				=> array('g', 0),
 			'sk'			=> array('sk', $default_key),
-			'sd'			=> array('sd', 'a'),
+			'sd'			=> array('sd', 'd'),
 			'form'			=> array('form', ''),
 			'field'			=> array('field', ''),
 			'select_single'	=> array('select_single', $select_single),
