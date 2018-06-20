@@ -243,7 +243,7 @@ if($club < 0 && $delcategory) {
 
 if(!empty($addref) && $user_id > 1) {
     
-   if(!$result = $db->sql_query("select user_id from bookmarks where user_id = $user_id and arxiv_tag='$addref'")) {
+   if($result = $db->sql_query("select user_id from bookmarks where user_id = $user_id and arxiv_tag='$addref'")) {
         if(!$row = $db->sql_fetchrow($result)) {
             $db->sql_freeresult($result);
             
