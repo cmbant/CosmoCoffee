@@ -312,14 +312,17 @@ function coffee_validate_email($email) {
 
 // 1403.3985
 // 1806.05022
+// astro-ph/0311381
 function prepare_post_subject_cosmocoffee($subject, $save_to_db = false) {
     $result = array(
         'subject' => $subject,
         'paper_id' => NULL
     );
+    
+    $arxiv_tag = is_arxiv_tag($subject) ? $subject : get_arxiv_tag_from_post_subject($subject);
 
-    if (is_arxiv_tag($subject)) {
-        $arxiv_info = get_arxiv_paper_info($subject);
+    if ($arxiv_tag) {
+        $arxiv_info = get_arxiv_paper_info($arxiv_tag);
         if ($arxiv_info) {
             $result['subject'] = '[' . $arxiv_info['tag'] . '] ' . $arxiv_info['title'];
             if ($save_to_db) {
@@ -336,6 +339,21 @@ function is_arxiv_tag($str) {
         return TRUE;
     else
         return FALSE;
+}
+
+function get_arxiv_tag_from_post_subject($subject) {
+    $arxiv_tag = '';
+
+    $found = preg_match('#^\[([a-z][a-zA-Z\.\-]{3,}/[0-9v]{6,})\]#i', $subject, $matches);
+    if (!$found) {
+        $found = preg_match('#^\[([0-9]{4,4}\.[0-9]{4,5})\]#i', $subject, $matches);
+    }
+    
+    if ($found) {
+        $arxiv_tag = $matches[1];
+    }
+    
+    return $arxiv_tag;    
 }
 
 function get_arxiv_paper_info($arxiv_in) {
