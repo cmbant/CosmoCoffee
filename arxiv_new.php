@@ -260,13 +260,13 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         }
 
         if ($user->data['user_id'] != ANONYMOUS) {
-            $titleLinks .= "[<a href='/bookmark.php?add=$arxivTag' target='_blank'>Bookmarks</a>]";
+            $titleLinks .= "[<a href='/bookmark.php?add=$arxivTag' target='_blank'>Bookmark</a>]";
         }
 
         if($row['paper_id']) {
-            $titleLinks .= " [<a href='/arxiv_start.pl?$arxivTag' target='_blank'>discuss</a>]";
+            $titleLinks .= " [<a href='/discuss/$arxivTag' target='_blank'>View discussion</a>]";            
         } else {
-            $titleLinks .= " [<a href='/discuss/$arxivTag' target='_blank'>View discussion</a>]";
+            $titleLinks .= " [<a href='/arxiv_start.pl?$arxivTag' target='_blank'>discuss</a>]";
         }
         
         $text .= "<dt><h3 class='arxiv_title'><b>$arxivTag</b>$titleLinks</h3></dt>";
