@@ -55,7 +55,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
             trigger_error('Could not validate club name');
         }
         
-        $rows = $db->sql_fetc>owset($result);
+        $rows = $db->sql_fetchrow($result);
         $db->sql_freeresult($result);
         
         if (empty($rows)) {            
@@ -156,7 +156,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
 
             $managetxt .= '<h3 style="border: none!important;">';
             $managetxt .= "<a class='maintitle' href='$bookfname?club=$club_id'>{$row['name']}</a>";
-            $managetxt .= " [<a href='$fname?action=delete&club_id='$club_id'>delete</a>]";
+            $managetxt .= " [<a href='$fname?action=delete&club_id=$club_id'>delete</a>]";
             $managetxt .= '</h3>';
 
             $managetxt .= '<p>';
