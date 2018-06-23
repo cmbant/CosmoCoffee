@@ -47,15 +47,19 @@
 				</li>
 			<!-- ENDIF -->
 		<!-- ENDIF -->
-		<!-- EVENT overall_footer_teamlink_before -->
-		<!-- IF U_TEAM -->
-			<li class="rightside" data-last-responsive="true">
-				<a href="{U_TEAM}" role="menuitem">
-					<i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
-				</a>
-			</li>
-		<!-- ENDIF -->
-		<!-- EVENT overall_footer_teamlink_after -->
+
+        <!-- IF SHOW_TEAM -->
+            <!-- EVENT overall_footer_teamlink_before -->
+            <!-- IF U_TEAM -->
+                <li class="rightside" data-last-responsive="true">
+                    <a href="{U_TEAM}" role="menuitem">
+                        <i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
+                    </a>
+                </li>
+            <!-- ENDIF -->
+            <!-- EVENT overall_footer_teamlink_after -->
+        <!-- ENDIF -->
+    
 		<!-- IF U_CONTACT_US -->
 			<li class="rightside" data-last-responsive="true">
 				<a href="{U_CONTACT_US}" role="menuitem">
