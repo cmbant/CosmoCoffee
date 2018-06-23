@@ -62,13 +62,15 @@
 								</a>
 							</li>
 						<!-- ENDIF -->
-						<!-- IF U_TEAM -->
-							<li>
-								<a href="{U_TEAM}" role="menuitem">
-									<i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
-								</a>
-							</li>
-						<!-- ENDIF -->
+                        <!-- IF SHOW_TEAM -->
+                            <!-- IF U_TEAM -->
+                                <li>
+                                    <a href="{U_TEAM}" role="menuitem">
+                                        <i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
+                                    </a>
+                                </li>
+                            <!-- ENDIF -->
+                        <!-- ENDIF -->
 					<!-- ENDIF -->
 					<li class="separator"></li>
 
