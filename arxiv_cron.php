@@ -5,6 +5,7 @@ define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
+include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 
 anti_hack($phpEx);
 
@@ -30,6 +31,8 @@ do_arxiv('math-ph');
 do_arxiv('hep-ex');
 do_arxiv('cs');
 do_arxiv('stat');
+
+delete_forum_cache();
 
 
 function do_arxiv($in) {
@@ -164,4 +167,20 @@ function doclean($text) {
     return $text;
 }
 
+function delete_forum_cache() {
+    global $config, $cache, $phpbb_container, $auth, $phpbb_log, $db;
+        
+    $config->increment('assets_version', 1);
+    $cache->purge();
 
+    // Remove old renderers from the text_formatter service. Since this
+    // operation is performed after the cache is purged, there is not "current"
+    // renderer and in effect all renderers will be purged
+    $phpbb_container->get('text_formatter.cache')->tidy();
+
+    // Clear permissions
+    $auth->acl_clear_prefetch();
+    phpbb_cache_moderators($db, $cache, $auth);
+    
+    $phpbb_log->add('admin', ANONYMOUS, '', 'LOG_PURGE_CACHE');
+}

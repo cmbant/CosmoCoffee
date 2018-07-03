@@ -1,8 +1,0 @@
-cd /home/site296/public_html
-/usr/local/bin/php arxiv_cron.php
-/usr/local/bin/php test_insert.php
-
-#cd /usr/home/cosmocoffee/public_html/cosmocoffee_info
-#/usr/local/bin/php arxiv_cron.php
-#/usr/local/bin/php test_insert.php
-

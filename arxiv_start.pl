@@ -25,15 +25,10 @@ if ($data =~ m/new/){
 
 use DBI;
 
-$database = "site296_cosmocoffee_db";
-$username = "site296_db_user";
-$password = "zAEQpb6X";
-$hostname = "localhost";
-
-#$database = "wordweb1_coffee";
-#$username = "wordweb1_cosmo";
-#$password = "SD3FJFr9fVA";
-#$hostname = "localhost";
+$database = "cosmocoffee_cosmocoffee";
+$username = "1015824_7_r";
+$password = "7KzWVN32";
+$hostname = "db85a.pair.com";
 
 $db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password); 
     $sql = "select arxiv from ARXIV_NEW where arxiv_tag = '$data'";

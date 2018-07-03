@@ -128,6 +128,7 @@ function arxiv_tex($text) {
     $text = str_replace('&lt;&lt;', '\\ll ', $text);
     $text = str_replace('&gt;&gt;', '\\gg ', $text);
     $text = simpletex_noBB($text, $realtex);
+    $text = preg_replace('/\{([^\{]*?)\}/', '$1', $text);
     $text = str_replace(array('\\rm', '\\emph', '\\em'), '', $text);
 
     if ($realtex) {
@@ -372,6 +373,7 @@ function get_arxiv_paper_info($arxiv_in) {
     $info['title'] = $matches[1];
 
     $found = preg_match('|Authors:.*>(.*)<\/div>|isU', $html, $matches);
+    
     if (!$found) {
 #		$found = preg_match( '|Authors:(.*)<BLOCKQUOTE>|isU',
 #			$html, $matches );
@@ -381,6 +383,8 @@ function get_arxiv_paper_info($arxiv_in) {
     $raw_authors = $matches[1];
     // remove html tags
     $authors = preg_replace("'<[\/\!]*?[^<>]*?>'si", "", $raw_authors);
+    $authors = preg_replace('/(\s)\s+/s', '$1', $authors);
+    $authors = preg_replace('/\<\/b\>/is', '', $authors);
     $info['authors'] = $authors;
 
     $found = preg_match('|Abstract:.*>(.*)<\/BLOCKQUOTE>|isU', $html, $matches);
@@ -389,7 +393,7 @@ function get_arxiv_paper_info($arxiv_in) {
         return FALSE;
     $info['abstract'] = $matches[1];
 
-    $found = preg_match('|Comments:.*/div>.*<div.*>(.*)<\/div|isU', $html, $matches);
+    $found = preg_match('|Comments:.*/td>.*<td.*>(.*)<\/td|isU', $html, $matches);
     //if ( !$found ) return FALSE;
     $info['comments'] = $matches[1];
 

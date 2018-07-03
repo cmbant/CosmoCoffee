@@ -17,10 +17,10 @@ $data =~ s/\'/\'\'/g;
 $OK = 0;
 
 use DBI;
-$database = "wordweb1_coffee";
-$username = "wordweb1_cosmo";
-$password = "SD3FJFr9fVA";
-$hostname = "localhost";
+$database = "cosmocoffee_cosmocoffee";
+$username = "1015824_7_r";
+$password = "7KzWVN32";
+$hostname = "db85a.pair.com";
 $db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password); 
 
   $query = $db->prepare("select phpbb_topics.topic_id,phpbb_topics.forum_id from phpbb_topics,phpbb_papers where phpbb_papers.paper_id=phpbb_topics.paper_id and phpbb_papers.arxiv_tag='$data'");
@@ -36,7 +36,7 @@ $db->disconnect;
 
 if ($OK){
 
-print "Location: http://cosmocoffee.info/viewtopic.php?t=$topic\n\n"; 
+print "Location: https://cosmocoffee.info/viewtopic.php?t=$topic\n\n"; 
 exit;
 }
 
