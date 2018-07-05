@@ -1,4 +1,0 @@
-<?php exit; ?>
-1562172996
-736
-a:1:{s:32:"2c3e92b11d2badc6dd395475ec6a97d6";a:3:{i:0;a:4:{s:10:"named_path";s:64:"ext/david63/privacypolicy/language/en/info_acp_privacypolicy.php";s:8:"ext_name";s:21:"david63/privacypolicy";s:4:"path";s:38:"ext/david63/privacypolicy/language/en/";s:8:"filename";s:26:"info_acp_privacypolicy.php";}i:1;a:4:{s:10:"named_path";s:52:"ext/marcovo/mathjax/language/en/info_acp_mathjax.php";s:8:"ext_name";s:15:"marcovo/mathjax";s:4:"path";s:32:"ext/marcovo/mathjax/language/en/";s:8:"filename";s:20:"info_acp_mathjax.php";}i:2;a:4:{s:10:"named_path";s:50:"ext/phpbb/viglink/language/en/info_acp_viglink.php";s:8:"ext_name";s:13:"phpbb/viglink";s:4:"path";s:30:"ext/phpbb/viglink/language/en/";s:8:"filename";s:20:"info_acp_viglink.php";}}}
