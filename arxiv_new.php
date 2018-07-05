@@ -272,7 +272,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $text .= "<dt><h3 class='arxiv_title'><b>$arxivTag</b>$titleLinks</h3></dt>";
         
         $text .= "<dd>";
-        $text .= '<b>Title:</b> '. arxiv_tex($title) .'<br>';        
+        $text .= '<span class="arxiv_title_line"><b>Title:</b> '. arxiv_tex($title) .'</span><br>';        
         
         $authors = tex_accents($authors);
         $authors = preg_replace('#\\\rm\{(.+?)\}#s','\\1', $authors);        

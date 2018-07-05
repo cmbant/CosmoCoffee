@@ -19,3 +19,15 @@
 @import url("icons.css?v=3.2");
 @import url("colours.css?v=3.2");
 @import url("responsive.css?v=3.2");
+
+.arxiv_title_line{
+    font-size:13px;
+}
+
+.arxiv_title{
+    font-size:15px;
+}
+
+dd p.postbody2{
+    margin-top:4px;
+}
