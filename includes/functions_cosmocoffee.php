@@ -44,11 +44,11 @@ function make_clickable_cosmocoffee($text) {
     // matches an "xxxx://yyyy" URL at the start of a line, or after a space.
     // xxxx can only be alpha characters.
     // yyyy is anything up to the first space, newline, comma, double quote or <
-    $ret = preg_replace("#(^|[\n ])([\w]+?://[\w\#$%&~/.\-;:=,?@\[\]+]*)#is", "\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $ret);
+    //$ret = preg_replace("#(^|[\n ])([\w]+?://[\w\#$%&~/.\-;:=,?@\[\]+]*)#is", "\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $ret);
 
     // matches a "www|ftp.xxxx.yyyy[/zzzz]" kinda lazy URL thing
     // Must contain at least 2 dots. xxxx contains either alphanum, or "-"
-    // zzzz is optional.. will contain everything up to the first space, newline, 
+    // zzzz is optional.. will contain everything up to the first space, newline,
     // comma, double quote or <.
     $ret = preg_replace("#(^|[\n ])((www|ftp)\.[\w\#$%&~/.\-;:=,?@\[\]+]*)#is", "\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>", $ret);
 
@@ -70,7 +70,7 @@ function make_clickable_cosmocoffee($text) {
 
     // Remove our padding..
     $ret = substr($ret, 1);
-    
+
     // http://cosmocoffee.info/files/Antony_Lewis/nT.png
     $ret = preg_replace('/http:\/\/cosmocoffee.info\/files\/(.[^\'"]+)/', '/cosmo_files.php?file=\\1', $ret);
 
@@ -142,7 +142,7 @@ function simpletex_noBB($text, $realtex = false) {
     //Replace A_a, \greek etc with html
     //Remove things that look like URLs, input_parameters, etc
     // \sch\"odinger etc
-    
+
     if (
         preg_match('/\$/', $text) ||
         preg_match('/\[tex\]/', $text) ||
@@ -154,7 +154,7 @@ function simpletex_noBB($text, $realtex = false) {
     ) {
         return $text;
     }
-    
+
     $text = tex_accents($text);
 
     $specs = array('\\\\', '\\{', '\\}', '\\^', '\\_', '\\$', '^\\circ', '^{\\circ}', '\Lambda CDM');
@@ -222,7 +222,7 @@ function simpletex_noBB($text, $realtex = false) {
     //Use minus to prevent word-breaking
     $text = preg_replace('/\-(?=[0-9])/', '&minus;', $text);
 
-    // Remaining {} contain nothing {} or stuff we can't easily process 
+    // Remaining {} contain nothing {} or stuff we can't easily process
     $text = preg_replace('/\{([^\{]*?)\}/', '$1', $text);
 
     return $text;
@@ -259,7 +259,7 @@ function tex_accents($text) {
 }
 
 function mathItalic($matches) {
-    // two or more condescutive letters in {} that are not specials or parts of HTML tags 
+    // two or more condescutive letters in {} that are not specials or parts of HTML tags
     return preg_replace('/(?!\\\[a-zA-Z]*)(?![\/&\<\"][a-zA-Z]*[\"=;\>])(^|[^a-zA-Z])([A-Za-z]{2,})/', '$1<I>$2</I>', $matches[1]);
 }
 
@@ -319,7 +319,7 @@ function prepare_post_subject_cosmocoffee($subject, $save_to_db = false) {
         'subject' => $subject,
         'paper_id' => NULL
     );
-    
+
     $arxiv_tag = is_arxiv_tag($subject) ? $subject : get_arxiv_tag_from_post_subject($subject);
 
     if ($arxiv_tag) {
@@ -349,12 +349,12 @@ function get_arxiv_tag_from_post_subject($subject) {
     if (!$found) {
         $found = preg_match('#^\[([0-9]{4,4}\.[0-9]{4,5})\]#i', $subject, $matches);
     }
-    
+
     if ($found) {
         $arxiv_tag = $matches[1];
     }
-    
-    return $arxiv_tag;    
+
+    return $arxiv_tag;
 }
 
 function get_arxiv_paper_info($arxiv_in) {
@@ -373,7 +373,7 @@ function get_arxiv_paper_info($arxiv_in) {
     $info['title'] = $matches[1];
 
     $found = preg_match('|Authors:.*>(.*)<\/div>|isU', $html, $matches);
-    
+
     if (!$found) {
 #		$found = preg_match( '|Authors:(.*)<BLOCKQUOTE>|isU',
 #			$html, $matches );
@@ -414,19 +414,19 @@ function add_arxiv_paper_to_db($arxiv_info) {
     if ($result = $db->sql_query("SELECT paper_id FROM phpbb_papers where arxiv_tag='$arxiv_tag'")) {
         if ($row = $db->sql_fetchrow($result)) {
             $sql = "UPDATE
-                        phpbb_papers 
-                    SET  
-                        paper_authors = '$paper_authors', 
-                        paper_title = '$paper_title', 
-                        paper_url = '$paper_url', 
-                        paper_abstract = '$paper_abstract', 
+                        phpbb_papers
+                    SET
+                        paper_authors = '$paper_authors',
+                        paper_title = '$paper_title',
+                        paper_url = '$paper_url',
+                        paper_abstract = '$paper_abstract',
                         paper_comments = '$paper_comments'
-                    WHERE 
+                    WHERE
                         paper_id = {$row['paper_id']}";
         } else {
             $sql = "INSERT INTO
-                        phpbb_papers (arxiv_tag, paper_authors, paper_title, paper_url, paper_abstract, paper_comments) 
-                    VALUES 
+                        phpbb_papers (arxiv_tag, paper_authors, paper_title, paper_url, paper_abstract, paper_comments)
+                    VALUES
                         ('$arxiv_tag', '$paper_authors', '$paper_title', '$paper_url', '$paper_abstract', '$paper_comments')";
         }
         $db->sql_freeresult($result);
@@ -443,9 +443,9 @@ function add_arxiv_paper_to_db($arxiv_info) {
     return $paper_id;
 }
 
-function arxiv_traceback($arxiv) {        
+function arxiv_traceback($arxiv) {
     $cosmoCoffeeUrl = 'http://cosmocoffee.info';
-    
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://arxiv.org/trackback/' . $arxiv);
 //    $header[] = "Content-Type: application/x-www-form-urlencoded; charset=utf-8";
