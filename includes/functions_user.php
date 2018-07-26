@@ -1714,6 +1714,11 @@ function validate_username($username, $allowed_username = false)
 		return false;
 	}
 
+//CosmoCoffee check name has space
+       if (!strpos($username," ")) {
+               return 'USERNAME_DISALLOWED';
+        }
+
 	// ... fast checks first.
 	if (strpos($username, '&quot;') !== false || strpos($username, '"') !== false || empty($clean_username))
 	{
