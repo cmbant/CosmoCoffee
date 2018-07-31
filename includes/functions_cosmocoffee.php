@@ -36,8 +36,6 @@ function get_username_by_id($user_id) {
 function make_clickable_cosmocoffee($text) {
     global $user;
 
-    $text = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $text);
-
     // pad it with a space so we can match things at the start of the 1st line.
     $ret = ' ' . $text;
 
@@ -50,7 +48,7 @@ function make_clickable_cosmocoffee($text) {
     // Must contain at least 2 dots. xxxx contains either alphanum, or "-"
     // zzzz is optional.. will contain everything up to the first space, newline,
     // comma, double quote or <.
-    $ret = preg_replace("#(^|[\n ])((www|ftp)\.[\w\#$%&~/.\-;:=,?@\[\]+]*)#is", "\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>", $ret);
+    //$ret = preg_replace("#(^|[\n ])((www|ftp)\.[\w\#$%&~/.\-;:=,?@\[\]+]*)#is", "\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>", $ret);
 
     // matches an email@domain type address at the start of a line, or after a space.
     // Note: Only the followed chars are valid; alphanums, "-", "_" and or ".".
@@ -74,7 +72,8 @@ function make_clickable_cosmocoffee($text) {
     // http://cosmocoffee.info/files/Antony_Lewis/nT.png
     $ret = preg_replace('/http:\/\/cosmocoffee.info\/files\/(.[^\'"]+)/', '/cosmo_files.php?file=\\1', $ret);
 
-    return simpletex($ret);
+    return $ret;
+    //return simpletex($ret);
 }
 
 function microtime_float() {
