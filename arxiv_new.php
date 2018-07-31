@@ -67,7 +67,7 @@ if(!empty($month)) {
 $arxiv_sql = $db->sql_in_set('arxiv', $arxives);
 
 
-$text .= get_arhives_html($arxiv_sql, $date_range, $keywords, $arxives);
+$text .= get_archives_html($arxiv_sql, $date_range, $keywords, $arxives);
 
 $text .= "<dt><hr><h3>Replacements</h3></dt>";
 $text .= get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives);
@@ -158,7 +158,7 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives) 
     return $linksHtml;
 }
 
-function get_arhives_html($arxiv_sql, $date_range, $keywords, $arxives) {
+function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives) {
     global $db;
 
     $scores = [];
@@ -185,6 +185,7 @@ function get_arhives_html($arxiv_sql, $date_range, $keywords, $arxives) {
             $items[] = $rowResult['item'];
         }
     }
+    $db->sql_freeresult($result);
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);
@@ -217,6 +218,7 @@ function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxi
             $items[] = $rowResult['item'];
         }
     }
+    $db->sql_freeresult($result);
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);
