@@ -54,7 +54,7 @@ function do_arxiv($in) {
             return;
         }
 
-        print "$arxiv ";
+        print "$arxiv ".$adate;
 
         $date = $adate;
 
@@ -109,7 +109,7 @@ function parse_post($post, $isreplace) {
         
         $extra = $ref[4];
         
-        $abstract = preg_replace('#\<a href\s*=\s*\"(.*?)\".*?\>\s*this http URL\s*\<\/a\s*\>#is', '\\1', $ref[5]);
+        $abstract = preg_replace('#\<a href\s*=\s*\"(.*?)\".*?\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $ref[5]);
         $abstract = preg_replace("'\<[\/\!]*?[^\<\>]*?\>'si", "", $abstract);
         $abstract = doclean($abstract);
 
@@ -118,9 +118,9 @@ function parse_post($post, $isreplace) {
 
         if (preg_match('#Comments:.*?\>\s*(.*?)\<\/div#is', $extra, $ref)) {
             $comments = $ref[1];
-            $comments = preg_replace('#\<a href\s*=\s*\"([^\"]*?)\"\>\s*this http URL\s*\<\/a\s*\>#is', '\\1', $comments);
-            $comments = doclean(preg_replace('#\<[\/\!]*?[^\<\>]*?\>#si', '', $comments));
-        } else {
+            $comments = preg_replace('#\<a href\s*=\s*\"([^\"]*?)\"\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $comments);
+ 	    $comments = doclean(preg_replace('#\<[\/\!]*?[^\<\>]*?\>#si', '', $comments));
+	} else {
             $comments = '';
         }
         
