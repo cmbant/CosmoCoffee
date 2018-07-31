@@ -4,7 +4,10 @@
 <script type="text/x-mathjax-config">
 // <![CDATA[
 MathJax.Hub.PreProcess.disabled = true;
-MathJax.Hub.Config({messageStyle:"none"});
+MathJax.Hub.Config({messageStyle:"none", tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'], ['[tex]','[/tex]'] ],
+            processEscapes: true
+        }});
 ready(function() {phpbb2jax()});
 // ]]>
 </script>
