@@ -937,7 +937,7 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 	static $static_class;
 	static $magic_url_match_args;
     
-    $text = make_clickable_cosmocoffee($text);
+        $text = make_clickable_cosmocoffee($text);
 
 	if (!isset($magic_url_match_args[$server_url]) || $static_class != $class)
 	{
@@ -979,7 +979,7 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 		);
 	}
     
-    return $text;
+ #   return $text;
 
 	foreach ($magic_url_match_args[$server_url] as $magic_args)
 	{
