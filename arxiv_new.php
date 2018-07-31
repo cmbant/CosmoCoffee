@@ -274,7 +274,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $text .= "<dt><h3 class='arxiv_title'><b>$arxivTag</b>$titleLinks</h3></dt>";
 
         $text .= "<dd>";
-        $text .= '<span class="arxiv_title_line"><b>Title:</b> '. arxiv_tex($title) .'</span><br>';
+        $text .= '<span class="arxiv_title_line"><b>Title:</b> '. $title .'</span><br>';
 
         $authors = tex_accents($authors);
         #$authors = preg_replace('#\\\rm\{(.+?)\}#s','\\1', $authors);
@@ -290,7 +290,6 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         if(!$replace) {
             $abs_matches = $abs_matches * 1000 / max(1000, strlen($abstract));
             $abstract = preg_replace('/\\\\cite\{([^\{]*?)\}/', '[$1]', $abstract);
-           # $abstract = arxiv_tex($abstract);
             $abstract = make_clickable($abstract);
             $text .= "<p class='postbody2'>$abstract<br></p>";
         }
