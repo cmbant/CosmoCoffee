@@ -76,7 +76,6 @@ if (!empty($arxiv)) {
 
     $result = get_data('https://api.adsabs.harvard.edu/v1/search/query?fl=bibcode&q=arXiv:'.$arxiv);
     if ($result){
-
        $obj = json_decode($result);
        if ($obj->response) {
 
