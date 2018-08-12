@@ -11,9 +11,28 @@
 				<div class="pointer"><div class="pointer-inner"></div></div>
 				<ul class="dropdown-contents" role="menu">
 					<!-- EVENT navbar_header_quick_links_before -->
+     				           <li class="separator"></li>
+							<li>
+                                			<a href="/bibtex.php" role="menuitem">
+                                				<i class="icon fa-file-o fa-fw icon-gray" aria-hidden="true"></i><span>BibTex tool</span>
+                                			</a>
+                                                </li>
+                                               <li class="separator"></li>
+							<li>
+                                			<a href="{U_FAQ}" role="menuitem">
+                                				<i class="icon fa-file-o fa-fw icon-gray" aria-hidden="true"></i><span>{L_FAQ}</span>
+                                			</a>
+                                                </li>
+                                         <li class="separator"></li>
+							<li>
+                                			<a href="/booking.php" role="menuitem">
+                                				<i class="icon fa-file-o fa-fw icon-gray" aria-hidden="true"></i><span>Room booking</span>
+                                			</a>
+                                                </li>
+                                      				
 
 					<!-- IF S_DISPLAY_SEARCH -->
-						<li class="separator"></li>
+                                		<li class="separator"></li>
 						<!-- IF S_REGISTERED_USER -->
 							<li>
 								<a href="{U_SEARCH_SELF}" role="menuitem">
@@ -51,6 +70,8 @@
 									<i class="icon fa-search fa-fw" aria-hidden="true"></i><span>{L_SEARCH}</span>
 								</a>
 							</li>
+
+                                		</li>
 					<!-- ENDIF -->
 
 					<!-- IF not S_IS_BOT and (S_DISPLAY_MEMBERLIST or U_TEAM) -->
@@ -79,12 +100,6 @@
 			</div>
 		</li>
 
-		<!-- EVENT overall_header_navigation_prepend -->
-		<li <!-- IF not S_USER_LOGGED_IN -->data-skip-responsive="true"<!-- ELSE -->data-last-responsive="true"<!-- ENDIF -->>
-			<a href="{U_FAQ}" rel="help" title="{L_FAQ_EXPLAIN}" role="menuitem">
-				<i class="icon fa-question-circle fa-fw" aria-hidden="true"></i><span>{L_FAQ}</span>
-			</a>
-		</li>
 		<!-- EVENT overall_header_navigation_append -->
 		<!-- IF U_ACP -->
 			<li data-last-responsive="true">
@@ -100,8 +115,8 @@
 				</a>
 			</li>
 		<!-- ENDIF -->
-        
-        
+
+
         <!--CosmoCoffee-->
         <li data-last-responsive="true">
             <a href="/arxiv_new.php" title="Arxiv New Filter" role="menuitem">
@@ -112,7 +127,7 @@
             <a href="/bookmark.php" title="Bookmarks &amp; clubs" role="menuitem">
                 <i class="icon fa-bookmark fa-fw" aria-hidden="true"></i><span>Bookmarks &amp; clubs</span>
             </a>
-        </li>        
+        </li>
         <!--CosmoCoffee-->
 
 	<!-- IF S_REGISTERED_USER -->
@@ -189,12 +204,12 @@
 		<!-- ENDIF -->
 		<!-- EVENT navbar_header_logged_out_content -->
 	<!-- ENDIF -->
-    
+
         <!--CosmoCoffee-->
         <li data-last-responsive="true" style="text-align: center; margin-right: 15%;" class="rightside">
             <form method="get" action="/arxivjump.pl" TARGET="_top">
                 <span>Arxiv ref/author: </span>
-                <input type="text" name="r" size="12" maxlength="40" style="height: 18px;" value=""> 
+                <input type="text" name="r" size="12" maxlength="40" style="height: 18px;" value="">
                 <input type="submit" value="Go" class="button">
             </form>
         </li>

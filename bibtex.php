@@ -18,8 +18,7 @@ $ads_fields = array();
 $joint = 0;
 
 $arxiv = $request->variable('arxiv', '');
-$arxiv = '1807.06210';
-//$arxiv = 'astro-ph/0412276';
+//$arxiv = '1807.06210';
 
 $ads_key='NBqUzF2r6UOleFEdoEypeCFKKuayVj7nsEpgna4V';
 
@@ -57,7 +56,7 @@ function get_bibtex($bibcode) {
           $obj = json_decode($data);
            if ($obj->export) {
                 return $obj->export;
-            } 
+            }
         }
   return false;
 }
@@ -70,7 +69,7 @@ if (!empty($arxiv)) {
 
     $SPIRES_url = 'http://inspirehep.net/search?action_search=Search&of=hx&p=FIND+EPRINT+' . $arxiv;
     $html = get_url($SPIRES_url);
-    
+
     if (preg_match('#<pre>(.*?)</pre>#s', $html, $txt)) {
         $bibtex = $txt[1];
     }
@@ -79,10 +78,10 @@ if (!empty($arxiv)) {
     if ($result){
        $obj = json_decode($result);
        if ($obj->response) {
-        
+
           $bibcode = $obj->response->docs[0]->bibcode;
           $html = get_bibtex($bibcode);
-        
+
         if (preg_match('#(\@[a-zA-Z]*)(.*)#s', $html, $ads_bib)) {
             $ads_tag = $ads_bib[1];
             $ads_bib = $ads_bib[0];
@@ -96,7 +95,7 @@ if (!empty($arxiv)) {
         }
      }
     }
-  
+
     $bib = $bibtex;
 
     if (!preg_match('#ArXiv#s', $ads_bib) && !preg_match('#journal#s', $bibtex)) {
