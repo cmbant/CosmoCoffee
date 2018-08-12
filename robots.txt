@@ -1,4 +1,5 @@
 User-agent: *
+Crawl-Delay: 5
 Disallow: /faq.php
 Disallow: /memberlist.php
 Disallow: /posting.php
@@ -9,3 +10,18 @@ Disallow: /arxiv_view.php
 Disallow: /search.php
 Disallow: /bibtex.php
 Disallow: /bookmark.php
+Disallow: /cache/
+Disallow: /adm/
+Disallow: /docs/
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: SemrushBot-SA
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: Yandex
+Disallow: /

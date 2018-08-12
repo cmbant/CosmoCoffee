@@ -10,11 +10,6 @@ include($phpbb_root_path . 'includes/bbcode.' . $phpEx); ///////////////////////
 
 anti_hack($phpEx);
 
-$user->session_begin();
-$auth->acl($user->data);
-$user->setup();
-$user->get_profile_fields($user->data['user_id']);
-
 $inner_page_title = null;
 $text = '';
 $bibtex = '';
@@ -23,14 +18,55 @@ $ads_fields = array();
 $joint = 0;
 
 $arxiv = $request->variable('arxiv', '');
-//$arxiv = 'astro-ph/0412276';
+//$arxiv = '1807.06210';
+
+$ads_key='NBqUzF2r6UOleFEdoEypeCFKKuayVj7nsEpgna4V';
+
+function get_data($url) {
+  global $ads_key;
+         $ch = curl_init();
+             $timeout = 5;
+              curl_setopt($ch, CURLOPT_URL, $url);
+               curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Authorization: Bearer '.$ads_key
+                                ));
+       $data = curl_exec($ch);
+       curl_close($ch);
+return $data;
+}
+
+
+function get_bibtex($bibcode) {
+      global $ads_key;
+      $ch = curl_init();
+      $timeout = 15;
+      curl_setopt($ch, CURLOPT_URL, 'https://api.adsabs.harvard.edu/v1/export/bibtex');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+      curl_setopt($ch, CURLOPT_POSTFIELDS, '{"bibcode":["'. $bibcode .'"]}');
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Authorization: Bearer '.$ads_key,
+                    'Content-Type: application/json'));
+       $data = curl_exec($ch);
+       curl_close($ch);
+       if ($data) {
+          $obj = json_decode($data);
+           if ($obj->export) {
+                return $obj->export;
+            }
+        }
+  return false;
+}
 
 
 $text .= get_BibTex_form_html();
 
-if (!empty($arxiv)) {    
+if (!empty($arxiv)) {
     $inner_page_title = "BibTex for $arxiv";
-    
+
     $SPIRES_url = 'http://inspirehep.net/search?action_search=Search&of=hx&p=FIND+EPRINT+' . $arxiv;
     $html = get_url($SPIRES_url);
 
@@ -38,28 +74,30 @@ if (!empty($arxiv)) {
         $bibtex = $txt[1];
     }
 
-    $ads_url = 'http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:' . $arxiv;
-    $html = get_url($ads_url);
+    $result = get_data('https://api.adsabs.harvard.edu/v1/search/query?fl=bibcode&q=arXiv:'.$arxiv);
+    if ($result){
 
-    if (preg_match('#(http:.*?nph\-bib_query.bibcode.*?)\"#', $html, $key)) {
-        
-        $url2 = str_replace('&amp;', '&', $key[1]);
-        $html = get_url($url2);
+       $obj = json_decode($result);
+       if ($obj->response) {
+
+          $bibcode = $obj->response->docs[0]->bibcode;
+          $html = get_bibtex($bibcode);
 
         if (preg_match('#(\@[a-zA-Z]*)(.*)#s', $html, $ads_bib)) {
             $ads_tag = $ads_bib[1];
             $ads_bib = $ads_bib[0];
         } else
             $ads_bib = '';
-        
+
         $match_count = preg_match_all("#([a-z]+?) = (.*?)(,\n|\n)#is", $html, $matches);
 
         for ($i = 0; $i < $match_count; $i++) {
             $ads_fields[$matches[1][$i]] = $matches[2][$i];
         }
+     }
     }
 
-    $bib = $bibtex;    
+    $bib = $bibtex;
 
     if (!preg_match('#ArXiv#s', $ads_bib) && !preg_match('#journal#s', $bibtex)) {
 
@@ -80,13 +118,18 @@ if (!empty($arxiv)) {
     if ($joint) {
         $text .= '<span class="gen">BEST: <pre>' . $bib . '</pre></span>';
     }
-    
+
     $text .= '<hr>';
     $text .= '<span class="gen"><A HREF="' . $SPIRES_url . '">inSPIRE</A>: <pre>' . $bibtex . '</pre></span>';
     $text .= '<span class="gen"><A HREF="' . $ads_url . '">ADS</A>: <pre>' . $ads_bib . '</pre></span>';
 }
 
 $text .= '<hr><p align="center" class="gen">Modified BibTex files for including arxiv eprint references in many paper styles are available <A HREF="http://arxiv.org/hypertex/bibstyles">here</A>; see also <A HREf="/viewtopic.php?t=304">this post</A>.</p>';
+
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup();
+$user->get_profile_fields($user->data['user_id']);
 
 
 page_header('Arxiv BibTex');
@@ -108,19 +151,19 @@ function get_BibTex_form_html() {
     return '<center>
                 <form method="get" action="' . $request->server('SCRIPT_NAME') . '" TARGET="_top">
                     <span class="gen">Get BibTex for Arxiv ref: </span>
-                    <input class="post" type="text" name="arxiv" size="18" maxlength="40" value="">  
+                    <input class="post" type="text" name="arxiv" size="18" maxlength="40" value="">
                     <input type="submit" value="Go" class="button">
                 </form>
-            </center>';    
+            </center>';
 }
 
 function add_field($name, $ads_fields) {
     $field = '';
-    
+
     if (!empty($ads_fields[$name])) {
         $field = '     ' . sprintf('%-9s', $name) . " = " . $ads_fields[$name] . ",\n";
-    }    
-    
+    }
+
     return $field;
 }
 

@@ -1,7 +1,16 @@
-Options -Indexes
+Options -Indexes +FollowSymLinks
+
+Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
+
 
 <IfModule mod_rewrite.c>
 RewriteEngine on
+
+SetEnvIfNoCase User-Agent "SemrushBot" bad_user
+SetEnvIfNoCase User-Agent "AhrefsBot" bad_user
+#DDOS?
+SetEnvIfNoCase User-Agent "NT.*61.0.3163.100" bad_user
+Deny from env=bad_user
 
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=307]
