@@ -2,6 +2,9 @@ Options -Indexes +FollowSymLinks
 
 Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
 
+AddType application/x-httpd-php56 .php
+Action application/x-httpd-php56 /fcgi-bin/php56_wrapper.sh
+
 
 <IfModule mod_rewrite.c>
 RewriteEngine on

@@ -49,6 +49,8 @@ $text=<<<EOT
       p.parentNode.insertBefore(s,p);
       })(document, 'script', '//aff.bstatic.com/static/affiliate_base/js/flexiproduct.js');
 </script>
+
+Tip: when viewing properties on Booking.com, look at the separate page of reviews, sorted by date so you don't just see the cherry-picked best ones.
 <H2>Specific locations</H2>
 <p>
 <A HREF="http://www.booking.com/searchresults.html?city=-2590884&aid=379309&label=brighton">Brighton, UK</A> (hotel near station try <A HREF="http://www.booking.com/hotel/gb/jurys-inn-brighton.html?aid=379309&label=brighton">Jurys Inn</A> or try a <A HREF="https://www.booking.com/searchresults.en.html?city=-2590884&nflt=ht_id%253D216%253Bht_id%253D208%253Breview_score%253D90%253Breview_score%253D80%253Breview_score%253D70&aid=379309&no_rooms=1&group_adults=1&room1=A&label=brighton">B&B</A>)
