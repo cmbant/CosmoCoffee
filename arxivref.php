@@ -51,6 +51,11 @@ if (strpos($data, 'new')) {
     $arxiv = "https://$mirror/abs/$data";
 }
 
+#no frame in arXiv
+ header('Location: ' . $arxiv);
+ exit;
+     
+
 $alternative_text = "Your browser doesn't support frames: Click on the link below to proceed to the<br><a href='$arxiv'>Arxiv</a>";
 $text = "<iframe src='$arxiv' style='border:0; height: 63vh; width:100%'>$alternative_text</iframe>";
 
