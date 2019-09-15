@@ -1,5 +1,12 @@
 <?php
 
+$subs = array(
+    "Mon. Not. Roy. Astron. Soc." => "\\mnras",
+    "Astrophys. J." => "\\apj",
+    "Astron. Astrophys." => "\\aap",
+    "Phys. Rev. Lett." => "\\prl"
+);
+
 define('IN_PHPBB', true);
 
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
@@ -114,13 +121,31 @@ if (!empty($arxiv)) {
         }
     }
 
-    if ($joint) {
-        $text .= '<span class="gen">BEST: <pre>' . $bib . '</pre></span>';
+
+
+   $text .= '<script>function copyToClipboard(element) {
+  var $temp = $("<textarea>");
+  $("body").append($temp);
+  $temp.val($(element).text()).select();
+  document.execCommand("copy");
+  $temp.remove();
+}</script>';
+
+   if ($joint) {
+        $text .= '<p><span class="gen">BEST: [<button onclick="copyToClipboard(\'#bib1\')">Copy</button>]<pre id="bib1">' . $bib . '</pre><button </span></p>';
+    }
+    $text .= '<hr>';
+    $text .= '<p><span class="gen"><A HREF="' . $SPIRES_url . '">inSPIRE</A>: [<button onclick="copyToClipboard(\'#bib2\')">Copy</button>]<pre id="bib2">' . $bibtex . '</pre>
+   </span></p>';
+    $bibtex2=strtr($bibtex, $subs);
+    if ($bibtex2 != $bibtex){
+    $text .= '<p><span class="gen"><A HREF="' . $SPIRES_url . '">inSPIRE (journal macros)</A>:  [<button onclick="copyToClipboard(\'#bib2a\')">Copy</button>] <pre id="bib2a">' . $bibtex2 . '</pre>
+   </span></p>';
+
     }
 
-    $text .= '<hr>';
-    $text .= '<span class="gen"><A HREF="' . $SPIRES_url . '">inSPIRE</A>: <pre>' . $bibtex . '</pre></span>';
-    $text .= '<span class="gen"><A HREF="' . $ads_url . '">ADS</A>: <pre>' . $ads_bib . '</pre></span>';
+
+    $text .= '<span class="gen"><A HREF="' . $ads_url . '">ADS</A>:  [<button onclick="copyToClipboard(\'#bib3\')">Copy</button>] <pre id="bib3">' . $ads_bib . '</pre></span></p>';
 }
 
 $text .= '<hr><p align="center" class="gen">Modified BibTex files for including arxiv eprint references in many paper styles are available <A HREF="http://arxiv.org/hypertex/bibstyles">here</A>; see also <A HREf="/viewtopic.php?t=304">this post</A>.</p>';

@@ -9,6 +9,7 @@ include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 
 anti_hack($phpEx);
 
+
 $date = '';
 $firstpaper = true;
 $arxiv = '';
@@ -42,7 +43,7 @@ function do_arxiv($in) {
 
     $url = "http://arxiv.org/list/$arxiv/new?skip=0&show=500";
     $html = get_url($url);
-
+ 
     $parts = explode('<h3>', $html, 4);
 
 
@@ -144,6 +145,7 @@ function parse_post($post, $isreplace) {
                 $sql = "REPLACE INTO ARXIV_REPLACE (arxiv_tag, date, arxiv, number,title,authors,comments) values" .
                     " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments');";
             } else {
+	        
                 $sql = "REPLACE INTO ARXIV_NEW (arxiv_tag, date, arxiv, number,title,authors,comments,abstract) values" .
                     " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments','$abstract');";
             }
@@ -160,9 +162,13 @@ function parse_post($post, $isreplace) {
     }
 }
 
+
 function doclean($text) {
     $text = preg_replace('/(\s)\s+/s', '$1', $text);
     $text = preg_replace('/\<\/b\>/is', '', $text);
+    $text = iconv("utf-8", "ascii//ignore", $text);
+ 
+ # echo $text;
     $text = clean_sql($text);
     return $text;
 }
