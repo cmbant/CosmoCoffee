@@ -108,7 +108,8 @@ class link_helper
 		$text = $tag->getAttribute('text');
 		if (utf8_strlen($text) > 55)
 		{
-			$text = utf8_substr($text, 0, 39) . ' ... ' . utf8_substr($text, -10);
+		//me
+		//	$text = utf8_substr($text, 0, 39) . ' ... ' . utf8_substr($text, -10);
 		}
 
 		$tag->setAttribute('text', $text);
