@@ -146,7 +146,7 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives) 
                 <TD class="genmed"><?= $linksHtml ?></TD>
                 <TD align="right" class ="genmed">
                     <?php foreach($arxives as $arxivItem): ?>
-                        [<A TARGET="_blank" HREF="http://arxiv.org/list/<?= $arxivItem ?>/new"><?= $arxivItem ?></A>]
+                        [<A TARGET="_blank" HREF="https://arxiv.org/list/<?= $arxivItem ?>/new"><?= $arxivItem ?></A>]
                     <?php endforeach; ?>
                 </TD>
             </TR>
@@ -252,11 +252,11 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $arxivSubject = $row['arxiv'];
 
         $titleLinks = " [";
-        $titleLinks .= "<a href='http://$mirror/abs/$arxivTag' target='_blank'>abs</a>, ";
-        $titleLinks .= "<a href='http://$mirror/pdf/$arxivTag'>pdf</a>";
+        $titleLinks .= "<a href='https://$mirror/abs/$arxivTag' target='_blank'>abs</a>, ";
+        $titleLinks .= "<a href='https://$mirror/pdf/$arxivTag'>pdf</a>";
 
         if(!defined('IPHONE')) {
-            $titleLinks .= ", <a href='http://$mirror/ps/$arxivTag'>ps</a>] [<a href='/bibtex.php?arxiv=$arxivTag'>BibTex</a>] ";
+            $titleLinks .= ", <a href='https://$mirror/ps/$arxivTag'>ps</a>] [<a href='/bibtex.php?arxiv=$arxivTag'>BibTex</a>] ";
         } else {
             $titleLinks .= "] ";
         }

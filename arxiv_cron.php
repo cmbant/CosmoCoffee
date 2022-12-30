@@ -140,6 +140,7 @@ function parse_post($post, $isreplace) {
                     #exit;
                 }
             }
+##	    $title = (strlen($title) > 255) ? substr($title,0,252).'...' : $title;		
 
             if ($isreplace) {
                 $sql = "REPLACE INTO ARXIV_REPLACE (arxiv_tag, date, arxiv, number,title,authors,comments) values" .

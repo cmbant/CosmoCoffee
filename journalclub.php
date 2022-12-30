@@ -39,10 +39,10 @@ $description = $request->variable('description', '');
 
 
 if ($user->data['user_id'] != ANONYMOUS) {
-    
+
     $text .= get_new_club_called_html();
 
-    //Get valid clubs user can admin    
+    //Get valid clubs user can admin
     if ($result = $db->sql_query("select club_id from club_members as c where c.user_id=$user_id and c.manager=1")) {
         while ($row = $db->sql_fetchrow($result)) {
             $isManager[$row['club_id']] = 1;
@@ -54,15 +54,15 @@ if ($user->data['user_id'] != ANONYMOUS) {
         if (!($result = $db->sql_query("select * from journal_clubs where name='$clubname'"))) {
             trigger_error('Could not validate club name');
         }
-        
+
         $rows = $db->sql_fetchrow($result);
         $db->sql_freeresult($result);
-        
-        if (empty($rows)) {            
+
+        if (empty($rows)) {
             if (($result = $db->sql_query("insert into journal_clubs (name,shortname) values('$clubname','$clubname')"))) {
                 $club_id = $db->sql_nextid();
                 $db->sql_freeresult($result);
-                
+
                 $db->sql_query("insert into club_members (user_id,club_id,manager) values($user_id,$club_id,1)");
             }
         } else {
@@ -72,25 +72,25 @@ if ($user->data['user_id'] != ANONYMOUS) {
 
     //Add user to club
     if (!empty($add) && $isManager[$club_id] == 1) {
-        
+
         $manager = ($request->variable('manager', '') == 'on') ? 1 : 0;
-        
+
         if ($result = $db->sql_query("select user_id from phpbb_users where username='$add'")) {
-            
+
             $rows = $db->sql_fetchrowset($result);
             $db->sql_freeresult($result);
-            
-            if (empty($rows)) { 
+
+            if (empty($rows)) {
                 $error = 'No CosmoCoffee profile found for username ' . $add;
             } else {
                 foreach($rows as $row) {
                     $in_user_id = $row['user_id'];
-                    
+
                     if ($result = $db->sql_query("select * from club_members where user_id=$in_user_id and club_id=$club_id")) {
                         $rows = $db->sql_fetchrowset($result);
                         $db->sql_freeresult($result);
-                        
-                        if (empty($rows)) { 
+
+                        if (empty($rows)) {
                             $db->sql_query("insert into club_members (user_id,club_id,manager) values($in_user_id,$club_id,$manager)");
                         }
                     }
@@ -103,14 +103,14 @@ if ($user->data['user_id'] != ANONYMOUS) {
     if ($action == 'remove' && ($isManager[$club_id] == 1 || $user_id == $in_user_id)) {
         $db->sql_query("delete from club_members where user_id=$in_user_id and club_id=$club_id");
     }
-    
+
     //Delete club
-    if ($action == 'delete' && $isManager[$club_id] == 1) {        
+    if ($action == 'delete' && $isManager[$club_id] == 1) {
         if ($request->variable('confirm', '') !== '1') {
             $text .= '<p align="center"><a href="' . $fname . '?action=delete&confirm=1&club_id=' . $club_id . '">Click here to confirm if you really want to delete the journal club</a></p><hr>';
         } else {
-            $db->sql_query("delete from journal_clubs where club_id = $club_id");  
-            $db->sql_query("delete from club_members where club_id = $club_id");            
+            $db->sql_query("delete from journal_clubs where club_id = $club_id");
+            $db->sql_query("delete from club_members where club_id = $club_id");
             $db->sql_query("delete from club_paper_status where club_id = $club_id");
             $db->sql_query("update bookmarks set club_id=0 where club_id=$club_id");
         }
@@ -131,25 +131,25 @@ if ($user->data['user_id'] != ANONYMOUS) {
     }
 
     $text .= '<p>';
-    
-      
+
+
     //List managing clubs
     $managetxt = '';
     $sqlManager = "select
-                    j.name, j.shortname, j.club_id, j.description 
-                from 
+                    j.name, j.shortname, j.club_id, j.description
+                from
                     club_members as c,
-                    journal_clubs as j 
-                where 
+                    journal_clubs as j
+                where
                     c.user_id=$user_id
-                and 
-                    c.club_id=j.club_id 
-                and 
-                    c.manager=1";    
+                and
+                    c.club_id=j.club_id
+                and
+                    c.manager=1";
 
     if ($result = $db->sql_query($sqlManager)) {
         while ($row = $db->sql_fetchrow($result)) {
-            
+
             $club_id = $row['club_id'];
             $description = $row['description'];
             $shortname = $row['shortname'];
@@ -170,27 +170,27 @@ if ($user->data['user_id'] != ANONYMOUS) {
             $managetxt .=   '<input class="button" value="Update" type="submit">';
             $managetxt .= '</form>';
             $managetxt .= '</p>';
-            
+
             $sql = "select
-                        u.username, u.user_id, c.manager 
-                    from 
-                        phpbb_users as u, club_members as c 
-                    where 
-                        c.user_id=u.user_id 
-                    and 
+                        u.username, u.user_id, c.manager
+                    from
+                        phpbb_users as u, club_members as c
+                    where
+                        c.user_id=u.user_id
+                    and
                         c.club_id=$club_id
-                    and 
+                    and
                         u.user_id<>$user_id
-                    order by 
+                    order by
                         c.manager DESC,u.username";
             if ($u = $db->sql_query($sql)) {
-                $managetxt .= '<ol style="list-style-position: inside;">';                
+                $managetxt .= '<ol style="list-style-position: inside;">';
                 while ($urow = $db->sql_fetchrow($u)) {
                     $id = $urow['user_id'];
                     $auser = $urow['username'];
-                    
+
                     $managetxt .= "<li>";
-                    
+
                     $managetxt .= "<a href='memberlist.php?mode=viewprofile&u=$id'>$auser</a> ";
                     $managetxt .= " [<a href='$fname?action=remove&user_id=$id&club_id=$club_id'>Remove</a>]";
 
@@ -202,7 +202,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
                     $managetxt .= "</li>";
                 }
                 $managetxt .= '</ol>';
-            }            
+            }
             $managetxt .= '<p>';
             $managetxt .= '<form method="get" action="/' . $fname . '" TARGET="_top">';
             $managetxt .=   '<SPAN class=gen>Add user: </SPAN>';
@@ -213,23 +213,23 @@ if ($user->data['user_id'] != ANONYMOUS) {
             $managetxt .=   '<input type="submit" value="Add" class="button">';
             $managetxt .=   '</form>';
             $managetxt .= '</p>';
-        }        
+        }
     }
-    
+
     if ($managetxt != '') {
         $text .= '<p class="gen">' . $managetxt . '</p>';
     }
 
-    $membertxt = '';    
+    $membertxt = '';
     $sqlMember = "select
-                    j.name, j.club_id, j.description 
-                from 
-                    club_members as c ,journal_clubs as j 
-                where 
+                    j.name, j.club_id, j.description
+                from
+                    club_members as c ,journal_clubs as j
+                where
                     c.user_id=$user_id
-                and 
-                    c.club_id=j.club_id 
-                and 
+                and
+                    c.club_id=j.club_id
+                and
                     c.manager<>1";
 
     if ($result = $db->sql_query($sqlMember)) {
@@ -240,7 +240,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
             $membertxt .= ' [<a href="' . $fname . '?action=remove&club_id=' . $row['club_id'] . '&user_id=' . $user_id . '">Unsubscribe</a>]';
             $membertxt .= '</h3>';
             $membertxt .= '<p>' . $row['description'] . '</p>';
-        }        
+        }
     }
 
     if ($membertxt != '') {
@@ -269,9 +269,9 @@ function get_new_club_called_html() {
     return '<center>
                 <form method="get" action="' . $request->server('SCRIPT_NAME') . '" TARGET="_top">
                     <span class="gen">Start new club called: </span>
-                    <input class="post" type="text" name="newclub" size="40" maxlength="255" value=""> 
+                    <input class="post" type="text" name="newclub" size="40" maxlength="255" value="">
                     <input type="submit" value="Add" class="button">
                 </form>
             </center>
-            <hr>';    
+            <hr>';
 }

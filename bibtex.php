@@ -25,7 +25,7 @@ $ads_fields = array();
 $joint = 0;
 
 $arxiv = $request->variable('arxiv', '');
-//$arxiv = '1807.06210';
+#$arxiv = '1807.06210';
 
 $ads_key='NBqUzF2r6UOleFEdoEypeCFKKuayVj7nsEpgna4V';
 
@@ -68,18 +68,27 @@ function get_bibtex($bibcode) {
   return false;
 }
 
+function get_inspire($url) {
+         $ch = curl_init();
+             $timeout = 5;
+              curl_setopt($ch, CURLOPT_URL, $url);
+              curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+              curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+                       
+       $data = curl_exec($ch);
+       curl_close($ch);
+return $data;
+}
 
 $text .= get_BibTex_form_html();
 
 if (!empty($arxiv)) {
     $inner_page_title = "BibTex for $arxiv";
-
-    $SPIRES_url = 'http://inspirehep.net/search?action_search=Search&of=hx&p=FIND+EPRINT+' . $arxiv;
-    $html = get_url($SPIRES_url);
-
-    if (preg_match('#<pre>(.*?)</pre>#s', $html, $txt)) {
-        $bibtex = $txt[1];
-    }
+     #https://github.com/inspirehep/rest-api-doc
+    $SPIRES_url = 'https://inspirehep.net/api/arxiv/'.$arxiv. '?format=bibtex';
+    $bibtex = get_inspire($SPIRES_url);
+ 
+ 
 
     $result = get_data('https://api.adsabs.harvard.edu/v1/search/query?fl=bibcode&q=arXiv:'.$arxiv);
     if ($result){
