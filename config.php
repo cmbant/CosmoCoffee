@@ -15,3 +15,4 @@ $acm_type = 'phpbb\\cache\\driver\\file';
 // @define('PHPBB_DISPLAY_LOAD_TIME', true);
 @define('PHPBB_ENVIRONMENT', 'production');
 // @define('DEBUG_CONTAINER', true);
+

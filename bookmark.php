@@ -579,9 +579,9 @@ foreach($rows as $row) {
     $text .=  '[<a href="https://arxiv.org/pdf/' .$tag. '">PDF</A>]';
     $pdfs .= "https://arxiv.org/pdf/$tag\n";
 
-    if(!defined('IPHONE')) {
-        $text.=' [<a href="https://arxiv.org/ps/' .$tag.'">PS</A>]';
-    }
+#    if(!defined('IPHONE')) {
+#        $text.=' [<a href="https://arxiv.org/ps/' .$tag.'">PS</A>]';
+#    }
     if($user_id == 'all' && $canchange) {
         $text .= " [<a href=\"/bookmark.php?add=$tag\">Bookmark</a>]";
     }

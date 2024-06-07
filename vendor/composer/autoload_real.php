@@ -13,34 +13,31 @@ class ComposerAutoloaderInit08cb2830df97abba09d1487e0d3fad51
         }
     }
 
+    /**
+     * @return \Composer\Autoload\ClassLoader
+     */
     public static function getLoader()
     {
         if (null !== self::$loader) {
             return self::$loader;
         }
 
+        require __DIR__ . '/platform_check.php';
+
         spl_autoload_register(array('ComposerAutoloaderInit08cb2830df97abba09d1487e0d3fad51', 'loadClassLoader'), true, true);
-        self::$loader = $loader = new \Composer\Autoload\ClassLoader();
+        self::$loader = $loader = new \Composer\Autoload\ClassLoader(\dirname(__DIR__));
         spl_autoload_unregister(array('ComposerAutoloaderInit08cb2830df97abba09d1487e0d3fad51', 'loadClassLoader'));
 
-        $map = require __DIR__ . '/autoload_namespaces.php';
-        foreach ($map as $namespace => $path) {
-            $loader->set($namespace, $path);
-        }
+        $includePaths = require __DIR__ . '/include_paths.php';
+        $includePaths[] = get_include_path();
+        set_include_path(implode(PATH_SEPARATOR, $includePaths));
 
-        $map = require __DIR__ . '/autoload_psr4.php';
-        foreach ($map as $namespace => $path) {
-            $loader->setPsr4($namespace, $path);
-        }
-
-        $classMap = require __DIR__ . '/autoload_classmap.php';
-        if ($classMap) {
-            $loader->addClassMap($classMap);
-        }
+        require __DIR__ . '/autoload_static.php';
+        call_user_func(\Composer\Autoload\ComposerStaticInit08cb2830df97abba09d1487e0d3fad51::getInitializer($loader));
 
         $loader->register(true);
 
-        $includeFiles = require __DIR__ . '/autoload_files.php';
+        $includeFiles = \Composer\Autoload\ComposerStaticInit08cb2830df97abba09d1487e0d3fad51::$files;
         foreach ($includeFiles as $fileIdentifier => $file) {
             composerRequire08cb2830df97abba09d1487e0d3fad51($fileIdentifier, $file);
         }
@@ -49,11 +46,16 @@ class ComposerAutoloaderInit08cb2830df97abba09d1487e0d3fad51
     }
 }
 
+/**
+ * @param string $fileIdentifier
+ * @param string $file
+ * @return void
+ */
 function composerRequire08cb2830df97abba09d1487e0d3fad51($fileIdentifier, $file)
 {
     if (empty($GLOBALS['__composer_autoload_files'][$fileIdentifier])) {
-        require $file;
-
         $GLOBALS['__composer_autoload_files'][$fileIdentifier] = true;
+
+        require $file;
     }
 }

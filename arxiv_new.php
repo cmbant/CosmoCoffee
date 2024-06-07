@@ -249,14 +249,14 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         }
 
         $arxivTag = $row['arxiv_tag'];
-        $arxivSubject = $row['arxiv'];
+        $arxivSubject = isset($row['arxiv']) ? $row['arxiv'] : null;
 
         $titleLinks = " [";
         $titleLinks .= "<a href='https://$mirror/abs/$arxivTag' target='_blank'>abs</a>, ";
         $titleLinks .= "<a href='https://$mirror/pdf/$arxivTag'>pdf</a>";
 
         if(!defined('IPHONE')) {
-            $titleLinks .= ", <a href='https://$mirror/ps/$arxivTag'>ps</a>] [<a href='/bibtex.php?arxiv=$arxivTag'>BibTex</a>] ";
+            $titleLinks .= "] [<a href='/bibtex.php?arxiv=$arxivTag'>BibTex</a>] ";
         } else {
             $titleLinks .= "] ";
         }

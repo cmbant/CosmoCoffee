@@ -253,7 +253,13 @@ function simpletex($text) {
 
 function tex_accents($text) {
     $texstrs = array('\"' => 'uml', '`' => 'grave', '\'' => 'acute', '^' => 'circ', '~' => 'tilde', '&quot;' => 'uml');
-    $text = preg_replace('/\\\([\'\"\`\^\~]|&quot;)[\{]?([oeaUOAINEuni])[\}]?/e', "'&\\2'.\$texstrs['\\1'].';'", $text);
+    $text = preg_replace_callback(
+        '/\\\([\'\"\`\^\~]|&quot;)[\{]?([oeaUOAINEuni])[\}]?/',
+        function($matches) use ($texstrs) {
+            return '&' . $matches[2] . $texstrs[$matches[1]] . ';';
+        },
+        $text
+    );
     return $text;
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+
 define('IN_PHPBB', true);
 
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
@@ -8,6 +9,10 @@ include($phpbb_root_path . 'common.' . $phpEx);
 include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 
 anti_hack($phpEx);
+
+#error_reporting(E_ALL); // Report all PHP errors
+#ini_set('display_errors', 1); // Display all errors on the web page
+
 
 
 $date = '';
@@ -47,7 +52,7 @@ function do_arxiv($in) {
     $parts = explode('<h3>', $html, 4);
 
 
-    if (preg_match('#New submissions for.*?(\d+ \w\w\w \d*)#is', $parts[1], $date_file)) {
+    if (preg_match('#New submissions for.*?(\d+ \w* \d*)#is', $parts[1], $date_file)) {
 
         $adate = date("Y-m-d", strtotime($date_file[1]));
 
@@ -61,17 +66,18 @@ function do_arxiv($in) {
 
         $posts = $parts[1];
 
-        if (preg_match('#Cross\-lists for#is', $parts[2])) {
+       if (preg_match('#.*Cross submissions for#is', $parts[2])) {
             $rest = $parts[3];
         } else {
             $rest = $parts[2];
         }
 
         do_section($posts, false);
-
-        if (preg_match('#Replacements for.*?\<DL\>(.*?)\<\/DL#is', $rest, $parts)) {
-
+        
+        if (preg_match('#.*?Replacement submissions for.*?(\<DT\>.*?)\<\/DL#is', $rest, $parts)) {
+   
             $replace = $parts[1];
+ 
             do_section($replace, true);
         }
 
@@ -94,14 +100,16 @@ function parse_post($post, $isreplace) {
     global $db, $date, $firstpaper, $arxiv;
 
     if ($isreplace) {
-        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div)#is';
-    } else {
-        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div).*?\<p .*?\>(.*?)\<\/p#is';
+#        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div)#is';
+         $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(.*?<\/div\>)#is';
+} else {
+#        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div).*?\<p .*?\>(.*?)\<\/p#is';
+         $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(<div.*?<\/div\>).*?\<p.*?\>\s*(.*?)\s*\<\/p#is';
     }
 
     if (preg_match($match, $post, $ref)) {
 
-        $formats = $ref[1];
+        $formats = trim($ref[1]);
         $title = doclean($ref[2]);
 
         $authors = $ref[3];
@@ -114,8 +122,8 @@ function parse_post($post, $isreplace) {
         $abstract = preg_replace("'\<[\/\!]*?[^\<\>]*?\>'si", "", $abstract);
         $abstract = doclean($abstract);
 
-//print "$authors\n$title\n$abstract\n$extra\n\n";
-//exit;
+#print "$authors\n$title\n$abstract\n$extra\n\n";
+#exit;
 
         if (preg_match('#Comments:.*?\>\s*(.*?)\<\/div#is', $extra, $ref)) {
             $comments = $ref[1];
@@ -124,7 +132,12 @@ function parse_post($post, $isreplace) {
 	} else {
             $comments = '';
         }
-        
+
+#print "$authors\n$title\n$abstract\n$comments\n\n";
+#exit;
+
+
+
         //if (preg_match('#\/abs\/([0-9a-zA-Z\.\-\/]*)#s',$formats,$ref)){
         if (true) {
             $arxiv_tag = $formats;
@@ -145,11 +158,13 @@ function parse_post($post, $isreplace) {
             if ($isreplace) {
                 $sql = "REPLACE INTO ARXIV_REPLACE (arxiv_tag, date, arxiv, number,title,authors,comments) values" .
                     " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments');";
+	#	    echo $sql; exit;
             } else {
 	        
                 $sql = "REPLACE INTO ARXIV_NEW (arxiv_tag, date, arxiv, number,title,authors,comments,abstract) values" .
                     " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments','$abstract');";
-            }
+#                 echo $sql;   
+}
             if (!$db->sql_query($sql)) {
                 print( 'Error in adding paper to db');
             }
@@ -165,11 +180,11 @@ function parse_post($post, $isreplace) {
 
 
 function doclean($text) {
+  # echo $text;
     $text = preg_replace('/(\s)\s+/s', '$1', $text);
     $text = preg_replace('/\<\/b\>/is', '', $text);
-    $text = iconv("utf-8", "ascii//ignore", $text);
+   # $text = iconv("utf-8", "ascii//ignore", $text);
  
- # echo $text;
     $text = clean_sql($text);
     return $text;
 }

@@ -1,5 +1,7 @@
 Options -Indexes +FollowSymLinks
 
+Deny from 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192 
+
 Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
 
 AddType application/x-httpd-php56 .php
@@ -25,6 +27,8 @@ RewriteCond %{HTTP_HOST} !^cosmocoffee.info [OR]
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://cosmocoffee.info/$1 [R=permanent,L]
 
+RewriteCond %{HTTP_REFERER} google.*testing [NC]
+RewriteRule .* - [F]
 
 
 #
