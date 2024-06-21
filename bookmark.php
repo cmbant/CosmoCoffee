@@ -2,6 +2,14 @@
 
 define('IN_PHPBB', true);
 
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+
+
+
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
@@ -470,9 +478,9 @@ if($club >= 0) {
 
     $sort = 'n.date DESC';
 
-    $sql = "select notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who from ARXIV_NEW as n,
+    $sql = "select notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who, bookdate from ARXIV_NEW as n,
     (select b.arxiv_tag, count(*) as ac,group_concat(u.username order by u.username SEPARATOR '\n') as who,
-    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes from bookmarks b,club_members as c,
+    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate from bookmarks b,club_members as c,
     phpbb_users as u where b.club_id=$club and u.user_id=c.user_id and c.user_id=b.user_id and c.club_id=$club
     group by b.arxiv_tag) as temp left join club_paper_status as ps on (ps.arxiv_tag=temp.arxiv_tag and ps.club_id=$club)
     where n.arxiv_tag=temp.arxiv_tag and $status order by $sort LIMIT $startc,$maxrows";
@@ -560,7 +568,7 @@ foreach($rows as $row) {
                 $txt .= $tagtxt;
             } elseif ($type == 'note') {
                 $txt .= $row['note'];
-            }
+            } 
         }
         $text .= trim($txt).'<br>';
         continue;
@@ -616,7 +624,10 @@ foreach($rows as $row) {
                $text .= ', ';
            }
         }
-        $text .= '</span>';
+        $text .= '</span>'; 
+        if (!is_null($row['bookdate'])) {
+            $text .= ' (' . date("Y-m-d", strtotime($row['bookdate'])) . ')';
+         }       
     }
 
     if($club < 0 && $canchange == 1 && $user_id != 'all') {
