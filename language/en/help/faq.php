@@ -25,7 +25,7 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-// CosmoCoffee
+	// CosmoCoffee
     'HELP_FAQ_BLOCK_INTRODUCTION' => 'CosmoCoffee Introduction',
     
     'HELP_FAQ_INTRODUCTION_WHAT_IS_COSMOCOFFEE_QUESTION' => 'What is CosmoCoffee?',
@@ -52,7 +52,6 @@ $lang = array_merge($lang, array(
     
     'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> "You can view posts without registering, however if you register the site will remember what you have already viewed, making it much easier to identify new content. You can also watch topics (be notified by email when a new message is posted), see people's email addresses, and customize the <A HREF='/arxiv_new.php'>Arxiv New</A> keyword filder.<br /><br />Also we hope that you would like to post something. To encourage responsible usage only registered users are allowed to post. (with the exception of the Management forum, where you can report issues related to not being able to register).",
 // CosmoCoffee
-    
 	'HELP_FAQ_ATTACHMENTS_ALLOWED_ANSWER'	=> 'Each board administrator can allow or disallow certain attachment types. If you are unsure what is allowed to be uploaded, contact the board administrator for assistance.',
 	'HELP_FAQ_ATTACHMENTS_ALLOWED_QUESTION'	=> 'What attachments are allowed on this board?',
 	'HELP_FAQ_ATTACHMENTS_OWN_ANSWER'	=> 'To find your list of attachments that you have uploaded, go to your User Control Panel and follow the links to the attachments section.',
@@ -139,11 +138,11 @@ $lang = array_merge($lang, array(
 	'HELP_FAQ_LOGIN_CANNOT_REGISTER_QUESTION'	=> 'Why can’t I register?',
 	'HELP_FAQ_LOGIN_COPPA_ANSWER'	=> 'COPPA, or the Children’s Online Privacy Protection Act of 1998, is a law in the United States requiring websites which can potentially collect information from minors under the age of 13 to have written parental consent or some other method of legal guardian acknowledgment, allowing the collection of personally identifiable information from a minor under the age of 13. If you are unsure if this applies to you as someone trying to register or to the website you are trying to register on, contact legal counsel for assistance. Please note that phpBB Limited and the owners of this board cannot provide legal advice and is not a point of contact for legal concerns of any kind, except as outlined in question “Who do I contact about abusive and/or legal matters related to this board?”.',
 	'HELP_FAQ_LOGIN_COPPA_QUESTION'	=> 'What is COPPA?',
-	'HELP_FAQ_LOGIN_DELETE_COOKIES_ANSWER'	=> '“Delete all board cookies” deletes the cookies created by phpBB which keep you authenticated and logged into the board. Cookies also provide functions such as read tracking if they have been enabled by a board administrator. If you are having login or logout problems, deleting board cookies may help.',
-	'HELP_FAQ_LOGIN_DELETE_COOKIES_QUESTION'	=> 'What does the “Delete all board cookies” do?',
+	'HELP_FAQ_LOGIN_DELETE_COOKIES_ANSWER'	=> '“Delete cookies” deletes the cookies created by phpBB which keep you authenticated and logged into the board. Cookies also provide functions such as read tracking if they have been enabled by a board administrator. If you are having login or logout problems, deleting board cookies may help.',
+	'HELP_FAQ_LOGIN_DELETE_COOKIES_QUESTION'	=> 'What does the “Delete cookies” do?',
 	'HELP_FAQ_LOGIN_LOST_PASSWORD_ANSWER'	=> 'Don’t panic! While your password cannot be retrieved, it can easily be reset. Visit the login page and click <em>I forgot my password</em>. Follow the instructions and you should be able to log in again shortly.<br />However, if you are not able to reset your password, contact a board administrator.',
 	'HELP_FAQ_LOGIN_LOST_PASSWORD_QUESTION'	=> 'I’ve lost my password!',
-	//'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> 'You may not have to, it is up to the administrator of the board as to whether you need to register in order to post messages. However; registration will give you access to additional features not available to guest users such as definable avatar images, private messaging, emailing of fellow users, usergroup subscription, etc. It only takes a few moments to register so it is recommended you do so.',
+	'HELP_FAQ_LOGIN_REGISTER_ANSWER'	=> 'You may not have to, it is up to the administrator of the board as to whether you need to register in order to post messages. However; registration will give you access to additional features not available to guest users such as definable avatar images, private messaging, emailing of fellow users, usergroup subscription, etc. It only takes a few moments to register so it is recommended you do so.',
 	'HELP_FAQ_LOGIN_REGISTER_CONFIRM_ANSWER'	=> 'First, check your username and password. If they are correct, then one of two things may have happened. If COPPA support is enabled and you specified being under 13 years old during registration, you will have to follow the instructions you received. Some boards will also require new registrations to be activated, either by yourself or by an administrator before you can logon; this information was present during registration. If you were sent an email, follow the instructions. If you did not receive an email, you may have provided an incorrect email address or the email may have been picked up by a spam filer. If you are sure the email address you provided is correct, try contacting an administrator.',
 	'HELP_FAQ_LOGIN_REGISTER_CONFIRM_QUESTION'	=> 'I registered but cannot login!',
 	'HELP_FAQ_LOGIN_REGISTER_QUESTION'	=> 'Why do I need to register?',

@@ -46,6 +46,7 @@ class bbcode_firstpass extends bbcode
 	var $message = '';
 	var $warn_msg = array();
 	var $parsed_items = array();
+	var $mode;
 
 	/**
 	* Parse BBCode
@@ -390,7 +391,7 @@ class bbcode_firstpass extends bbcode
 		$in = str_replace(' ', '%20', $in);
 
 		// Checking urls
-		if (!preg_match('#^' . get_preg_expression('url') . '$#iu', $in) && !preg_match('#^' . get_preg_expression('www_url') . '$#iu', $in))
+		if (!preg_match('#^' . get_preg_expression('url_http') . '$#iu', $in) && !preg_match('#^' . get_preg_expression('www_url') . '$#iu', $in))
 		{
 			return '[img]' . $in . '[/img]';
 		}
@@ -399,32 +400,6 @@ class bbcode_firstpass extends bbcode
 		if (!preg_match('#^[a-z0-9]+://#i', $in))
 		{
 			$in = 'http://' . $in;
-		}
-
-		if ($config['max_' . $this->mode . '_img_height'] || $config['max_' . $this->mode . '_img_width'])
-		{
-			$imagesize = new \FastImageSize\FastImageSize();
-			$size_info = $imagesize->getImageSize(htmlspecialchars_decode($in));
-
-			if ($size_info === false)
-			{
-				$error = true;
-				$this->warn_msg[] = $user->lang['UNABLE_GET_IMAGE_SIZE'];
-			}
-			else
-			{
-				if ($config['max_' . $this->mode . '_img_height'] && $config['max_' . $this->mode . '_img_height'] < $size_info['height'])
-				{
-					$error = true;
-					$this->warn_msg[] = $user->lang('MAX_IMG_HEIGHT_EXCEEDED', (int) $config['max_' . $this->mode . '_img_height']);
-				}
-
-				if ($config['max_' . $this->mode . '_img_width'] && $config['max_' . $this->mode . '_img_width'] < $size_info['width'])
-				{
-					$error = true;
-					$this->warn_msg[] = $user->lang('MAX_IMG_WIDTH_EXCEEDED', (int) $config['max_' . $this->mode . '_img_width']);
-				}
-			}
 		}
 
 		if ($error || $this->path_in_domain($in))
@@ -531,7 +506,7 @@ class bbcode_firstpass extends bbcode
 				}
 
 				// Because highlight_string is specialcharing the text (but we already did this before), we have to reverse this in order to get correct results
-				$code = htmlspecialchars_decode($code);
+				$code = html_entity_decode($code, ENT_COMPAT);
 				$code = highlight_string($code, true);
 
 				$str_from = array('<span style="color: ', '<font color="syntax', '</font>', '<code>', '</code>','[', ']', '.', ':');
@@ -1128,8 +1103,6 @@ class parse_message extends bbcode_firstpass
 	var $allow_quote_bbcode = true;
 	var $allow_url_bbcode = true;
 
-	var $mode;
-
 	/**
 	* The plupload object used for dealing with attachments
 	* @var \phpbb\plupload\plupload
@@ -1139,7 +1112,7 @@ class parse_message extends bbcode_firstpass
 	/**
 	* Init - give message here or manually
 	*/
-	function parse_message($message = '')
+	function __construct($message = '')
 	{
 		// Init BBCode UID
 		$this->bbcode_uid = substr(base_convert(unique_id(), 16, 36), 0, BBCODE_UID_LEN);
@@ -1181,7 +1154,7 @@ class parse_message extends bbcode_firstpass
 		}
 
 		// Store message length...
-		$message_length = ($mode == 'post') ? utf8_strlen($this->message) : utf8_strlen(preg_replace('#\[\/?[a-z\*\+\-]+(=[\S]+)?\]#ius', ' ', $this->message));
+		$message_length = ($mode == 'post') ? utf8_strlen($this->message) : utf8_strlen(preg_replace('#\[\/?[a-z\*\+\-]+(?:=\S+?)?\]#ius', '', $this->message));
 
 		// Maximum message length check. 0 disables this check completely.
 		if ((int) $config['max_' . $mode . '_chars'] > 0 && $message_length > (int) $config['max_' . $mode . '_chars'])
@@ -1274,7 +1247,7 @@ class parse_message extends bbcode_firstpass
 		));
 
 		// Parse this message
-		$this->message = $parser->parse(htmlspecialchars_decode($this->message, ENT_QUOTES));
+		$this->message = $parser->parse(html_entity_decode($this->message, ENT_QUOTES));
 
 		// Remove quotes that are nested too deep
 		if ($config['max_quote_depth'] > 0)
@@ -1525,6 +1498,35 @@ class parse_message extends bbcode_firstpass
 	}
 
 	/**
+	 * Check attachment form token depending on submit type
+	 *
+	 * @param \phpbb\language\language $language Language
+	 * @param \phpbb\request\request_interface $request Request
+	 * @param string $form_name Form name for checking form key
+	 *
+	 * @return bool True if form token is not needed or valid, false if needed and invalid
+	 */
+	function check_attachment_form_token(\phpbb\language\language $language, \phpbb\request\request_interface $request, $form_name)
+	{
+		$add_file = $request->is_set_post('add_file');
+		$delete_file = $request->is_set_post('delete_file');
+
+		if (($add_file || $delete_file) && !check_form_key($form_name))
+		{
+			$this->warn_msg[] = $language->lang('FORM_INVALID');
+
+			if ($request->is_ajax() && $this->plupload)
+			{
+				$this->plupload->emit_error(-400, 'FORM_INVALID');
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	* Parse Attachments
 	*/
 	function parse_attachments($form_name, $mode, $forum_id, $submit, $preview, $refresh, $is_message = false)
@@ -1586,6 +1588,16 @@ class parse_message extends bbcode_firstpass
 						'in_message'		=> ($is_message) ? 1 : 0,
 						'poster_id'			=> $user->data['user_id'],
 					);
+
+					/**
+					* Modify attachment sql array on submit
+					*
+					* @event core.modify_attachment_sql_ary_on_submit
+					* @var	array	sql_ary		Array containing SQL data
+					* @since 3.2.6-RC1
+					*/
+					$vars = array('sql_ary');
+					extract($phpbb_dispatcher->trigger_event('core.modify_attachment_sql_ary_on_submit', compact($vars)));
 
 					$db->sql_query('INSERT INTO ' . ATTACHMENTS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary));
 
@@ -1721,6 +1733,16 @@ class parse_message extends bbcode_firstpass
 							'in_message'		=> ($is_message) ? 1 : 0,
 							'poster_id'			=> $user->data['user_id'],
 						);
+
+						/**
+						* Modify attachment sql array on upload
+						*
+						* @event core.modify_attachment_sql_ary_on_upload
+						* @var	array	sql_ary		Array containing SQL data
+						* @since 3.2.6-RC1
+						*/
+						$vars = array('sql_ary');
+						extract($phpbb_dispatcher->trigger_event('core.modify_attachment_sql_ary_on_upload', compact($vars)));
 
 						$db->sql_query('INSERT INTO ' . ATTACHMENTS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary));
 

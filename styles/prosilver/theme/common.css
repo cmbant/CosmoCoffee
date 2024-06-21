@@ -176,11 +176,12 @@ a:hover	{ text-decoration: underline; }
 }
 
 .site_logo {
-	display: inline-block;
+	background-repeat: no-repeat;
 	width: 102px;
-    height: 52px;
-    background-size: contain;
-    background-repeat: no-repeat;
+	height: 52px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	display: block;
 }
 
 /* Site description and logo */
@@ -670,15 +671,15 @@ table.table1 tbody th {
 /* Specific column styles */
 table.table1 .name		{ text-align: left; }
 table.table1 .center		{ text-align: center; }
-table.table1 .reportby	{ width: 15%; }
+table.table1 .reportby		{ width: 15%; }
 table.table1 .posts		{ text-align: center; width: 7%; }
-table.table1 .joined	{ text-align: left; width: 15%; }
-table.table1 .active	{ text-align: left; width: 15%; }
+table.table1 .joined		{ text-align: left; width: 15%; }
+table.table1 .active		{ text-align: left; width: 15%; }
 table.table1 .mark		{ text-align: center; width: 7%; }
 table.table1 .info		{ text-align: left; width: 30%; }
-table.table1 .info div	{ width: 100%; white-space: normal; overflow: hidden; }
-table.table1 .autocol	{ line-height: 2em; white-space: nowrap; }
-table.table1 thead .autocol { padding-left: 1em; }
+table.table1 .info div		{ width: 100%; white-space: normal; overflow: hidden; }
+table.table1 .autocol		{ line-height: 2em; white-space: nowrap; }
+table.table1 thead .autocol	{ padding-left: 1em; }
 
 table.table1 span.rank-img {
 	float: right;
@@ -744,7 +745,6 @@ table.info tbody th {
 }
 
 dl.details {
-	/*font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;*/
 	font-size: 1.1em;
 }
 
@@ -782,7 +782,7 @@ fieldset.fields1 dd.recipients {
 	margin-left: 1em;
 }
 
-fieldset.fields1 ul.recipients  input.button2{
+fieldset.fields1 ul.recipients  input.button2 {
 	font-size: 0.8em;
 	margin-right: 0;
 	padding: 0;
@@ -983,8 +983,15 @@ fieldset.fields1 dl.pmlist dd.recipients {
 /* Miscellaneous styles
 ---------------------------------------- */
 .copyright {
-	padding: 5px;
+	font-size: 10px;
 	text-align: center;
+	padding: 10px;
+}
+
+.footer-row {
+	font-size: 10px;
+	line-height: 1.8;
+	margin: 0;
 }
 
 .small {
@@ -1269,6 +1276,10 @@ ul.linklist:after,
 	width: 50px;
 }
 
+.dropdown .clone.hidden {
+	display: none;
+}
+
 .dropdown .clone.hidden + li.separator {
 	display: none;
 }
@@ -1276,7 +1287,6 @@ ul.linklist:after,
 .dropdown .clone.hidden + li {
 	border-top: none;
 }
-
 .table-arxiv-info {
     table-layout: fixed; 
     width: 100%;

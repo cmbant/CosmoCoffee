@@ -34,6 +34,27 @@ function view_message($id, $mode, $folder_id, $msg_id, $folder, $message_row)
 	$author_id	= (int) $message_row['author_id'];
 	$view		= $request->variable('view', '');
 
+	/**
+	* Modify private message data before it is prepared to be displayed
+	*
+	* @event core.ucp_pm_view_message_before
+	* @var int		folder_id		ID of the folder the message is in
+	* @var array	folder			Array with data of user's message folders
+	* @var int		msg_id			ID of the private message
+	* @var array	message_row		Array with message data
+	* @var int		author_id		ID of the message author
+	* @since 3.2.10-RC1
+	* @since 3.3.1-RC1
+	*/
+	$vars = [
+		'folder_id',
+		'folder',
+		'msg_id',
+		'message_row',
+		'author_id',
+	];
+	extract($phpbb_dispatcher->trigger_event('core.ucp_pm_view_message_before', compact($vars)));
+
 	// Not able to view message, it was deleted by the sender
 	if ($message_row['pm_deleted'])
 	{
@@ -192,6 +213,8 @@ function view_message($id, $mode, $folder_id, $msg_id, $folder, $message_row)
 		$u_jabber = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=contact&amp;action=jabber&amp;u=' . $author_id);
 	}
 
+	$can_edit_pm = ($message_row['message_time'] > time() - ($config['pm_edit_time'] * 60) || !$config['pm_edit_time']) && $folder_id == PRIVMSGS_OUTBOX && $auth->acl_get('u_pm_edit');
+
 	$msg_data = array(
 		'MESSAGE_AUTHOR_FULL'		=> get_username_string('full', $author_id, $user_info['username'], $user_info['user_colour'], $user_info['username']),
 		'MESSAGE_AUTHOR_COLOUR'		=> get_username_string('colour', $author_id, $user_info['username'], $user_info['user_colour'], $user_info['username']),
@@ -232,7 +255,7 @@ function view_message($id, $mode, $folder_id, $msg_id, $folder, $message_row)
 		'U_EMAIL'			=> $user_info['email'],
 		'U_REPORT'			=> ($config['allow_pm_report']) ? $phpbb_container->get('controller.helper')->route('phpbb_report_pm_controller', array('id' => $message_row['msg_id'])) : '',
 		'U_QUOTE'			=> ($auth->acl_get('u_sendpm') && $author_id != ANONYMOUS) ? "$url&amp;mode=compose&amp;action=quote&amp;f=$folder_id&amp;p=" . $message_row['msg_id'] : '',
-		'U_EDIT'			=> (($message_row['message_time'] > time() - ($config['pm_edit_time'] * 60) || !$config['pm_edit_time']) && $folder_id == PRIVMSGS_OUTBOX && $auth->acl_get('u_pm_edit')) ? "$url&amp;mode=compose&amp;action=edit&amp;f=$folder_id&amp;p=" . $message_row['msg_id'] : '',
+		'U_EDIT'			=> $can_edit_pm ? "$url&amp;mode=compose&amp;action=edit&amp;f=$folder_id&amp;p=" . $message_row['msg_id'] : '',
 		'U_POST_REPLY_PM'	=> ($auth->acl_get('u_sendpm') && $author_id != ANONYMOUS) ? "$url&amp;mode=compose&amp;action=reply&amp;f=$folder_id&amp;p=" . $message_row['msg_id'] : '',
 		'U_POST_REPLY_ALL'	=> ($auth->acl_get('u_sendpm') && $author_id != ANONYMOUS) ? "$url&amp;mode=compose&amp;action=reply&amp;f=$folder_id&amp;reply_to_all=1&amp;p=" . $message_row['msg_id'] : '',
 		'U_PREVIOUS_PM'		=> "$url&amp;f=$folder_id&amp;p=" . $message_row['msg_id'] . "&amp;view=previous",
@@ -296,7 +319,9 @@ function view_message($id, $mode, $folder_id, $msg_id, $folder, $message_row)
 	 * @var	array	cp_row		Array with senders custom profile field data
 	 * @var	array	msg_data	Template array with message data
 	 * @var array	user_info	User data of the sender
+	 * @var array	attachments	Attachments data
 	 * @since 3.2.2-RC1
+	 * @changed 3.2.5-RC1 Added attachments
 	 */
 	$vars = array(
 		'id',
@@ -308,6 +333,7 @@ function view_message($id, $mode, $folder_id, $msg_id, $folder, $message_row)
 		'cp_row',
 		'msg_data',
 		'user_info',
+		'attachments',
 	);
 	extract($phpbb_dispatcher->trigger_event('core.ucp_pm_view_message', compact($vars)));
 

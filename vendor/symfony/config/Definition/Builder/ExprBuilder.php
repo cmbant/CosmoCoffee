@@ -71,7 +71,7 @@ class ExprBuilder
      */
     public function ifString()
     {
-        $this->ifPart = function ($v) { return is_string($v); };
+        $this->ifPart = function ($v) { return \is_string($v); };
 
         return $this;
     }
@@ -89,13 +89,25 @@ class ExprBuilder
     }
 
     /**
+     * Tests if the value is empty.
+     *
+     * @return ExprBuilder
+     */
+    public function ifEmpty()
+    {
+        $this->ifPart = function ($v) { return empty($v); };
+
+        return $this;
+    }
+
+    /**
      * Tests if the value is an array.
      *
      * @return $this
      */
     public function ifArray()
     {
-        $this->ifPart = function ($v) { return is_array($v); };
+        $this->ifPart = function ($v) { return \is_array($v); };
 
         return $this;
     }
@@ -107,7 +119,7 @@ class ExprBuilder
      */
     public function ifInArray(array $array)
     {
-        $this->ifPart = function ($v) use ($array) { return in_array($v, $array, true); };
+        $this->ifPart = function ($v) use ($array) { return \in_array($v, $array, true); };
 
         return $this;
     }
@@ -119,7 +131,20 @@ class ExprBuilder
      */
     public function ifNotInArray(array $array)
     {
-        $this->ifPart = function ($v) use ($array) { return !in_array($v, $array, true); };
+        $this->ifPart = function ($v) use ($array) { return !\in_array($v, $array, true); };
+
+        return $this;
+    }
+
+    /**
+     * Transforms variables of any type into an array.
+     *
+     * @return $this
+     */
+    public function castToArray()
+    {
+        $this->ifPart = function ($v) { return !\is_array($v); };
+        $this->thenPart = function ($v) { return [$v]; };
 
         return $this;
     }
@@ -143,13 +168,13 @@ class ExprBuilder
      */
     public function thenEmptyArray()
     {
-        $this->thenPart = function ($v) { return array(); };
+        $this->thenPart = function ($v) { return []; };
 
         return $this;
     }
 
     /**
-     * Sets a closure marking the value as invalid at validation time.
+     * Sets a closure marking the value as invalid at processing time.
      *
      * if you want to add the value of the node in your message just use a %s placeholder.
      *
@@ -161,13 +186,13 @@ class ExprBuilder
      */
     public function thenInvalid($message)
     {
-        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
+        $this->thenPart = function ($v) use ($message) { throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
         return $this;
     }
 
     /**
-     * Sets a closure unsetting this key of the array at validation time.
+     * Sets a closure unsetting this key of the array at processing time.
      *
      * @return $this
      *
@@ -175,7 +200,7 @@ class ExprBuilder
      */
     public function thenUnset()
     {
-        $this->thenPart = function ($v) { throw new UnsetKeyException('Unsetting key'); };
+        $this->thenPart = function ($v) { throw new UnsetKeyException('Unsetting key.'); };
 
         return $this;
     }

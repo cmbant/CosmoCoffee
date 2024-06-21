@@ -25,7 +25,12 @@ class faq extends controller
 	{
 		$this->language->add_lang('help/faq');
 
-        $this->manager->add_block(
+		$this->template->assign_block_vars('navlinks', array(
+			'BREADCRUMB_NAME'	=> $this->language->lang('FAQ_EXPLAIN'),
+			'U_BREADCRUMB'		=> $this->helper->route('phpbb_help_faq_controller'),
+		));
+
+		$this->manager->add_block(
 			'HELP_FAQ_BLOCK_INTRODUCTION',
 			false,
 			array(
@@ -53,7 +58,7 @@ class faq extends controller
 			'HELP_FAQ_BLOCK_USERSETTINGS',
 			false,
 			array(
-                'HELP_FAQ_USERSETTINGS_ARXIV_NEW_QUESTION' => 'HELP_FAQ_USERSETTINGS_ARXIV_NEW_ANSWER',
+				'HELP_FAQ_USERSETTINGS_ARXIV_NEW_QUESTION' => 'HELP_FAQ_USERSETTINGS_ARXIV_NEW_ANSWER',
 				'HELP_FAQ_USERSETTINGS_CHANGE_SETTINGS_QUESTION' => 'HELP_FAQ_USERSETTINGS_CHANGE_SETTINGS_ANSWER',
 				'HELP_FAQ_USERSETTINGS_HIDE_ONLINE_QUESTION' => 'HELP_FAQ_USERSETTINGS_HIDE_ONLINE_ANSWER',
 				'HELP_FAQ_USERSETTINGS_TIMEZONE_QUESTION' => 'HELP_FAQ_USERSETTINGS_TIMEZONE_ANSWER',
@@ -113,23 +118,23 @@ class faq extends controller
 				'HELP_FAQ_GROUPS_TEAM_QUESTION' => 'HELP_FAQ_GROUPS_TEAM_ANSWER',
 			)
 		);
-//		$this->manager->add_block(
-//			'HELP_FAQ_BLOCK_PMS',
-//			false,
-//			array(
-//				'HELP_FAQ_PMS_CANNOT_SEND_QUESTION' => 'HELP_FAQ_PMS_CANNOT_SEND_ANSWER',
-//				'HELP_FAQ_PMS_UNWANTED_QUESTION' => 'HELP_FAQ_PMS_UNWANTED_ANSWER',
-//				'HELP_FAQ_PMS_SPAM_QUESTION' => 'HELP_FAQ_PMS_SPAM_ANSWER',
-//			)
-//		);
-//		$this->manager->add_block(
-//			'HELP_FAQ_BLOCK_FRIENDS',
-//			false,
-//			array(
-//				'HELP_FAQ_FRIENDS_BASIC_QUESTION' => 'HELP_FAQ_FRIENDS_BASIC_ANSWER',
-//				'HELP_FAQ_FRIENDS_MANAGE_QUESTION' => 'HELP_FAQ_FRIENDS_MANAGE_ANSWER',
-//			)
-//		);
+		// $this->manager->add_block(
+		// 	'HELP_FAQ_BLOCK_PMS',
+		// 	false,
+		// 	array(
+		// 		'HELP_FAQ_PMS_CANNOT_SEND_QUESTION' => 'HELP_FAQ_PMS_CANNOT_SEND_ANSWER',
+		// 		'HELP_FAQ_PMS_UNWANTED_QUESTION' => 'HELP_FAQ_PMS_UNWANTED_ANSWER',
+		// 		'HELP_FAQ_PMS_SPAM_QUESTION' => 'HELP_FAQ_PMS_SPAM_ANSWER',
+		// 	)
+		// );
+		// $this->manager->add_block(
+		// 	'HELP_FAQ_BLOCK_FRIENDS',
+		// 	false,
+		// 	array(
+		// 		'HELP_FAQ_FRIENDS_BASIC_QUESTION' => 'HELP_FAQ_FRIENDS_BASIC_ANSWER',
+		// 		'HELP_FAQ_FRIENDS_MANAGE_QUESTION' => 'HELP_FAQ_FRIENDS_MANAGE_ANSWER',
+		// 	)
+		// );
 		$this->manager->add_block(
 			'HELP_FAQ_BLOCK_SEARCH',
 			false,

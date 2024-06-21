@@ -1,18 +1,24 @@
 <?php
 
-/*
+/**
 * @package   s9e\TextFormatter
-* @copyright Copyright (c) 2010-2017 The s9e Authors
+* @copyright Copyright (c) 2010-2022 The s9e authors
 * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
 */
 namespace s9e\TextFormatter\Configurator\Bundles;
+
 use s9e\TextFormatter\Configurator;
 use s9e\TextFormatter\Configurator\Bundle;
+
 class Forum extends Bundle
 {
+	/**
+	* {@inheritdoc}
+	*/
 	public function configure(Configurator $configurator)
 	{
 		$configurator->rootRules->enableAutoLineBreaks();
+
 		$configurator->BBCodes->addFromRepository('B');
 		$configurator->BBCodes->addFromRepository('CENTER');
 		$configurator->BBCodes->addFromRepository('CODE');
@@ -42,12 +48,14 @@ class Forum extends Bundle
 		$configurator->BBCodes->addFromRepository('U');
 		$configurator->BBCodes->addFromRepository('UL');
 		$configurator->BBCodes->addFromRepository('URL');
+
 		$configurator->rendering->parameters = [
 			'L_WROTE'   => 'wrote:',
 			'L_HIDE'    => 'Hide',
 			'L_SHOW'    => 'Show',
 			'L_SPOILER' => 'Spoiler'
 		];
+
 		$emoticons = [
 			':)'  => '1F642',
 			':-)' => '1F642',
@@ -73,23 +81,19 @@ class Forum extends Bundle
 			':o'  => '1F62E',
 			':lol:' => '1F602'
 		];
+
 		foreach ($emoticons as $code => $hex)
-			$configurator->Emoji->addAlias($code, \html_entity_decode('&#x' . $hex . ';'));
-		$configurator->MediaEmbed->createIndividualBBCodes = \true;
-		$configurator->MediaEmbed->add('bandcamp');
-		$configurator->MediaEmbed->add('dailymotion');
-		$configurator->MediaEmbed->add('facebook');
-		$configurator->MediaEmbed->add('indiegogo');
-		$configurator->MediaEmbed->add('instagram');
-		$configurator->MediaEmbed->add('kickstarter');
-		$configurator->MediaEmbed->add('liveleak');
-		$configurator->MediaEmbed->add('soundcloud');
-		$configurator->MediaEmbed->add('twitch');
-		$configurator->MediaEmbed->add('twitter');
-		$configurator->MediaEmbed->add('vimeo');
-		$configurator->MediaEmbed->add('vine');
-		$configurator->MediaEmbed->add('wshh');
-		$configurator->MediaEmbed->add('youtube');
+		{
+			$configurator->Emoji->aliases[$code] = html_entity_decode('&#x' . $hex . ';');
+		}
+
+		$sites = ['bandcamp', 'dailymotion', 'facebook', 'indiegogo', 'instagram', 'kickstarter', 'liveleak', 'soundcloud', 'twitch', 'twitter', 'vimeo', 'vine', 'wshh', 'youtube'];
+		foreach ($sites as $siteId)
+		{
+			$configurator->MediaEmbed->add($siteId);
+			$configurator->BBCodes->add($siteId, ['contentAttributes' => ['id', 'url']]);
+		}
+
 		$configurator->Autoemail;
 		$configurator->Autolink;
 	}

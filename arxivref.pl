@@ -17,10 +17,11 @@ $data =~ s/\'/\'\'/g;
 $OK = 0;
 
 use DBI;
-$database = "cosmocoffee_cosmocoffee";
-$username = "1015824_7_r";
-$password = "7KzWVN32";
-$hostname = "db85a.pair.com";
+$database = "cosmocoffee_cosmocoffee2024";
+$username = "1015824_25_r";
+$password = "usAp2CGzrHTK4eB4";
+$hostname = "db179.pair.com";
+
 $db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password); 
 
   $query = $db->prepare("select phpbb_topics.topic_id,phpbb_topics.forum_id from phpbb_topics,phpbb_papers where phpbb_papers.paper_id=phpbb_topics.paper_id and phpbb_papers.arxiv_tag='$data'");

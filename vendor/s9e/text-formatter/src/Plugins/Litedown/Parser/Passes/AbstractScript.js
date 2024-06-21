@@ -1,8 +1,8 @@
 /**
 * @param {string}  tagName     Name of the tag used by this pass
 * @param {string}  syntaxChar  Relevant character used by this syntax
-* @param {!Regexp} shortRegexp Regexp used for the short form syntax
-* @param {!Regexp} longRegexp  Regexp used for the long form syntax
+* @param {!RegExp} shortRegexp Regexp used for the short form syntax
+* @param {!RegExp} longRegexp  Regexp used for the long form syntax
 */
 function parseAbstractScript(tagName, syntaxChar, shortRegexp, longRegexp)
 {
@@ -35,7 +35,7 @@ function parseAbstractScript(tagName, syntaxChar, shortRegexp, longRegexp)
 		while (m = regexp.exec(text))
 		{
 			var match    = m[0],
-				matchPos = +m['index'],
+				matchPos = m.index,
 				matchLen = match.length;
 
 			addTagPair(tagName, matchPos, 2, matchPos + matchLen - 1, 1);
@@ -61,10 +61,10 @@ function parseAbstractScript(tagName, syntaxChar, shortRegexp, longRegexp)
 		while (m = regexp.exec(text))
 		{
 			var match    = m[0],
-				matchPos = +m['index'],
+				matchPos = m.index,
 				matchLen = match.length,
 				startPos = matchPos,
-				endLen   = (match.substr(-1) === syntaxChar) ? 1 : 0,
+				endLen   = (match.charAt(matchLen - 1) === syntaxChar) ? 1 : 0,
 				endPos   = matchPos + matchLen - endLen;
 
 			addTagPair(tagName, startPos, 1, endPos, endLen);

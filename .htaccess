@@ -4,8 +4,8 @@ Deny from 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235 107.189.12
 
 Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
 
-AddType application/x-httpd-php56 .php
-Action application/x-httpd-php56 /fcgi-bin/php56_wrapper.sh
+#AddType application/x-httpd-php56 .php
+#Action application/x-httpd-php56 /fcgi-bin/php56_wrapper.sh
 
 
 <IfModule mod_rewrite.c>
@@ -23,6 +23,7 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=307]
 RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
 RewriteRule ^ https://%1%{REQUEST_URI} [R=307,L]
 
+# Commented For testing
 RewriteCond %{HTTP_HOST} !^cosmocoffee.info [OR]
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://cosmocoffee.info/$1 [R=permanent,L]

@@ -32,6 +32,9 @@ class ucp_groups
 		global $db, $user, $auth, $cache, $template;
 		global $request, $phpbb_container, $phpbb_log;
 
+		/** @var \phpbb\language\language $language Language object */
+		$language = $phpbb_container->get('language');
+
 		$user->add_lang('groups');
 
 		$return_page = '<br /><br />' . sprintf($user->lang['RETURN_PAGE'], '<a href="' . $this->u_action . '">', '</a>');
@@ -133,7 +136,7 @@ class ucp_groups
 							{
 								trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 							}
-							list(, $row) = each($row);
+							$row = current($row);
 
 							$sql = 'SELECT group_type
 								FROM ' . GROUPS_TABLE . '
@@ -237,7 +240,7 @@ class ucp_groups
 							{
 								trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 							}
-							list(, $row) = each($row);
+							$row = current($row);
 
 							if (!$row['group_leader'])
 							{
@@ -396,7 +399,10 @@ class ucp_groups
 				$action		= (isset($_POST['addusers'])) ? 'addusers' : $request->variable('action', '');
 				$group_id	= $request->variable('g', 0);
 
-				include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
+				if (!function_exists('phpbb_get_user_rank'))
+				{
+					include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
+				}
 
 				add_form_key('ucp_groups');
 
@@ -434,10 +440,10 @@ class ucp_groups
 						'GROUP_DESC_DISP'		=> generate_text_for_display($group_row['group_desc'], $group_row['group_desc_uid'], $group_row['group_desc_bitfield'], $group_row['group_desc_options']),
 						'GROUP_TYPE'			=> $group_row['group_type'],
 
-						'AVATAR'				=> (empty($avatar) ? '<img src="' . $phpbb_admin_path . 'images/no_avatar.gif" alt="" />' : $avatar),
-						'AVATAR_IMAGE'			=> (empty($avatar) ? '<img src="' . $phpbb_admin_path . 'images/no_avatar.gif" alt="" />' : $avatar),
-						'AVATAR_WIDTH'			=> (isset($group_row['group_avatar_width'])) ? $group_row['group_avatar_width'] : '',
-						'AVATAR_HEIGHT'			=> (isset($group_row['group_avatar_height'])) ? $group_row['group_avatar_height'] : '',
+						'AVATAR'				=> !empty($avatar) ? $avatar : '',
+						'AVATAR_IMAGE'			=> !empty($avatar) ? $avatar : '',
+						'AVATAR_WIDTH'			=> isset($group_row['group_avatar_width']) ? $group_row['group_avatar_width'] : '',
+						'AVATAR_HEIGHT'			=> isset($group_row['group_avatar_height']) ? $group_row['group_avatar_height'] : '',
 					));
 				}
 
@@ -454,7 +460,7 @@ class ucp_groups
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -489,21 +495,22 @@ class ucp_groups
 						{
 							if (confirm_box(true))
 							{
+								$avatar_data['id'] = substr($avatar_data['id'], 1);
 								$phpbb_avatar_manager->handle_avatar_delete($db, $user, $avatar_data, GROUPS_TABLE, 'group_');
 								$cache->destroy('sql', GROUPS_TABLE);
 
-								$message = ($action == 'edit') ? 'GROUP_UPDATED' : 'GROUP_CREATED';
+								$message = $action === 'edit' ? 'GROUP_UPDATED' : 'GROUP_CREATED';
 								trigger_error($user->lang[$message] . $return_page);
 							}
 							else
 							{
 								confirm_box(false, $user->lang('CONFIRM_AVATAR_DELETE'), build_hidden_fields(array(
-										'avatar_delete'     => true,
-										'i'                 => $id,
-										'mode'              => $mode,
-										'g'			        => $group_id,
-										'action'            => $action))
-								);
+									'avatar_delete'     => true,
+									'i'                 => $id,
+									'mode'              => $mode,
+									'g'			        => $group_id,
+									'action'            => $action,
+								)));
 							}
 						}
 
@@ -528,7 +535,12 @@ class ucp_groups
 								'teampage'	=> $group_row['group_teampage'],
 							);
 
-							if ($config['allow_avatar'])
+							if (!check_form_key('ucp_groups'))
+							{
+								$error[] = $user->lang['FORM_INVALID'];
+							}
+
+							if (!count($error) && $config['allow_avatar'])
 							{
 								// Handle avatar
 								$driver_name = $phpbb_avatar_manager->clean_driver_name($request->variable('avatar_driver', ''));
@@ -548,11 +560,6 @@ class ucp_groups
 
 								// Merge any avatars errors into the primary error array
 								$error = array_merge($error, $phpbb_avatar_manager->localize_errors($user, $avatar_error));
-							}
-
-							if (!check_form_key('ucp_groups'))
-							{
-								$error[] = $user->lang['FORM_INVALID'];
 							}
 
 							// Validate submitted colour value
@@ -748,7 +755,7 @@ class ucp_groups
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -869,11 +876,16 @@ class ucp_groups
 							trigger_error($user->lang['NO_GROUP'] . $return_page);
 						}
 
+						if (!check_form_key('ucp_groups'))
+						{
+							trigger_error($user->lang('FORM_INVALID') . $return_page);
+						}
+
 						if (!($row = group_memberships($group_id, $user->data['user_id'])))
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -900,7 +912,7 @@ class ucp_groups
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -979,7 +991,7 @@ class ucp_groups
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -1040,7 +1052,7 @@ class ucp_groups
 						{
 							trigger_error($user->lang['NOT_MEMBER_OF_GROUP'] . $return_page);
 						}
-						list(, $row) = each($row);
+						$row = current($row);
 
 						if (!$row['group_leader'])
 						{
@@ -1054,13 +1066,27 @@ class ucp_groups
 
 						if (confirm_box(true))
 						{
+							$return_manage_page = '<br /><br />' . $language->lang('RETURN_PAGE', '<a href="' . $this->u_action . '&amp;action=list&amp;g=' . $group_id . '">', '</a>');
+
 							// Add user/s to group
 							if ($error = group_user_add($group_id, false, $name_ary, $group_name, $default, 0, 0, $group_row))
 							{
-								trigger_error($user->lang[$error] . $return_page);
+								$display_message = $language->lang($error);
+
+								if ($error == 'GROUP_USERS_INVALID')
+								{
+									// Find which users don't exist
+									$actual_name_ary = $name_ary;
+									$actual_user_id_ary = [];
+									user_get_id_name($actual_user_id_ary, $actual_name_ary, false, true);
+
+									$display_message = $language->lang('GROUP_USERS_INVALID', implode($language->lang('COMMA_SEPARATOR'), array_udiff($name_ary, $actual_name_ary, 'strcasecmp')));
+								}
+
+								trigger_error($display_message . $return_manage_page);
 							}
 
-							trigger_error($user->lang['GROUP_USERS_ADDED'] . '<br /><br />' . sprintf($user->lang['RETURN_PAGE'], '<a href="' . $this->u_action . '&amp;action=list&amp;g=' . $group_id . '">', '</a>'));
+							trigger_error($language->lang('GROUP_USERS_ADDED') . $return_manage_page);
 						}
 						else
 						{

@@ -320,7 +320,7 @@ function bump_topic_allowed($forum_id, $topic_bumped, $last_post_time, $topic_po
 * Generates a text with approx. the specified length which contains the specified words and their context
 *
 * @param	string	$text	The full text from which context shall be extracted
-* @param	string	$words	An array of words which should be contained in the result, has to be a valid part of a PCRE pattern (escape with preg_quote!)
+* @param	array	$words	An array of words which should be contained in the result, has to be a valid part of a PCRE pattern (escape with preg_quote!)
 * @param	int		$length	The desired length of the resulting text, however the result might be shorter or longer than this value
 *
 * @return	string			Context of the specified words separated by "..."
@@ -532,7 +532,7 @@ function strip_bbcode(&$text, $uid = '')
 
 	if (preg_match('#^<[rt][ >]#', $text))
 	{
-		$text = $phpbb_container->get('text_formatter.utils')->clean_formatting($text);
+		$text = utf8_htmlspecialchars($phpbb_container->get('text_formatter.utils')->clean_formatting($text));
 	}
 	else
 	{
@@ -627,7 +627,7 @@ function generate_text_for_display($text, $uid, $bitfield, $flags, $censor_text 
 			}
 			else
 			{
-				$bbcode->bbcode($bitfield);
+				$bbcode->bbcode_set_bitfield($bitfield);
 			}
 
 			$bbcode->bbcode_second_pass($text, $uid);
@@ -803,8 +803,8 @@ function make_clickable_callback($type, $whitespace, $url, $relative_url, $class
 	$orig_url		= $url;
 	$orig_relative	= $relative_url;
 	$append			= '';
-	$url			= htmlspecialchars_decode($url);
-	$relative_url	= htmlspecialchars_decode($relative_url);
+	$url			= html_entity_decode($url, ENT_COMPAT);
+	$relative_url	= html_entity_decode($relative_url, ENT_COMPAT);
 
 	// make sure no HTML entities were matched
 	$chars = array('<', '>', '"');
@@ -874,9 +874,9 @@ function make_clickable_callback($type, $whitespace, $url, $relative_url, $class
 		break;
 	}
 
-	//$short_url = (utf8_strlen($url) > 55) ? utf8_substr($url, 0, 39) . ' ... ' . utf8_substr($url, -10) : $url;
-	//me
-	
+	// CosmoCoffee
+	// $short_url = (utf8_strlen($url) > 55) ? utf8_substr($url, 0, 39) . ' ... ' . utf8_substr($url, -10) : $url;
+
 	$short_url = $url; 
 
 	switch ($type)
@@ -914,9 +914,9 @@ function make_clickable_callback($type, $whitespace, $url, $relative_url, $class
 		break;
 	}
 
-	$url	= htmlspecialchars($url);
-	$text	= htmlspecialchars($text);
-	$append	= htmlspecialchars($append);
+	$url	= htmlspecialchars($url, ENT_COMPAT);
+	$text	= htmlspecialchars($text, ENT_COMPAT);
+	$append	= htmlspecialchars($append, ENT_COMPAT);
 
 	$html	= "$whitespace<!-- $tag --><a$class href=\"$url\">$text</a><!-- $tag -->$append";
 
@@ -924,13 +924,17 @@ function make_clickable_callback($type, $whitespace, $url, $relative_url, $class
 }
 
 /**
-* make_clickable function
-*
-* Replace magic urls of form http://xxx.xxx., www.xxx. and xxx@xxx.xxx.
-* Cuts down displayed size of link if over 50 chars, turns absolute links
-* into relative versions when the server/script path matches the link
-*/
-function make_clickable($text, $server_url = false, $class = 'postlink')
+ * Replaces magic urls of form http://xxx.xxx., www.xxx. and xxx@xxx.xxx.
+ * Cuts down displayed size of link if over 50 chars, turns absolute links
+ * into relative versions when the server/script path matches the link
+ *
+ * @param string		$text		Message text to parse URL/email entries
+ * @param bool|string	$server_url	The server URL. If false, the board URL will be used
+ * @param string		$class		CSS class selector to add to the parsed URL entries
+ *
+ * @return string	A text with parsed URL/email entries
+ */
+function make_clickable($text, $server_url = false, string $class = 'postlink')
 {
 	if ($server_url === false)
 	{
@@ -939,9 +943,8 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 
 	static $static_class;
 	static $magic_url_match_args;
-    
-        $text = make_clickable_cosmocoffee($text);
-
+	$text = make_clickable_cosmocoffee($text);
+	
 	if (!isset($magic_url_match_args[$server_url]) || $static_class != $class)
 	{
 		$static_class = $class;
@@ -953,41 +956,70 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 			$magic_url_match_args = array();
 		}
 
-		// relative urls for this board
-		$magic_url_match_args[$server_url][] = array(
-			'#(^|[\n\t (>.])(' . preg_quote($server_url, '#') . ')/(' . get_preg_expression('relative_url_inline') . ')#iu',
-			MAGIC_URL_LOCAL,
-			$local_class,
-		);
+		// Check if the match for this $server_url and $class already exists
+		$element_exists = false;
+		if (isset($magic_url_match_args[$server_url]))
+		{
+			array_walk_recursive($magic_url_match_args[$server_url], function($value) use (&$element_exists, $static_class)
+				{
+					if ($value == $static_class)
+					{
+						$element_exists = true;
+						return;
+					}
+				}
+			);
+		}
 
-		// matches a xxxx://aaaaa.bbb.cccc. ...
-		$magic_url_match_args[$server_url][] = array(
-			'#(^|[\n\t (>.])(' . get_preg_expression('url_inline') . ')#iu',
-			MAGIC_URL_FULL,
-			$class,
-		);
+		// Only add new $server_url and $class matches if not exist
+		if (!$element_exists)
+		{
+			// relative urls for this board
+			$magic_url_match_args[$server_url][] = [
+				'#(^|[\n\t (>.])(' . preg_quote($server_url, '#') . ')/(' . get_preg_expression('relative_url_inline') . ')#iu',
+				MAGIC_URL_LOCAL,
+				$local_class,
+				$static_class,
+			];
 
-		// matches a "www.xxxx.yyyy[/zzzz]" kinda lazy URL thing
-		$magic_url_match_args[$server_url][] = array(
-			'#(^|[\n\t (>])(' . get_preg_expression('www_url_inline') . ')#iu',
-			MAGIC_URL_WWW,
-			$class,
-		);
+			// matches a xxxx://aaaaa.bbb.cccc. ...
+			$magic_url_match_args[$server_url][] = [
+				'#(^|[\n\t (>.])(' . get_preg_expression('url_inline') . ')#iu',
+				MAGIC_URL_FULL,
+				$class,
+				$static_class,
+			];
 
-		// matches an email@domain type address at the start of a line, or after a space or after what might be a BBCode.
-		$magic_url_match_args[$server_url][] = array(
-			'/(^|[\n\t (>])(' . get_preg_expression('email') . ')/iu',
-			MAGIC_URL_EMAIL,
-			'',
-		);
+			// matches a "www.xxxx.yyyy[/zzzz]" kinda lazy URL thing
+			$magic_url_match_args[$server_url][] = [
+				'#(^|[\n\t (>])(' . get_preg_expression('www_url_inline') . ')#iu',
+				MAGIC_URL_WWW,
+				$class,
+				$static_class,
+			];
+		}
+
+		if (!isset($magic_url_match_args[$server_url]['email']))
+		{
+			// matches an email@domain type address at the start of a line, or after a space or after what might be a BBCode.
+			$magic_url_match_args[$server_url]['email'] = [
+				'/(^|[\n\t (>])(' . get_preg_expression('email') . ')/iu',
+				MAGIC_URL_EMAIL,
+				'',
+			];
+		}
 	}
-    
- #   return $text;
 
 	foreach ($magic_url_match_args[$server_url] as $magic_args)
 	{
 		if (preg_match($magic_args[0], $text, $matches))
 		{
+			// Only apply $class from the corresponding function call argument (excepting emails which never has a class)
+			if ($magic_args[1] != MAGIC_URL_EMAIL && $magic_args[3] != $static_class)
+			{
+				continue;
+			}
+
 			$text = preg_replace_callback($magic_args[0], function($matches) use ($magic_args)
 			{
 				$relative_url = isset($matches[3]) ? $matches[3] : '';
@@ -996,7 +1028,7 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 		}
 	}
 
-    return $text;
+	return $text;
 }
 
 /**
@@ -1060,7 +1092,7 @@ function smiley_text($text, $force_option = false)
 	}
 	else
 	{
-		$root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $phpbb_path_helper->get_web_root_path();
+		$root_path = $phpbb_path_helper->get_web_root_path();
 
 		/**
 		* Event to override the root_path for smilies
@@ -1173,6 +1205,8 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count_a
 		$filename = $phpbb_root_path . $config['upload_path'] . '/' . utf8_basename($attachment['physical_filename']);
 
 		$upload_icon = '';
+		$download_link = '';
+		$display_cat = false;
 
 		if (isset($extensions[$attachment['extension']]))
 		{
@@ -1252,11 +1286,6 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count_a
 				$display_cat = ATTACHMENT_CATEGORY_NONE;
 			}
 
-			if ($display_cat == ATTACHMENT_CATEGORY_FLASH && !$user->optionget('viewflash'))
-			{
-				$display_cat = ATTACHMENT_CATEGORY_NONE;
-			}
-
 			$download_link = append_sid("{$phpbb_root_path}download/file.$phpEx", 'id=' . $attachment['attach_id']);
 			$l_downloaded_viewed = 'VIEWED_COUNTS';
 
@@ -1285,21 +1314,6 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count_a
 						'THUMB_IMAGE'		=> $thumbnail_link,
 					);
 
-					$update_count_ary[] = $attachment['attach_id'];
-				break;
-
-				// Macromedia Flash Files
-				case ATTACHMENT_CATEGORY_FLASH:
-					list($width, $height) = @getimagesize($filename);
-
-					$block_array += array(
-						'S_FLASH_FILE'	=> true,
-						'WIDTH'			=> $width,
-						'HEIGHT'		=> $height,
-						'U_VIEW_LINK'	=> $download_link . '&amp;view=1',
-					);
-
-					// Viewed/Heared File ... update the download count
 					$update_count_ary[] = $attachment['attach_id'];
 				break;
 
@@ -1352,7 +1366,7 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count_a
 		);
 		extract($phpbb_dispatcher->trigger_event('core.parse_attachments_modify_template_data', compact($vars)));
 		$update_count_ary = $update_count;
-		unset($update_count);
+		unset($update_count, $display_cat, $download_link);
 
 		$template->assign_block_vars('_file', $block_array);
 
@@ -1446,7 +1460,7 @@ function truncate_string($string, $max_length = 60, $max_store_length = 255, $al
 		$string = substr($string, 4);
 	}
 
-	$_chars = utf8_str_split(htmlspecialchars_decode($string));
+	$_chars = utf8_str_split(html_entity_decode($string, ENT_COMPAT));
 	$chars = array_map('utf8_htmlspecialchars', $_chars);
 
 	// Now check the length ;)
@@ -1461,7 +1475,7 @@ function truncate_string($string, $max_length = 60, $max_store_length = 255, $al
 	if (utf8_strlen($string) > $max_store_length)
 	{
 		// let's split again, we do not want half-baked strings where entities are split
-		$_chars = utf8_str_split(htmlspecialchars_decode($string));
+		$_chars = utf8_str_split(html_entity_decode($string, ENT_COMPAT));
 		$chars = array_map('utf8_htmlspecialchars', $_chars);
 
 		do
@@ -1489,6 +1503,8 @@ function truncate_string($string, $max_length = 60, $max_store_length = 255, $al
 * Get username details for placing into templates.
 * This function caches all modes on first call, except for no_profile and anonymous user - determined by $user_id.
 *
+* @html Username spans and links
+*
 * @param string $mode Can be profile (for getting an url to the profile), username (for obtaining the username), colour (for obtaining the user colour), full (for obtaining a html string representing a coloured link to the users profile) or no_profile (the same as full but forcing no profile link)
 * @param int $user_id The users id
 * @param string $username The users name
@@ -1508,6 +1524,7 @@ function get_username_string($mode, $user_id, $username, $username_colour = '', 
 	{
 		global $phpbb_root_path, $phpEx;
 
+		/** @html Username spans and links for usage in the template */
 		$_profile_cache['base_url'] = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u={USER_ID}');
 		$_profile_cache['tpl_noprofile'] = '<span class="username">{USERNAME}</span>';
 		$_profile_cache['tpl_noprofile_colour'] = '<span style="color: {USERNAME_COLOUR};" class="username-coloured">{USERNAME}</span>';
@@ -1679,7 +1696,7 @@ class bitfield
 {
 	var $data;
 
-	function bitfield($bitfield = '')
+	function __construct($bitfield = '')
 	{
 		$this->data = base64_decode($bitfield);
 	}
@@ -1763,5 +1780,50 @@ class bitfield
 	function merge($bitfield)
 	{
 		$this->data = $this->data | $bitfield->get_blob();
+	}
+}
+
+/**
+ * Formats the quote according to the given BBCode status setting
+ *
+ * @param phpbb\language\language				$language Language class
+ * @param parse_message 						$message_parser Message parser class
+ * @param phpbb\textformatter\utils_interface	$text_formatter_utils Text formatter utilities
+ * @param bool 									$bbcode_status The status of the BBCode setting
+ * @param array 								$quote_attributes The attributes of the quoted post
+ * @param string 								$message_link Link of the original quoted post
+ */
+function phpbb_format_quote($language, $message_parser, $text_formatter_utils, $bbcode_status, $quote_attributes, $message_link = '')
+{
+	if ($bbcode_status)
+	{
+		$quote_text = $text_formatter_utils->generate_quote(
+			censor_text($message_parser->message),
+			$quote_attributes
+		);
+
+		$message_parser->message = $quote_text . "\n\n";
+	}
+	else
+	{
+		$offset = 0;
+		$quote_string = "&gt; ";
+		$message = censor_text(trim($message_parser->message));
+		// see if we are nesting. It's easily tricked but should work for one level of nesting
+		if (strpos($message, "&gt;") !== false)
+		{
+			$offset = 10;
+		}
+		$message = utf8_wordwrap($message, 75 + $offset, "\n");
+
+		$message = $quote_string . $message;
+		$message = str_replace("\n", "\n" . $quote_string, $message);
+
+		$message_parser->message = $quote_attributes['author'] . " " . $language->lang('WROTE') . ":\n" . $message . "\n";
+	}
+
+	if ($message_link)
+	{
+		$message_parser->message = $message_link . $message_parser->message;
 	}
 }

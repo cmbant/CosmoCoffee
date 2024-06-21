@@ -57,7 +57,7 @@ class user extends \phpbb\session
 	* @param \phpbb\language\language	$lang			phpBB's Language loader
 	* @param string						$datetime_class	Class name of datetime class
 	*/
-	function __construct(\phpbb\language\language $lang, $datetime_class)
+	public function __construct(\phpbb\language\language $lang, $datetime_class)
 	{
 		global $phpbb_root_path;
 
@@ -76,6 +76,16 @@ class user extends \phpbb\session
 	public function is_setup()
 	{
 		return $this->is_setup_flag;
+	}
+
+	/**
+	 * Get expiration time for user tokens, e.g. activation or reset password tokens
+	 *
+	 * @return int Expiration for user tokens
+	 */
+	public static function get_token_expiration(): int
+	{
+		return strtotime('+1 day') ?: 0;
 	}
 
 	/**
@@ -110,7 +120,7 @@ class user extends \phpbb\session
 	function setup($lang_set = false, $style_id = false)
 	{
 		global $db, $request, $template, $config, $auth, $phpEx, $phpbb_root_path, $cache;
-		global $phpbb_dispatcher;
+		global $phpbb_dispatcher, $phpbb_container;
 
 		$this->language->set_default_language($config['default_lang']);
 
@@ -189,6 +199,9 @@ class user extends \phpbb\session
 		/**
 		* Event to load language files and modify user data on every page
 		*
+		* Note: To load language file with this event, see description
+		* of lang_set_ext variable.
+		*
 		* @event core.user_setup
 		* @var	array	user_data			Array with user's data row
 		* @var	string	user_lang_name		Basename of the user's langauge
@@ -224,15 +237,7 @@ class user extends \phpbb\session
 
 		$this->language->set_user_language($user_lang_name);
 
-		try
-		{
-			$this->timezone = new \DateTimeZone($user_timezone);
-		}
-		catch (\Exception $e)
-		{
-			// If the timezone the user has selected is invalid, we fall back to UTC.
-			$this->timezone = new \DateTimeZone('UTC');
-		}
+		$this->create_timezone($user_timezone);
 
 		$this->add_lang($lang_set);
 		unset($lang_set);
@@ -259,8 +264,8 @@ class user extends \phpbb\session
 		}
 
 		$sql = 'SELECT *
-			FROM ' . STYLES_TABLE . " s
-			WHERE s.style_id = $style_id";
+			FROM ' . STYLES_TABLE . '
+			WHERE style_id = ' . (int) $style_id;
 		$result = $db->sql_query($sql, 3600);
 		$this->style = $db->sql_fetchrow($result);
 		$db->sql_freeresult($result);
@@ -271,16 +276,50 @@ class user extends \phpbb\session
 			$style_id = $this->data['user_style'];
 
 			$sql = 'SELECT *
-				FROM ' . STYLES_TABLE . " s
-				WHERE s.style_id = $style_id";
+				FROM ' . STYLES_TABLE . '
+				WHERE style_id = ' . (int) $style_id;
 			$result = $db->sql_query($sql, 3600);
 			$this->style = $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
 		}
 
+		// Fallback to board's default style
 		if (!$this->style)
 		{
-			trigger_error('NO_STYLE_DATA', E_USER_ERROR);
+			// Verify default style exists in the database
+			$sql = 'SELECT style_id
+				FROM ' . STYLES_TABLE . '
+				WHERE style_id = ' . (int) $config['default_style'];
+			$result = $db->sql_query($sql);
+			$style_id = (int) $db->sql_fetchfield('style_id');
+			$db->sql_freeresult($result);
+
+			if ($style_id > 0)
+			{
+				$db->sql_transaction('begin');
+
+				// Update $user row
+				$sql = 'SELECT *
+					FROM ' . STYLES_TABLE . '
+					WHERE style_id = ' . (int) $config['default_style'];
+				$result = $db->sql_query($sql);
+				$this->style = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				// Update user style preference
+				$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_style = ' . (int) $style_id . '
+					WHERE user_id = ' . (int) $this->data['user_id'];
+				$db->sql_query($sql);
+
+				$db->sql_transaction('commit');
+			}
+		}
+
+		// This should never happen
+		if (!$this->style)
+		{
+			trigger_error($this->language->lang('NO_STYLE_DATA', $this->data['user_style'], $this->data['user_id']), E_USER_ERROR);
 		}
 
 		// Now parse the cfg file and cache it
@@ -297,7 +336,7 @@ class user extends \phpbb\session
 
 			if (is_string($default_value))
 			{
-				$this->style[$key] = htmlspecialchars($this->style[$key]);
+				$this->style[$key] = htmlspecialchars($this->style[$key], ENT_COMPAT);
 			}
 		}
 
@@ -324,8 +363,8 @@ class user extends \phpbb\session
 		}
 
 		// Disable board if the install/ directory is still present
-		// For the brave development army we do not care about this, else we need to comment out this everytime we develop locally
-		if (!defined('DEBUG') && !defined('ADMIN_START') && !defined('IN_INSTALL') && !defined('IN_LOGIN') && file_exists($phpbb_root_path . 'install') && !is_file($phpbb_root_path . 'install'))
+		// For the brave development army we do not care about this, else we need to comment out this every time we develop locally
+		if (!$phpbb_container->getParameter('allow_install_dir') && !defined('ADMIN_START') && !defined('IN_INSTALL') && !defined('IN_LOGIN') && file_exists($phpbb_root_path . 'install') && !is_file($phpbb_root_path . 'install'))
 		{
 			// Adjust the message slightly according to the permissions
 			if ($auth->acl_gets('a_', 'm_') || $auth->acl_getf_global('m_'))
@@ -340,7 +379,7 @@ class user extends \phpbb\session
 		}
 
 		// Is board disabled and user not an admin or moderator?
-		if ($config['board_disable'] && !defined('IN_LOGIN') && !defined('SKIP_CHECK_DISABLED') && !$auth->acl_gets('a_', 'm_') && !$auth->acl_getf_global('m_'))
+		if ($config['board_disable'] && !defined('IN_INSTALL') && !defined('IN_LOGIN') && !defined('SKIP_CHECK_DISABLED') && !$auth->acl_gets('a_', 'm_') && !$auth->acl_getf_global('m_'))
 		{
 			if ($this->data['is_bot'])
 			{
@@ -443,7 +482,7 @@ class user extends \phpbb\session
 	* @return int|bool     The plural-case we need to use for the number plural-rule combination, false if $force_rule
 	* 					   was invalid.
 	*
-	* @deprecated: 3.2.0-dev (To be removed: 3.3.0)
+	* @deprecated: 3.2.0-dev (To be removed: 4.0.0)
 	*/
 	function get_plural_form($number, $force_rule = false)
 	{
@@ -454,8 +493,8 @@ class user extends \phpbb\session
 	* Add Language Items - use_db and use_help are assigned where needed (only use them to force inclusion)
 	*
 	* @param mixed $lang_set specifies the language entries to include
-	* @param bool $use_db internal variable for recursion, do not use	@deprecated 3.2.0-dev (To be removed: 3.3.0)
-	* @param bool $use_help internal variable for recursion, do not use	@deprecated 3.2.0-dev (To be removed: 3.3.0)
+	* @param bool $use_db internal variable for recursion, do not use	@deprecated 3.2.0-dev (To be removed: 4.0.0)
+	* @param bool $use_help internal variable for recursion, do not use	@deprecated 3.2.0-dev (To be removed: 4.0.0)
 	* @param string $ext_name The extension to load language from, or empty for core files
 	*
 	* Examples:
@@ -470,7 +509,7 @@ class user extends \phpbb\session
 	* Note: $use_db and $use_help should be removed. The old function was kept for BC purposes,
 	* 		so the BC logic is handled here.
 	*
-	* @deprecated: 3.2.0-dev (To be removed: 3.3.0)
+	* @deprecated: 3.2.0-dev (To be removed: 4.0.0)
 	*/
 	function add_lang($lang_set, $use_db = false, $use_help = false, $ext_name = '')
 	{
@@ -511,7 +550,7 @@ class user extends \phpbb\session
 	/**
 	 * BC function for loading language files
 	 *
-	 * @deprecated 3.2.0-dev (To be removed: 3.3.0)
+	 * @deprecated 3.2.0-dev (To be removed: 4.0.0)
 	 */
 	private function set_lang($lang_set, $use_help, $ext_name)
 	{
@@ -547,7 +586,7 @@ class user extends \phpbb\session
 	*
 	* Note: $use_db and $use_help should be removed. Kept for BC purposes.
 	*
-	* @deprecated: 3.2.0-dev (To be removed: 3.3.0)
+	* @deprecated: 3.2.0-dev (To be removed: 4.0.0)
 	*/
 	function add_lang_ext($ext_name, $lang_set, $use_db = false, $use_help = false)
 	{
@@ -598,7 +637,7 @@ class user extends \phpbb\session
 		if (!$format_date_override)
 		{
 			$time = new $this->datetime($this, '@' . (int) $gmepoch, $utc);
-			$time->setTimezone($this->timezone);
+			$time->setTimezone($this->create_timezone());
 
 			return $time->format($format, $forcedate);
 		}
@@ -606,6 +645,36 @@ class user extends \phpbb\session
 		{
 			return $format_date_override;
 		}
+	}
+
+	/**
+	 * Create a DateTimeZone object in the context of the current user
+	 *
+	 * @param string $user_timezone Time zone of the current user.
+	 * @return \DateTimeZone DateTimeZone object linked to the current users locale
+	 */
+	public function create_timezone($user_timezone = null)
+	{
+		if (!$this->timezone)
+		{
+			if (!$user_timezone)
+			{
+				global $config;
+				$user_timezone = ($this->data['user_id'] != ANONYMOUS) ? $this->data['user_timezone'] : $config['board_timezone'];
+			}
+
+			try
+			{
+				$this->timezone = new \DateTimeZone($user_timezone);
+			}
+			catch (\Exception $e)
+			{
+				// If the timezone the user has selected is invalid, we fall back to UTC.
+				$this->timezone = new \DateTimeZone('UTC');
+			}
+		}
+
+		return $this->timezone;
 	}
 
 	/**
@@ -618,7 +687,7 @@ class user extends \phpbb\session
 	*/
 	public function create_datetime($time = 'now', \DateTimeZone $timezone = null)
 	{
-		$timezone = $timezone ?: $this->timezone;
+		$timezone = $timezone ?: $this->create_timezone();
 		return new $this->datetime($this, $time, $timezone);
 	}
 
@@ -632,7 +701,7 @@ class user extends \phpbb\session
 	*/
 	public function get_timestamp_from_format($format, $time, \DateTimeZone $timezone = null)
 	{
-		$timezone = $timezone ?: $this->timezone;
+		$timezone = $timezone ?: $this->create_timezone();
 		$date = \DateTime::createFromFormat($format, $time, $timezone);
 		return ($date !== false) ? $date->format('U') : false;
 	}
@@ -749,7 +818,7 @@ class user extends \phpbb\session
 	}
 
 	/**
-	* Funtion to make the user leave the NEWLY_REGISTERED system group.
+	* Function to make the user leave the NEWLY_REGISTERED system group.
 	* @access public
 	*/
 	function leave_newly_registered()

@@ -123,9 +123,9 @@ class type_dropdown extends type_base
 	{
 		$var_name = 'pf_' . $profile_row['field_ident'];
 		return $this->request->variable($var_name, $profile_row['field_default_value']);
-//CosmoCofee
-//			return $this->request->variable($var_name, (int) $profile_row['field_default_value']);
-//CosmoCofee
+		//CosmoCofee
+		//return $this->request->variable($var_name, (int) $profile_row['field_default_value']);
+		//CosmoCofee
 	}
 
 	/**
@@ -143,9 +143,9 @@ class type_dropdown extends type_base
 
 		if (!$this->lang_helper->is_set($field_data['field_id'], $field_data['lang_id'], $field_value))
 		{
-//CosmoCofee
-//			return $this->user->lang('FIELD_INVALID_VALUE', $this->get_field_name($field_data['lang_name']));
-//CosmoCofee
+			//CosmoCofee
+			// return $this->user->lang('FIELD_INVALID_VALUE', $this->get_field_name($field_data['lang_name']));
+			//CosmoCofee
 		}
 
 		if ($field_value == $field_data['field_novalue'] && $field_data['field_required'])
@@ -238,11 +238,6 @@ class type_dropdown extends type_base
 		$options = $this->lang_helper->get($profile_row['field_id'], $profile_row['lang_id']);
 		foreach ($options as $option_id => $option_value)
 		{
-            //CosmoCofee
-            if(strpos($option_value, '|') !== false) {
-                list($option_id, $option_value) = explode('|', trim($option_value));
-            }
-            //CosmoCofee
 			$this->template->assign_block_vars('dropdown.options', array(
 				'OPTION_ID'	=> $option_id,
 				'SELECTED'	=> ($value == $option_id) ? ' selected="selected"' : '',

@@ -24,9 +24,9 @@ class acp_users
 	var $u_action;
 	var $p_master;
 
-	function acp_users(&$p_master)
+	function __construct($p_master)
 	{
-		$this->p_master = &$p_master;
+		$this->p_master = $p_master;
 	}
 
 	function main($id, $mode)
@@ -385,14 +385,18 @@ class acp_users
 									$user_actkey = empty($user_activation_key) ? $user_actkey : $user_activation_key;
 								}
 
-								if ($user_row['user_type'] == USER_NORMAL || empty($user_activation_key))
-								{
-									$sql = 'UPDATE ' . USERS_TABLE . "
-										SET user_actkey = '" . $db->sql_escape($user_actkey) . "'
-										WHERE user_id = $user_id";
-									$db->sql_query($sql);
-								}
+								// Always update actkey even if same and also update actkey expiration to 24 hours from now
+								$sql_ary = [
+									'user_actkey'				=> $user_actkey,
+									'user_actkey_expiration'	=> $user::get_token_expiration(),
+								];
 
+								$sql = 'UPDATE ' . USERS_TABLE . '
+									SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+									WHERE user_id = ' . (int) $user_id;
+								$db->sql_query($sql);
+
+								// Start sending email
 								$messenger = new messenger(false);
 
 								$messenger->template($email_template, $user_row['user_lang']);
@@ -402,8 +406,8 @@ class acp_users
 								$messenger->anti_abuse_headers($config, $user);
 
 								$messenger->assign_vars(array(
-									'WELCOME_MSG'	=> htmlspecialchars_decode(sprintf($user->lang['WELCOME_SUBJECT'], $config['sitename'])),
-									'USERNAME'		=> htmlspecialchars_decode($user_row['username']),
+									'WELCOME_MSG'	=> html_entity_decode(sprintf($user->lang['WELCOME_SUBJECT'], $config['sitename']), ENT_COMPAT),
+									'USERNAME'		=> html_entity_decode($user_row['username'], ENT_COMPAT),
 									'U_ACTIVATE'	=> "$server_url/ucp.$phpEx?mode=activate&u={$user_row['user_id']}&k=$user_actkey")
 								);
 
@@ -466,7 +470,7 @@ class acp_users
 									$messenger->anti_abuse_headers($config, $user);
 
 									$messenger->assign_vars(array(
-										'USERNAME'	=> htmlspecialchars_decode($user_row['username']))
+										'USERNAME'	=> html_entity_decode($user_row['username'], ENT_COMPAT))
 									);
 
 									$messenger->send(NOTIFY_EMAIL);
@@ -822,10 +826,12 @@ class acp_users
 							* @var	string	action		Quick tool that should be run
 							* @var	array	user_row	Current user data
 							* @var	string	u_action	The u_action link
+							* @var	int		user_id		User id of the user to manage
 							* @since 3.1.0-a1
 							* @changed 3.2.2-RC1 Added u_action
+							* @changed 3.2.10-RC1 Added user_id
 							*/
-							$vars = array('action', 'user_row', 'u_action');
+							$vars = array('action', 'user_row', 'u_action', 'user_id');
 							extract($phpbb_dispatcher->trigger_event('core.acp_users_overview_run_quicktool', compact($vars)));
 
 							unset($u_action);
@@ -844,9 +850,9 @@ class acp_users
 					// Validation data - we do not check the password complexity setting here
 					$check_ary = array(
 						'new_password'		=> array(
-							array('string', true, $config['min_pass_chars'], $config['max_pass_chars']),
+							array('string', true, $config['min_pass_chars'], 0),
 							array('password')),
-						'password_confirm'	=> array('string', true, $config['min_pass_chars'], $config['max_pass_chars']),
+						'password_confirm'	=> array('string', true, $config['min_pass_chars'], 0),
 					);
 
 					// Check username if altered
@@ -855,7 +861,7 @@ class acp_users
 						$check_ary += array(
 							'username'			=> array(
 								array('string', false, $config['min_name_chars'], $config['max_name_chars']),
-								array('username', $user_row['username'])
+								array('username', $user_row['username'], true)
 							),
 						);
 					}
@@ -966,10 +972,7 @@ class acp_users
 
 						if ($update_email !== false)
 						{
-							$sql_ary += array(
-								'user_email'		=> $update_email,
-								'user_email_hash'	=> phpbb_email_hash($update_email),
-							);
+							$sql_ary += ['user_email'		=> $update_email];
 
 							$phpbb_log->add('user', $user->data['user_id'], $user->ip, 'LOG_USER_UPDATE_EMAIL', false, array(
 								'reportee_id' => $user_id,
@@ -1085,7 +1088,7 @@ class acp_users
 					$s_action_options .= '<option value="' . $value . '">' . $user->lang['USER_ADMIN_' . $lang] . '</option>';
 				}
 
-				$last_active = (!empty($user_row['session_time'])) ? $user_row['session_time'] : $user_row['user_lastvisit'];
+				$last_active = (!empty($user_row['session_time'])) ? $user_row['session_time'] : $user_row['user_last_active'];
 
 				$inactive_reason = '';
 				if ($user_row['user_type'] == USER_INACTIVE)
@@ -1129,8 +1132,8 @@ class acp_users
 				$db->sql_freeresult($result);
 
 				$template->assign_vars(array(
-					'L_NAME_CHARS_EXPLAIN'		=> $user->lang($config['allow_name_chars'] . '_EXPLAIN', $user->lang('CHARACTERS', (int) $config['min_name_chars']), $user->lang('CHARACTERS', (int) $config['max_name_chars'])),
-					'L_CHANGE_PASSWORD_EXPLAIN'	=> $user->lang($config['pass_complex'] . '_EXPLAIN', $user->lang('CHARACTERS', (int) $config['min_pass_chars']), $user->lang('CHARACTERS', (int) $config['max_pass_chars'])),
+					'L_NAME_CHARS_EXPLAIN'		=> $user->lang($config['allow_name_chars'] . '_EXPLAIN', $user->lang('CHARACTERS_XY', (int) $config['min_name_chars']), $user->lang('CHARACTERS_XY', (int) $config['max_name_chars'])),
+					'L_CHANGE_PASSWORD_EXPLAIN'	=> $user->lang($config['pass_complex'] . '_EXPLAIN', $user->lang('CHARACTERS', (int) $config['min_pass_chars'])),
 					'L_POSTS_IN_QUEUE'			=> $user->lang('NUM_POSTS_IN_QUEUE', $user_row['posts_in_queue']),
 					'S_FOUNDER'					=> ($user->data['user_type'] == USER_FOUNDER) ? true : false,
 
@@ -1883,6 +1886,17 @@ class acp_users
 										'user_avatar_height' => $result['avatar_height'],
 									);
 
+									/**
+									* Modify users preferences data before assigning it to the template
+									*
+									* @event core.acp_users_avatar_sql
+									* @var	array	user_row	Array with user data
+									* @var	array	result		Array with user avatar data to be updated in the DB
+									* @since 3.2.4-RC1
+									*/
+									$vars = array('user_row', 'result');
+									extract($phpbb_dispatcher->trigger_event('core.acp_users_avatar_sql', compact($vars)));
+
 									$sql = 'UPDATE ' . USERS_TABLE . '
 										SET ' . $db->sql_build_array('UPDATE', $result) . '
 										WHERE user_id = ' . (int) $user_id;
@@ -2085,6 +2099,17 @@ class acp_users
 							'user_sig_bbcode_bitfield'	=> $bbcode_bitfield,
 						);
 
+						/**
+						* Modify user signature before it is stored in the DB
+						*
+						* @event core.acp_users_modify_signature_sql_ary
+						* @var	array	user_row	Array with user data
+						* @var	array	sql_ary		Array with user signature data to be updated in the DB
+						* @since 3.2.4-RC1
+						*/
+						$vars = array('user_row', 'sql_ary');
+						extract($phpbb_dispatcher->trigger_event('core.acp_users_modify_signature_sql_ary', compact($vars)));
+
 						$sql = 'UPDATE ' . USERS_TABLE . '
 							SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
 							WHERE user_id = ' . $user_id;
@@ -2099,7 +2124,7 @@ class acp_users
 
 				if ($request->is_set_post('preview'))
 				{
-					$decoded_message = generate_text_for_edit($signature, $bbcode_uid, $bbcode_bitfield);
+					$decoded_message = generate_text_for_edit($signature, $bbcode_uid, $bbcode_flags);
 				}
 
 				/** @var \phpbb\controller\helper $controller_helper */
@@ -2256,7 +2281,7 @@ class acp_users
 					}
 					else
 					{
-						$view_topic = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "t={$row['topic_id']}&amp;p={$row['post_msg_id']}") . '#p' . $row['post_msg_id'];
+						$view_topic = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "p={$row['post_msg_id']}") . '#p' . $row['post_msg_id'];
 					}
 
 					$template->assign_block_vars('attach', array(
@@ -2494,7 +2519,7 @@ class acp_users
 							'U_EDIT_GROUP'		=> append_sid("{$phpbb_admin_path}index.$phpEx", "i=groups&amp;mode=manage&amp;action=edit&amp;u=$user_id&amp;g={$data['group_id']}&amp;back_link=acp_users_groups"),
 							'U_DEFAULT'			=> $this->u_action . "&amp;action=default&amp;u=$user_id&amp;g=" . $data['group_id'] . '&amp;hash=' . generate_link_hash('acp_users'),
 							'U_DEMOTE_PROMOTE'	=> $this->u_action . '&amp;action=' . (($data['group_leader']) ? 'demote' : 'promote') . "&amp;u=$user_id&amp;g=" . $data['group_id'] . '&amp;hash=' . generate_link_hash('acp_users'),
-							'U_DELETE'			=> $this->u_action . "&amp;action=delete&amp;u=$user_id&amp;g=" . $data['group_id'],
+							'U_DELETE'			=> count($id_ary) > 1 ? $this->u_action . "&amp;action=delete&amp;u=$user_id&amp;g=" . $data['group_id'] : '',
 							'U_APPROVE'			=> ($group_type == 'pending') ? $this->u_action . "&amp;action=approve&amp;u=$user_id&amp;g=" . $data['group_id'] : '',
 
 							'GROUP_NAME'		=> $group_helper->get_name($data['group_name']),
@@ -2585,6 +2610,7 @@ class acp_users
 			break;
 
 			default:
+				$u_action = $this->u_action;
 
 				/**
 				* Additional modes provided by extensions
@@ -2594,11 +2620,14 @@ class acp_users
 				* @var	int		user_id			User id of the user to manage
 				* @var	array	user_row		Array with user data
 				* @var	array	error			Array with errors data
+				* @var	string	u_action		The u_action link
 				* @since 3.2.2-RC1
+				* @changed 3.2.10-RC1 Added u_action
 				*/
-				$vars = array('mode', 'user_id', 'user_row', 'error');
+				$vars = array('mode', 'user_id', 'user_row', 'error', 'u_action');
 				extract($phpbb_dispatcher->trigger_event('core.acp_users_mode_add', compact($vars)));
 
+				unset($u_action);
 			break;
 		}
 
