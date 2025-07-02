@@ -46,13 +46,12 @@ function do_arxiv($in) {
 
     $arxiv = $in;
 
-    $url = "http://arxiv.org/list/$arxiv/new?skip=0&show=500";
+    $url = "http://arxiv.org/list/$arxiv/new";
     $html = get_url($url);
  
-    $parts = explode('<h3>', $html, 4);
-
-
-    if (preg_match('#New submissions for.*?(\d+ \w* \d*)#is', $parts[1], $date_file)) {
+    $parts = explode('<h3>', $html, 5);
+  
+    if (preg_match('#new listings for.*?(\d+ \w* \d*)#is', $parts[1], $date_file)) {
 
         $adate = date("Y-m-d", strtotime($date_file[1]));
 
@@ -64,24 +63,22 @@ function do_arxiv($in) {
 
         $date = $adate;
 
-        $posts = $parts[1];
+        $posts = $parts[2];
 
-       if (preg_match('#.*Cross submissions for#is', $parts[2])) {
-            $rest = $parts[3];
+       if (preg_match('#.*Cross submissions#is', $parts[3])) {
+            $rest = $parts[4];
         } else {
-            $rest = $parts[2];
+            $rest = $parts[3];
         }
 
         do_section($posts, false);
-        
-        if (preg_match('#.*?Replacement submissions for.*?(\<DT\>.*?)\<\/DL#is', $rest, $parts)) {
+   
+        if (preg_match('#.*?Replacement submissions.*?(\<dt\>.*?)\<\/dl#is', $rest, $parts)) {
    
             $replace = $parts[1];
- 
             do_section($replace, true);
         }
 
-        $posts = $parts[2];
     } else {
         print ("no match: $url\n");
     }
@@ -118,10 +115,13 @@ function parse_post($post, $isreplace) {
         
         $extra = $ref[4];
         
+        if ($isreplace) {
+            $abstract = '';
+        } else{
         $abstract = preg_replace('#\<a href\s*=\s*\"(.*?)\".*?\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $ref[5]);
         $abstract = preg_replace("'\<[\/\!]*?[^\<\>]*?\>'si", "", $abstract);
         $abstract = doclean($abstract);
-
+        }
 #print "$authors\n$title\n$abstract\n$extra\n\n";
 #exit;
 
@@ -148,9 +148,6 @@ function parse_post($post, $isreplace) {
                 $sql = "select arxiv_tag from ARXIV_NEW where arxiv_tag ='" . $arxiv_tag . "';";
                 if (!$db->sql_query($sql)) {
                     print( 'Error looking old');
-                }
-                if ($db->sql_fetchrow($result)) {
-                    #exit;
                 }
             }
 ##	    $title = (strlen($title) > 255) ? substr($title,0,252).'...' : $title;		

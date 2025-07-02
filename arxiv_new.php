@@ -25,10 +25,10 @@ $template->set_filenames(array(
 
 $starttime = microtime_float();
 
-$arxivesString = ($user->profile_fields['pf_user_arxives']) ? $user->profile_fields['pf_user_arxives'] : $config['default_arxives'];
+$arxivesString = ($user->profile_fields['pf_user_arxives'] ?? '') ? $user->profile_fields['pf_user_arxives'] : $config['default_arxives'];
 $arxives = to_array($arxivesString);
 
-$keywords = ($user->profile_fields['pf_user_keywords']) ? $user->profile_fields['pf_user_keywords'] : $config['default_arxiv_keys'];
+$keywords = ($user->profile_fields['pf_user_keywords'] ?? '') ? $user->profile_fields['pf_user_keywords'] : $config['default_arxiv_keys'];
 $keywords = to_array($keywords);
 
 $date = ($request->is_set('d')) ? $request->variable('d', '') : '';
@@ -46,7 +46,7 @@ $latestArxiv = new DateTime($config['arxiv_new_date']);
 
 $text = '';
 
-if(!$user->profile_fields['pf_user_arxives']) {
+if(empty($user->profile_fields['pf_user_arxives'])) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
 }
 
@@ -229,7 +229,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
     $text = '';
 
     $match_strings = get_match_strings($keywords);
-    $mirror = ($user->profile_fields['pf_user_mirror']) ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror'];
+    $mirror = ($user->profile_fields['pf_user_mirror'] ?? '') ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror'];
 
     $title = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['title']);
     $authors = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['authors']);

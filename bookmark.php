@@ -3,10 +3,9 @@
 define('IN_PHPBB', true);
 
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-
+#error_reporting(E_ALL);
+#ini_set('display_errors', 1);
+#ini_set('display_startup_errors', 1);
 
 
 
@@ -35,6 +34,8 @@ $status_read = 1;
 $status_ignore = 2;
 $startc = 0; //first row to return
 $maxrows = 50;
+$isadmin = 0;
+
 
 $text = '';
 $error = '';
@@ -71,7 +72,7 @@ $delcategory = $request->variable('delcategory', 0);
 
 $deltag = $request->variable('deltag', 0);
 $editnote = $request->variable('editnote', 0);
-
+$sort_by = $request->variable('sort_by', 'paper_date');
 
 if($club >= 0) {
     $delref = '';
@@ -106,36 +107,45 @@ if($club >= 0) {
                     c.manager DESC, u.username";
 
         $emails = '';
-        if($result = $db->sql_query($sql)) {
-            $managersLinks = '';
-            $membersLinks = '';
-
-            while($row = $db->sql_fetchrow($result)) {
-                if($row['user_id'] == $user->data['user_id']) {
-                    $canchange = 1;
-                }
-                $link = "<a href='memberlist.php?mode=viewprofile&u={$row['user_id']}'>{$row['username']}</a> ";
-
-                if($row['manager'] === '1') {
-                    $managersLinks .= $link;
-
+        if ($result = $db->sql_query($sql)) {
+            $managers  = [];
+            $members   = [];
+            $emailsArr = [];
+        
+            while ($row = $db->sql_fetchrow($result)) {
+                // Build the profile‐link HTML
+                $link = "<a href='memberlist.php?mode=viewprofile&u={$row['user_id']}'>"
+                      . htmlspecialchars($row['username'], ENT_QUOTES)
+                      . "</a>";
+        
+                // Track managers vs members
+                if ($row['manager'] === '1') {
+                    $managers[] = $link;
                     if ($row['user_id'] == $user->data['user_id']) {
                         $isadmin = 1;
+                        $canchange = 1;
                     }
                 } else {
-                    $membersLinks .= $link;
+                    $members[] = $link;
                 }
-
-                if($row['user_id'] !== $user->data['user_id']) {
-                    $emails .= (empty($emails) ? '' : ';') . $row['user_email'];
+        
+                // Track emails (skip your own)
+                if ($row['user_id'] !== $user->data['user_id']) {
+                    $emailsArr[] = $row['user_email'];
+                    $canchange = 1;
                 }
             }
             $db->sql_freeresult($result);
-
+        
+            // Implode with comma+space
+            $managersLinks = implode(', ', $managers);
+            $membersLinks  = implode(', ', $members);
+            $emails        = implode(';',  $emailsArr);
+        
+            // Output
             $clubtxt .= "<p class='genmed'>Managers: $managersLinks</p>";
-            $clubtxt .= "<p class='genmed'>Members: $membersLinks</p>";
+            $clubtxt .= "<p class='genmed'>Members:  $membersLinks</p>";
         }
-
         if($isadmin === 1) {
             $clubtxt .= "<p class='genmed'><a href='mailto:$emails?subject=$page_title'>Emails</a></p>";
         }
@@ -457,30 +467,33 @@ if($club >= 0) {
     $text .= "<h4>";
     if($paper_status == $status_read) {
         $text .= "Old Papers";
-        $text .= " [<a href='$fname?club=$club&status=0'>Current papers</a>]";
-        $text .= " [<a href='$fname?club=$club&status=$status_ignore'>Ignored papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=0&sort_by=$sort_by'>Current papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=$status_ignore&sort_by=$sort_by'>Ignored papers</a>]";
     } elseif ($paper_status == $status_ignore) {
         $text .= "Ignored Papers";
-        $text .= " [<a href='$fname?club=$club&status=0'>Current papers</a>]";
-        $text .= " [<a href='$fname?club=$club&status=$status_read'>Old  papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=0&sort_by=$sort_by'>Current papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=$status_read&sort_by=$sort_by'>Old  papers</a>]";
     } else {
         $status = '(ps.status is null || ps.status=0)';
 
         $text .= "Current Papers";
-        $text .= " [<a href='$fname?club=$club&status=$status_read'>Old  papers</a>]";
-        $text .= " [<a href='$fname?club=$club&status=$status_ignore'>Ignored papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=$status_read&sort_by=$sort_by'>Old  papers</a>]";
+        $text .= " [<a href='$fname?club=$club&status=$status_ignore&sort_by=$sort_by'>Ignored papers</a>]";
     }
+    $opposite_sort = ($sort_by == 'bookmark_date') ? 'paper_date' : 'bookmark_date';
+    $sort_text = ($sort_by == 'bookmark_date') ? 'Sort by paper date' : 'Sort by bookmark date';
+    $text .= " (<a href='{$fname}?club=$club&status=$paper_status&sort_by={$opposite_sort}'>$sort_text</a>)";
     $text .= "</h4><p class='genmed'>";
 
     if($paper_status > 0) {
         $status = "ps.status=$paper_status";
     }
 
-    $sort = 'n.date DESC';
+    $sort = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, n.date DESC' : 'n.date DESC, bookdate DESC, book_id DESC';
 
     $sql = "select notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who, bookdate from ARXIV_NEW as n,
     (select b.arxiv_tag, count(*) as ac,group_concat(u.username order by u.username SEPARATOR '\n') as who,
-    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate from bookmarks b,club_members as c,
+    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate,MAX(b.bookmark_id) AS book_id from bookmarks b,club_members as c,
     phpbb_users as u where b.club_id=$club and u.user_id=c.user_id and c.user_id=b.user_id and c.club_id=$club
     group by b.arxiv_tag) as temp left join club_paper_status as ps on (ps.arxiv_tag=temp.arxiv_tag and ps.club_id=$club)
     where n.arxiv_tag=temp.arxiv_tag and $status order by $sort LIMIT $startc,$maxrows";
@@ -538,7 +551,7 @@ foreach($rows as $row) {
     $count = $row['ac'];
     $tag = $row['arxiv_tag'];
     $date = $row['date'];
-    $bookmark_id = $row['bookmark_id'];
+    $bookmark_id = $row['bookmark_id'] ?? '';
 
     if(isset($do_export)) {
         $types = explode(",", $do_export);
@@ -585,7 +598,7 @@ foreach($rows as $row) {
     }
 
     $text .=  '[<a href="https://arxiv.org/pdf/' .$tag. '">PDF</A>]';
-    $pdfs .= "https://arxiv.org/pdf/$tag\n";
+    $pdfs = "https://arxiv.org/pdf/$tag\n";
 
 #    if(!defined('IPHONE')) {
 #        $text.=' [<a href="https://arxiv.org/ps/' .$tag.'">PS</A>]';
@@ -612,7 +625,7 @@ foreach($rows as $row) {
     }
     $text .= '<br /><b>Title:</b> ' . $row['title'].'<br /><b>Authors:</b> ' . $row['authors'] ;
 
-    if($row['who'] != ''){
+    if(!empty($row['who'])){
         $people = explode("\n", $row['who']);
         $notes = explode("\n", $row['notes']);
         $text .= '<br /><span class="gensmall">';
@@ -643,7 +656,7 @@ foreach($rows as $row) {
                     if ($tagtxt <>'') $tagtxt.=', ';
 
                     $tagtxt .=  $bookmark_tags[$btag] .
-                    " [<A hREF=\"$fname?book_id=$bookmark_id&deltag=$btag&category=$category&editnote=".$HTTP_GET_VARS['editnote']."#$tag\">X</A>]";
+                    " [<A hREF=\"$fname?book_id=$bookmark_id&deltag=$btag&category=$category&editnote=".($HTTP_GET_VARS['editnote'] ?? '')."#$tag\">X</A>]";
                 }
             }
             $tagtxt="<br /><span  class=\"genmed\"><font color=\"navy\">Tag: $tagtxt</font></span>";
