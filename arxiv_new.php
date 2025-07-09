@@ -1,6 +1,6 @@
 <?php
 
-date_default_timezone_set( "EST" );
+date_default_timezone_set("EST");
 
 define('IN_PHPBB', true);
 define('BOOKMARK_LINK', '/bookmark.php');
@@ -46,7 +46,7 @@ $latestArxiv = new DateTime($config['arxiv_new_date']);
 
 $text = '';
 
-if(empty($user->profile_fields['pf_user_arxives'])) {
+if (empty($user->profile_fields['pf_user_arxives'])) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
 }
 
@@ -54,8 +54,8 @@ $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
 $text .= $links;
 $text .= '<dl>';
 
-if(!empty($month)) {
-    $date_range = "arxiv_tag like '". date("ym",strtotime("$year-$month-01")) ."%'";
+if (!empty($month)) {
+    $date_range = "arxiv_tag like '" . date("ym", strtotime("$year-$month-01")) . "%'";
     $date_range_replace = "date >= '$year-$month-01' and date < date_add('$year-$month-01',interval 1 month)";
 } elseif ($interval > 1) {
     $date_range = "date <= '$new_date' and date > date_sub('$new_date',interval $interval day)";
@@ -76,8 +76,8 @@ $text .= "</dl><hr>";
 $links .= '<p>' . get_month_links($latestArxiv) . '</p>';
 $links .= "<p>";
 
-$links .= '<span class ="gensmall">Search time: '. number_format((microtime_float() - $starttime), 3, '.', '') . ' seconds</span>';
-$links .= '<br><span class="gensmall">Papers matching: '. htmlspecialchars(implode(', ', $keywords)) .'</span>';
+$links .= '<span class ="gensmall">Search time: ' . number_format((microtime_float() - $starttime), 3, '.', '') . ' seconds</span>';
+$links .= '<br><span class="gensmall">Papers matching: ' . htmlspecialchars(implode(', ', $keywords)) . '</span>';
 
 if ($user->data['user_id'] != ANONYMOUS) {
     $links .= '<p><span class ="genmed">';
@@ -92,14 +92,15 @@ $links .= "</p>";
 $text .= $links;
 
 $template->assign_vars(array(
-    'MESSAGE_TEXT'	=> $text,
-    'MESSAGE_TITLE'	=> get_page_title($arxives, $new_date, $month, $year, $interval)
+    'MESSAGE_TEXT'    => $text,
+    'MESSAGE_TITLE'    => get_page_title($arxives, $new_date, $month, $year, $interval)
 ));
 
 make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
 page_footer();
 
-function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives) {
+function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives)
+{
     global $user, $request;
 
     $linksHtml = '';
@@ -113,52 +114,53 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives) 
     if ($interval > 1) {
         $dateDaysForLink->modify("-$interval day");
     }
-    $linksHtml .= '[<A HREF="' . $request->server('PHP_SELF') . '?i=7&d=' . $dateDaysForLink->format('Y-m-d') . '">Week to ' . $dateDaysForLink->format('jS M') .'</A>] ';
+    $linksHtml .= '[<A HREF="' . $request->server('PHP_SELF') . '?i=7&d=' . $dateDaysForLink->format('Y-m-d') . '">Week to ' . $dateDaysForLink->format('jS M') . '</A>] ';
 
-    if($latestArxiv > $newDate) {
+    if ($latestArxiv > $newDate) {
         $dateDaysForLink = new DateTime($new_date);
 
-        for($i = 1; $i <= 7; $i++) {
+        for ($i = 1; $i <= 7; $i++) {
             $dateDaysForLink->modify('+1 day');
-            if($dateDaysForLink > $latestArxiv) break;
-            if($dateDaysForLink->format('w') === '0' || $dateDaysForLink->format('w') === '6') continue;
+            if ($dateDaysForLink > $latestArxiv) break;
+            if ($dateDaysForLink->format('w') === '0' || $dateDaysForLink->format('w') === '6') continue;
             $links[] = '[<A HREF="' . $request->server('PHP_SELF') . '?d=' . $dateDaysForLink->format('Y-m-d') . '">' . $dateDaysForLink->format('j M') . '</A>] ';
         }
     }
 
-    $links[] = ($interval > 1) ? '[<A HREF="' . $request->server('PHP_SELF') . '?d=' . $newDate->format('Y-m-d') . '">' . $newDate->format('j M') . '</A>] ' : '' ;
+    $links[] = ($interval > 1) ? '[<A HREF="' . $request->server('PHP_SELF') . '?d=' . $newDate->format('Y-m-d') . '">' . $newDate->format('j M') . '</A>] ' : '';
 
     $dateDaysForLink = new DateTime($new_date);
-    for($i = 1; $i <= 7; $i++) {
+    for ($i = 1; $i <= 7; $i++) {
         $dateDaysForLink->modify('-1 day');
-        if($dateDaysForLink->format('w') === '0' || $dateDaysForLink->format('w') === '6') continue;
+        if ($dateDaysForLink->format('w') === '0' || $dateDaysForLink->format('w') === '6') continue;
 
         $links[] = '[<A HREF="' . $request->server('PHP_SELF') . '?d=' . $dateDaysForLink->format('Y-m-d') . '">' . $dateDaysForLink->format('j M') . '</A>] ';
     }
     arsort($links);
     $linksHtml .= implode('', $links);
 
-    if($latestArxiv == $newDate) {
+    if ($latestArxiv == $newDate) {
         ob_start();
-    ?>
+?>
         <TABLE BORDER=0 CELLPADDING=0 WIDTH=100%>
             <TR>
                 <TD class="genmed"><?= $linksHtml ?></TD>
-                <TD align="right" class ="genmed">
-                    <?php foreach($arxives as $arxivItem): ?>
+                <TD align="right" class="genmed">
+                    <?php foreach ($arxives as $arxivItem): ?>
                         [<A TARGET="_blank" HREF="https://arxiv.org/list/<?= $arxivItem ?>/new"><?= $arxivItem ?></A>]
                     <?php endforeach; ?>
                 </TD>
             </TR>
         </TABLE>
-    <?php
+<?php
         $linksHtml = ob_get_clean();
     }
 
     return $linksHtml;
 }
 
-function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives) {
+function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
+{
     global $db;
 
     $scores = [];
@@ -178,9 +180,9 @@ function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives) {
 
     $result = $db->sql_query($sql);
 
-    while($row = $db->sql_fetchrow($result)) {
+    while ($row = $db->sql_fetchrow($result)) {
         $rowResult = print_relevant($row, false, $keywords, $arxives);
-        if($rowResult) {
+        if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
@@ -191,7 +193,8 @@ function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives) {
     return implode('', $items);
 }
 
-function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives) {
+function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives)
+{
     global $db;
 
     $scores = [];
@@ -211,9 +214,9 @@ function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxi
 
     $result = $db->sql_query($sql);
 
-    while($row = $db->sql_fetchrow($result)) {
+    while ($row = $db->sql_fetchrow($result)) {
         $rowResult = print_relevant($row, true, $keywords, $arxives);
-        if($rowResult) {
+        if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
@@ -224,12 +227,13 @@ function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxi
     return implode('', $items);
 }
 
-function print_relevant($row, $replace, array $keywords, array $arxives) {
-    global $user, $config;
+function print_relevant($row, $replace, array $keywords, array $arxives)
+{
+    global $user;
     $text = '';
 
     $match_strings = get_match_strings($keywords);
-    $mirror = ($user->profile_fields['pf_user_mirror'] ?? '') ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror'];
+    $mirror = 'arxiv.org';
 
     $title = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['title']);
     $authors = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['authors']);
@@ -237,12 +241,12 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
 
     $addlen = 25;
 
-    $tit_matches = (strlen($title) - strlen($row['title'])) / $addlen ;
-    $tit_matches += (strlen($authors) - strlen($row['authors'])) / $addlen ;
+    $tit_matches = (strlen($title) - strlen($row['title'])) / $addlen;
+    $tit_matches += (strlen($authors) - strlen($row['authors'])) / $addlen;
     $abs_matches = ($replace) ? 0 : (strlen($abstract) - strlen($row['abstract'])) / $addlen;
 
-    if($tit_matches + $abs_matches > 0) {
-        if(!empty($match_strings['neg_match'])) {
+    if ($tit_matches + $abs_matches > 0) {
+        if (!empty($match_strings['neg_match'])) {
             if (preg_match($match_strings['neg_match'], "$title $abstract $authors")) {
                 return false;
             }
@@ -255,7 +259,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $titleLinks .= "<a href='https://$mirror/abs/$arxivTag' target='_blank'>abs</a>, ";
         $titleLinks .= "<a href='https://$mirror/pdf/$arxivTag'>pdf</a>";
 
-        if(!defined('IPHONE')) {
+        if (!defined('IPHONE')) {
             $titleLinks .= "] [<a href='/bibtex.php?arxiv=$arxivTag'>BibTex</a>] ";
         } else {
             $titleLinks .= "] ";
@@ -265,7 +269,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
             $titleLinks .= "[<a href='/bookmark.php?add=$arxivTag' target='_blank'>Bookmark</a>]";
         }
 
-        if($row['paper_id']) {
+        if ($row['paper_id']) {
             $titleLinks .= " [<a href='/discuss/$arxivTag' target='_blank'>View discussion</a>]";
         } else {
             $titleLinks .= " [<a href='/arxiv_start.pl?$arxivTag' target='_blank'>discuss</a>]";
@@ -274,7 +278,7 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $text .= "<dt><h3 class='arxiv_title'><b>$arxivTag</b>$titleLinks</h3></dt>";
 
         $text .= "<dd>";
-        $text .= '<span class="arxiv_title_line"><b>Title:</b> '. $title .'</span><br>';
+        $text .= '<span class="arxiv_title_line"><b>Title:</b> ' . $title . '</span><br>';
 
         $authors = tex_accents($authors);
         #$authors = preg_replace('#\\\rm\{(.+?)\}#s','\\1', $authors);
@@ -283,11 +287,11 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
         $comments = make_clickable($row['comments']);
         $comments = preg_replace('#(\<a\s*href=.*?\>).*?(\<\/a)#is', '\\1this URL\\2', $comments);
         #$comments = preg_replace('#\\\rm\{(.+?)\}#s','\\1', $comments);
-        if($comments) {
+        if ($comments) {
             $text .= "<b>Comments:</b> $comments<br>";
         }
 
-        if(!$replace) {
+        if (!$replace) {
             $abs_matches = $abs_matches * 1000 / max(1000, strlen($abstract));
             $abstract = preg_replace('/\\\\cite\{([^\{]*?)\}/', '[$1]', $abstract);
             $abstract = make_clickable($abstract);
@@ -303,32 +307,34 @@ function print_relevant($row, $replace, array $keywords, array $arxives) {
     return false;
 }
 
-function get_page_title($arxives, $new_date, $month, $year, $interval) {
+function get_page_title($arxives, $new_date, $month, $year, $interval)
+{
     $newDate = new DateTime($new_date);
-    if (!empty($month)){
+    if (!empty($month)) {
         $year = ($year) ? $year : $newDate->format('Y');
         $dateStr =  $newDate->setDate($year, $month, 1)->format('F Y');
     } else {
         $dateStr =  $newDate->format('l, jS F Y');
-        if($interval > 1) {
+        if ($interval > 1) {
             $dateStr = "$interval days to " . $dateStr;
         }
     }
 
-    return 'Filtered abstracts for ' . implode(', ', $arxives) . ': '. $dateStr;
+    return 'Filtered abstracts for ' . implode(', ', $arxives) . ': ' . $dateStr;
 }
 
-function get_month_links($latestArxiv) {
+function get_month_links($latestArxiv)
+{
     global $request;
     $monthlinks = '';
 
     $latestArxivMonth = $latestArxiv->format('m');
     $latestArxivYear = $latestArxiv->format('Y');
 
-    for($y = 2007; $y <= $latestArxivYear; $y++) {
-        $monthlinks .= '<p>'. $y .': ';
-        for ($m = 1; $m <= 12 ; $m++) {
-            if($y == $latestArxivYear && $m > $latestArxivMonth) break;
+    for ($y = 2007; $y <= $latestArxivYear; $y++) {
+        $monthlinks .= '<p>' . $y . ': ';
+        for ($m = 1; $m <= 12; $m++) {
+            if ($y == $latestArxivYear && $m > $latestArxivMonth) break;
             $monthlinks .= '[<A HREF="' . $request->server('PHP_SELF') . '?y=' . $y . '&m=' . $m . '">' . date('F', strtotime("$y-$m")) . '</A>] ';
         }
         $monthlinks .= '</p>';
@@ -336,5 +342,3 @@ function get_month_links($latestArxiv) {
 
     return $monthlinks;
 }
-
-

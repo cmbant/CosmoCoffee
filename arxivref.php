@@ -18,7 +18,7 @@ $data = $request->is_set('a') ? $request->variable('a', '') : null;
 $abs = $request->is_set('abs') ? $request->variable('abs', '') : null;
 $file = $request->is_set('file') ? $request->variable('file', '') : null;
 
-$mirror = ($user->profile_fields['pf_user_mirror']) ? $user->profile_fields['pf_user_mirror'] : $config['default_mirror'];
+$mirror = 'arxiv.org';
 
 if (!empty($file)) {
     header('Location: ' . "https://$mirror/$file");
@@ -29,19 +29,19 @@ if (!empty($file)) {
 }
 
 $sql = "select
-            phpbb_topics.topic_id 
-        from 
-            phpbb_topics, phpbb_papers 
-        where 
-            phpbb_papers.paper_id = phpbb_topics.paper_id 
-        and 
+            phpbb_topics.topic_id
+        from
+            phpbb_topics, phpbb_papers
+        where
+            phpbb_papers.paper_id = phpbb_topics.paper_id
+        and
             phpbb_papers.arxiv_tag = '$data'";
 
 if (!($result = $db->sql_query($sql))) {
     trigger_error('Could not query new paper information');
 }
 
-if ($row = $db->sql_fetchrow($result)) {    
+if ($row = $db->sql_fetchrow($result)) {
     redirect("/viewtopic.php?t=" . $row['topic_id']);
 }
 
@@ -52,9 +52,9 @@ if (strpos($data, 'new')) {
 }
 
 #no frame in arXiv
- header('Location: ' . $arxiv);
- exit;
-     
+header('Location: ' . $arxiv);
+exit;
+
 
 $alternative_text = "Your browser doesn't support frames: Click on the link below to proceed to the<br><a href='$arxiv'>Arxiv</a>";
 $text = "<iframe src='$arxiv' style='border:0; height: 63vh; width:100%'>$alternative_text</iframe>";
@@ -94,9 +94,9 @@ ob_start();
 ?>
 
 <frameset rows="155,*" frameborder="1">
-   <frame src="/arxiv_view.php" name="fr_top" scrolling="no" border="0" noresize>
-   <frame src="https://arxiv.org/list/astro-ph/new" name="fr_bottom">
- </frameset>
+    <frame src="/arxiv_view.php" name="fr_top" scrolling="no" border="0" noresize>
+        <frame src="https://arxiv.org/list/astro-ph/new" name="fr_bottom">
+</frameset>
 
 <?php
 echo ob_get_clean();
@@ -105,12 +105,12 @@ die('--80--');
 
 $text = '<HEAD><TITLE>CosmoCoffee :: ' . $data . '</TITLE></HEAD>
 <FRAMESET ROWS="155,*" FRAMEBORDER=1>
-<FRAME NAME="fr_top" SRC="/arxiv_view.php?r=' . $data . '" SCROLLING=NO BORDER=0 
+<FRAME NAME="fr_top" SRC="/arxiv_view.php?r=' . $data . '" SCROLLING=NO BORDER=0
 marginheight=0 marginwidth=0>
 <FRAME NAME="fr_bottom" SRC="' . $arxiv . '">
 </FRAMESET>
 <NOFRAMES>
-<BODY BGCOLOR="#cccc99" TEXT="#000000" LINK="#000066" VLINK="#000066" 
+<BODY BGCOLOR="#cccc99" TEXT="#000000" LINK="#000066" VLINK="#000066"
 topmargin=5 bottomMargin=0 leftMargin=0 BORDER=0>
 <CENTER>
 <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 COLS=1 WIDTH="500" >
@@ -118,7 +118,7 @@ topmargin=5 bottomMargin=0 leftMargin=0 BORDER=0>
 <td width="500" Height=80><CENTER></CENTER></TD>
 </TR>
 <TR>
-<TD> <P>Your browser doesn\'t support frames: Click on the link below to proceed to the<BR> <A HREF="' . $arxiv . ' 
+<TD> <P>Your browser doesn\'t support frames: Click on the link below to proceed to the<BR> <A HREF="' . $arxiv . '
 " TARGET="_blank">Arxiv</A>.
 </TD>
 </TR>
@@ -135,4 +135,3 @@ topmargin=5 bottomMargin=0 leftMargin=0 BORDER=0>
 
 echo $text;
 ?>
-

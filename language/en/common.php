@@ -1,26 +1,25 @@
 <?php
-/**
-*
-* This file is part of the phpBB Forum Software package.
-*
-* @copyright (c) phpBB Limited <https://www.phpbb.com>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-* For full copyright and license information, please see
-* the docs/CREDITS.txt file.
-*
-*/
 
 /**
-* DO NOT CHANGE
-*/
-if (!defined('IN_PHPBB'))
-{
+ *
+ * This file is part of the phpBB Forum Software package.
+ *
+ * @copyright (c) phpBB Limited <https://www.phpbb.com>
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ * For full copyright and license information, please see
+ * the docs/CREDITS.txt file.
+ *
+ */
+
+/**
+ * DO NOT CHANGE
+ */
+if (!defined('IN_PHPBB')) {
 	exit;
 }
 
-if (empty($lang) || !is_array($lang))
-{
+if (empty($lang) || !is_array($lang)) {
 	$lang = array();
 }
 
@@ -126,7 +125,7 @@ $lang = array_merge($lang, array(
 
 	'BACK_TO_TOP'			=> 'Top',
 	'BACK_TO_PREV'			=> 'Back to previous page',
-	'BAN_TRIGGERED_BY_EMAIL'=> 'A ban has been issued on your email address.',
+	'BAN_TRIGGERED_BY_EMAIL' => 'A ban has been issued on your email address.',
 	'BAN_TRIGGERED_BY_IP'	=> 'A ban has been issued on your IP address.',
 	'BAN_TRIGGERED_BY_USER'	=> 'A ban has been issued on your username.',
 	'BBCODE_GUIDE'			=> 'BBCode guide',
@@ -607,7 +606,7 @@ $lang = array_merge($lang, array(
 	'POSTED_ON_DATE'		=> 'on',
 	'POSTS'					=> 'Posts',
 	'POSTS_UNAPPROVED'		=> 'At least one post in this topic has not been approved.',
-	'POSTS_UNAPPROVED_FORUM'=> 'At least one post in this forum has not been approved.',
+	'POSTS_UNAPPROVED_FORUM' => 'At least one post in this forum has not been approved.',
 	'POST_BY_AUTHOR'		=> 'by',
 	'POST_BY_FOE'			=> '<strong>%1$s</strong>, who is currently on your ignore list, made this post.',
 	'POST_DISPLAY'			=> 'Display this post',
@@ -615,7 +614,7 @@ $lang = array_merge($lang, array(
 	'POST_DELETED_ACTION'	=> 'Deleted post:',
 	'POST_DELETED'			=> 'This post has been deleted.',
 	'POST_DELETED_BY'		=> '<strong>%2$s</strong> deleted the post by <strong>%1$s</strong> on %3$s.',
-	'POST_DELETED_BY_REASON'=> '<strong>%2$s</strong> deleted the post by <strong>%1$s</strong> on %3$s for the following reason: %4$s',
+	'POST_DELETED_BY_REASON' => '<strong>%2$s</strong> deleted the post by <strong>%1$s</strong> on %3$s for the following reason: %4$s',
 	'POST_DETAILS'			=> 'Post details',
 	'POST_NEW_TOPIC'		=> 'Post new topic',
 	'POST_PCT'				=> '%.2f%% of all posts',
@@ -809,7 +808,7 @@ $lang = array_merge($lang, array(
 	'TOPICS_UNAPPROVED'	=> 'At least one topic in this forum has not been approved.',
 	'TOPIC_ICON'		=> 'Topic icon',
 	'TOPIC_LOCKED'		=> 'This topic is locked, you cannot edit posts or make further replies.',
-	'TOPIC_LOCKED_SHORT'=> 'Topic locked',
+	'TOPIC_LOCKED_SHORT' => 'Topic locked',
 	'TOPIC_MOVED'		=> 'Moved topic',
 	'TOPIC_REVIEW'		=> 'Topic review',
 	'TOPIC_TITLE'		=> 'Topic title',
@@ -844,7 +843,7 @@ $lang = array_merge($lang, array(
 	'TWITTER'			=> 'Twitter',
 
 	'UNABLE_GET_IMAGE_SIZE'	=> 'It was not possible to determine the dimensions of the image. Please verify that the URL you entered is correct.',
-	'UNABLE_TO_DELIVER_FILE'=> 'Unable to deliver file.',
+	'UNABLE_TO_DELIVER_FILE' => 'Unable to deliver file.',
 	'UNKNOWN_BROWSER'		=> 'Unknown browser',
 	'UNMARK_ALL'			=> 'Unmark all',
 	'UNREAD_MESSAGES'		=> 'Unread messages',
@@ -1468,26 +1467,9 @@ $lang = array_merge($lang, array(
 	// The default dateformat which will be used on new installs in this language
 	// Translators should change this if a the usual date format is different
 	'default_dateformat'	=> 'D M d, Y g:i a', // Mon Jan 01, 2007 1:37 pm
-	//CosmoCoffee
-    'arxives'	=> array(
-        'arxiv.org' => 'Default (Cornell)',
-        'au.arxiv.org' => 'Australia',
-        'br.arxiv.org' => 'Brazil',
-        'cn.arxiv.org' => 'China',
-        'fr.arxiv.org' => 'France',
-        'de.arxiv.org' => 'Germany',
-        'in.arxiv.org' => 'India',
-        'il.arxiv.org' => 'Israel',
-        'it.arxiv.org' => 'Italy',
-        'jp.arxiv.org' => 'Japan',
-        'ru.arxiv.org' => 'Russia',
-        'za.arxiv.org' => 'South Africa',
-        'kr.arxiv.org' => 'South Korea',
-        'es.arxiv.org' => 'Spain',
-        'tw.arxiv.org' => 'Taiwan',
-        'uk.arxiv.org' => 'UK',
-        'aps.arxiv.org' => 'US mirror (aps)',
-        'lanl.arxiv.org' => 'US mirror (lanl)',
+	//CosmoCoffee - no longer used
+	'arxives'	=> array(
+		'arxiv.org' => 'arXiv.org',
 	),
 
 ));
