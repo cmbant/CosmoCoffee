@@ -12,8 +12,12 @@ define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
+include($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 
 anti_hack($phpEx);
+
+// Initialize ArXiv database
+$arxiv_db = new ArxivDatabase();
 
 $user->session_begin();
 $auth->acl($user->data);
@@ -265,19 +269,14 @@ if(!empty($addref) && $user_id > 1) {
         if(!$row = $db->sql_fetchrow($result)) {
             $db->sql_freeresult($result);
 
-            if($result = $db->sql_query("select title from ARXIV_NEW where arxiv_tag='$addref'")) {
-                if($row = $db->sql_fetchrow($result)) {
-                    $db->sql_freeresult($result);
-                    if(!$result = $db->sql_query("insert into bookmarks (user_id,arxiv_tag) values ($user_id,'$addref')")) {
-                        trigger_error('Could not query existing bookmarks');
-                    }
-                    $db->sql_freeresult($result);
-                } else {
-                    $error = "Paper $addref is not in the arXiv new database.";
+            // Check if paper exists in ArXiv SQLite database
+            if($arxiv_db->existsInArxivNew($addref)) {
+                if(!$result = $db->sql_query("insert into bookmarks (user_id,arxiv_tag) values ($user_id,'$addref')")) {
+                    trigger_error('Could not query existing bookmarks');
                 }
                 $db->sql_freeresult($result);
             } else {
-                $error = 'Invalid arxiv ID';
+                $error = "Paper $addref is not in the arXiv new database.";
             }
         }
     } else {
@@ -489,14 +488,37 @@ if($club >= 0) {
         $status = "ps.status=$paper_status";
     }
 
-    $sort = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, n.date DESC' : 'n.date DESC, bookdate DESC, book_id DESC';
-
-    $sql = "select notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who, bookdate from ARXIV_NEW as n,
+    // Get bookmark data from MySQL first (without ARXIV_NEW join)
+    // Original query selected: notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who, bookdate
+    $bookmark_sql = "select temp.arxiv_tag, temp.ac, temp.who, temp.notes, temp.bookdate, temp.book_id from
     (select b.arxiv_tag, count(*) as ac,group_concat(u.username order by u.username SEPARATOR '\n') as who,
     group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate,MAX(b.bookmark_id) AS book_id from bookmarks b,club_members as c,
     phpbb_users as u where b.club_id=$club and u.user_id=c.user_id and c.user_id=b.user_id and c.club_id=$club
     group by b.arxiv_tag) as temp left join club_paper_status as ps on (ps.arxiv_tag=temp.arxiv_tag and ps.club_id=$club)
-    where n.arxiv_tag=temp.arxiv_tag and $status order by $sort LIMIT $startc,$maxrows";
+    where $status LIMIT $startc,$maxrows";
+
+    $bookmark_result = $db->sql_query($bookmark_sql);
+    $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
+    $db->sql_freeresult($bookmark_result);
+
+    // Merge with paper details from SQLite
+    $rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+
+    // Sort the merged results
+    $sort_by_date = ($sort_by != 'bookmark_date');
+    usort($rows, function($a, $b) use ($sort_by_date) {
+        if ($sort_by_date) {
+            // Sort by paper date DESC, then bookmark date DESC
+            $date_cmp = strcmp($b['date'], $a['date']);
+            if ($date_cmp !== 0) return $date_cmp;
+            return strcmp($b['bookdate'], $a['bookdate']);
+        } else {
+            // Sort by bookmark date DESC, then paper date DESC
+            $bookdate_cmp = strcmp($b['bookdate'], $a['bookdate']);
+            if ($bookdate_cmp !== 0) return $bookdate_cmp;
+            return strcmp($b['date'], $a['date']);
+        }
+    });
 
 } else {
     $text .= '<p class="genmed">';
@@ -504,18 +526,52 @@ if($club >= 0) {
 
     if($user_id == 'all') {
         $usercond = '';
-        $date_cond = '';
-        $order = 'n.date DESC, ac DESC';
         $countcond = $request->variable('min_count', 0);
 
-        if($top_months) {
-            $date_cond = " and n.date >= date_sub(CURDATE(),interval $top_months month) ";
-            $order = 'ac DESC,n.date DESC';
-        } elseif ($countcond) {
-            $order = 'having ac >='. $countcond . ' order by n.date DESC, ac DESC';
+        // For "all users" view, we need to handle date filtering differently
+        // since we can't do cross-database joins. We'll get more data and filter in PHP.
+        $having_clause = '';
+        if ($countcond) {
+            $having_clause = " having ac >= $countcond";
         }
 
-        $sql = "select b.arxiv_tag,n.title, n.authors,n.date, count(*) as ac from bookmarks as b, ARXIV_NEW as n where $usercond b.arxiv_tag=n.arxiv_tag $date_cond group by n.arxiv_tag order by $order LIMIT $startc, $maxrows";
+        // Get a larger set of bookmark data to account for date filtering
+        $fetch_limit = $top_months ? ($startc + $maxrows) * 3 : $maxrows;
+        $bookmark_sql = "select b.arxiv_tag, count(*) as ac from bookmarks as b where 1=1 group by b.arxiv_tag $having_clause ORDER BY ac DESC LIMIT $fetch_limit";
+        $bookmark_result = $db->sql_query($bookmark_sql);
+        $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
+        $db->sql_freeresult($bookmark_result);
+
+        // Merge with paper details from SQLite
+        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+
+        // Filter by date if needed
+        if($top_months) {
+            $cutoff_date = date('Y-m-d', strtotime("-$top_months months"));
+            $all_rows = array_filter($all_rows, function($row) use ($cutoff_date) {
+                return isset($row['date']) && $row['date'] >= $cutoff_date;
+            });
+        }
+
+        // Sort results
+        if($top_months) {
+            // Sort by bookmark count DESC, then date DESC
+            usort($all_rows, function($a, $b) {
+                $ac_cmp = $b['ac'] - $a['ac'];
+                if ($ac_cmp !== 0) return $ac_cmp;
+                return strcmp($b['date'], $a['date']);
+            });
+        } else {
+            // Sort by date DESC, then bookmark count DESC
+            usort($all_rows, function($a, $b) {
+                $date_cmp = strcmp($b['date'], $a['date']);
+                if ($date_cmp !== 0) return $date_cmp;
+                return $b['ac'] - $a['ac'];
+            });
+        }
+
+        // Apply pagination after filtering and sorting
+        $rows = array_slice($all_rows, $startc, $maxrows);
 
     } else {
         $catcond = "";
@@ -528,24 +584,36 @@ if($club >= 0) {
                 $catcond = "pbt2.tag_id = $category and b.bookmark_id = pbt2.bookmark_id and ";
             }
         }
-        $order = 'n.date DESC, ac DESC';
-        if(!empty($addref) && $user_id > 1) {
-            $order= "b.arxiv_tag='$addref' DESC,$order";
-        }
 
-        $sql = "select group_concat(pbt.tag_id) as book_tags,b.bookmark_id,b.note,b.arxiv_tag, n.title, n.authors,n.date,
-        j.shortname,b.club_id, count(*) as ac from (bookmarks as b,ARXIV_NEW as n$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id)
-        where $usercond $catcond b.arxiv_tag = n.arxiv_tag group by n.arxiv_tag,pbt.bookmark_id order by $order LIMIT  $startc,$maxrows";
+        // Get bookmark data from MySQL (without ARXIV_NEW join)
+        $bookmark_sql = "select group_concat(pbt.tag_id) as book_tags,b.bookmark_id,b.note,b.arxiv_tag,
+        j.shortname,b.club_id, count(*) as ac from (bookmarks as b$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id)
+        where $usercond $catcond 1=1 group by b.arxiv_tag,pbt.bookmark_id LIMIT $startc,$maxrows";
+
+        $bookmark_result = $db->sql_query($bookmark_sql);
+        $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
+        $db->sql_freeresult($bookmark_result);
+
+        // Merge with paper details from SQLite
+        $rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+
+        // Sort results
+        usort($rows, function($a, $b) use ($addref, $user_id) {
+            // Priority sort for newly added bookmark
+            if(!empty($addref) && $user_id > 1) {
+                if ($a['arxiv_tag'] === $addref && $b['arxiv_tag'] !== $addref) return -1;
+                if ($b['arxiv_tag'] === $addref && $a['arxiv_tag'] !== $addref) return 1;
+            }
+            // Then by date DESC, then by bookmark count DESC
+            $date_cmp = strcmp($b['date'], $a['date']);
+            if ($date_cmp !== 0) return $date_cmp;
+            return $b['ac'] - $a['ac'];
+        });
 
     }
 }
 
-if(!$result = $db->sql_query($sql)) {
-    trigger_error('Could not query existing bookmarks');
-}
-
-$rows = $db->sql_fetchrowset($result);
-$db->sql_freeresult($result);
+// $rows is now populated by the new logic above
 
 foreach($rows as $row) {
     $count = $row['ac'];

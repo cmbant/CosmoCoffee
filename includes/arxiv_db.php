@@ -162,6 +162,35 @@ class ArxivDatabase
     }
 
     /**
+     * Get paper details for multiple arxiv_tags (for bookmark display)
+     * Returns all fields needed for bookmark display
+     */
+    public function getPaperDetailsByTags($arxiv_tags)
+    {
+        if (empty($arxiv_tags)) {
+            return [];
+        }
+
+        $placeholders = str_repeat('?,', count($arxiv_tags) - 1) . '?';
+        $sql = "SELECT arxiv_tag, title, authors, date, arxiv, number, comments, abstract FROM ARXIV_NEW WHERE arxiv_tag IN ($placeholders)";
+
+        $stmt = $this->db->prepare($sql);
+        $param_count = 1;
+        foreach ($arxiv_tags as $tag) {
+            $stmt->bindValue($param_count++, $tag, SQLITE3_TEXT);
+        }
+
+        $result = $stmt->execute();
+        $papers = [];
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $papers[$row['arxiv_tag']] = $row;
+        }
+        $stmt->close();
+
+        return $papers;
+    }
+
+    /**
      * Get arxiv field for a given arxiv_tag from ARXIV_NEW table
      */
     public function getArxivFromNew($arxiv_tag)
@@ -337,6 +366,41 @@ class ArxivDatabase
         if ($this->db) {
             $this->db->close();
         }
+    }
+
+    /**
+     * Helper function to merge bookmark data with paper details
+     * This replaces the complex SQL joins that can't work across databases
+     */
+    public static function mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db)
+    {
+        if (empty($bookmark_rows)) {
+            return [];
+        }
+
+        // Extract unique arxiv_tags from bookmark data
+        $arxiv_tags = [];
+        foreach ($bookmark_rows as $row) {
+            if (!empty($row['arxiv_tag']) && !in_array($row['arxiv_tag'], $arxiv_tags)) {
+                $arxiv_tags[] = $row['arxiv_tag'];
+            }
+        }
+
+        // Get paper details from SQLite
+        $paper_details = $arxiv_db->getPaperDetailsByTags($arxiv_tags);
+
+        // Merge the data
+        $merged_rows = [];
+        foreach ($bookmark_rows as $row) {
+            $arxiv_tag = $row['arxiv_tag'];
+            if (isset($paper_details[$arxiv_tag])) {
+                // Merge bookmark data with paper details
+                $merged_row = array_merge($row, $paper_details[$arxiv_tag]);
+                $merged_rows[] = $merged_row;
+            }
+        }
+
+        return $merged_rows;
     }
 
     public function __destruct()
