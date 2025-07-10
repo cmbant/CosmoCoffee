@@ -60,15 +60,24 @@ $text .= '<dl>';
 
 if (!empty($month)) {
     $date_range = "arxiv_tag like '" . date("ym", strtotime("$year-$month-01")) . "%'";
-    $date_range_replace = "date >= '$year-$month-01' and date < date_add('$year-$month-01',interval 1 month)";
+    // SQLite-compatible date range for month
+    $month_start = "$year-$month-01";
+    $month_end = date('Y-m-d', strtotime("$month_start +1 month"));
+    $date_range_replace = "date >= '$month_start' and date < '$month_end'";
 } elseif ($interval > 1) {
-    $date_range = "date <= '$new_date' and date > date_sub('$new_date',interval $interval day)";
+    // SQLite-compatible date range for interval
+    $start_date = date('Y-m-d', strtotime("$new_date -$interval days"));
+    $date_range = "date <= '$new_date' and date > '$start_date'";
     $date_range_replace = $date_range;
 } else {
     $date_range = "date = '$new_date'";
     $date_range_replace = $date_range;
 }
-$arxiv_sql = $db->sql_in_set('arxiv', $arxives);
+// Create SQLite-compatible IN clause for arxiv filter
+$arxiv_quoted = array_map(function ($arxiv) {
+    return "'" . SQLite3::escapeString($arxiv) . "'";
+}, $arxives);
+$arxiv_sql = "arxiv IN (" . implode(', ', $arxiv_quoted) . ")";
 
 
 $text .= get_archives_html($arxiv_sql, $date_range, $keywords, $arxives);
