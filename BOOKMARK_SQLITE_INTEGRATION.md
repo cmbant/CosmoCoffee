@@ -97,15 +97,23 @@ $arxiv_db = new ArxivDatabase();
 ## Technical Details
 
 ### Data Flow
-1. **Bookmark Addition**: 
+1. **Bookmark Addition**:
    - Check existence in SQLite via `existsInArxivNew()`
    - Insert bookmark record in MySQL
-   
+
 2. **Bookmark Display**:
-   - Query bookmark data from MySQL
+   - Query ALL bookmark data from MySQL (without LIMIT)
    - Get paper details from SQLite via `getPaperDetailsByTags()`
    - Merge data in PHP using `mergeBookmarkWithPaperData()`
-   - Sort and display results
+   - Apply filters (date, count, category, status)
+   - Sort using exact original SQL logic
+   - Apply pagination (LIMIT/OFFSET) after sorting
+
+### Critical Fixes Applied
+- **Pagination Fix**: Removed premature LIMIT from MySQL queries, now paginate after sorting
+- **Status Filtering**: Added missing default status condition `(ps.status is null || ps.status=0)`
+- **Sorting Logic**: Replicated exact original SQL ORDER BY clauses in PHP
+- **Date Filtering**: Proper handling of `top_months` parameter for "all users" view
 
 ### Error Handling
 - Graceful fallback if SQLite database unavailable
