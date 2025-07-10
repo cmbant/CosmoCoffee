@@ -32,17 +32,13 @@ The ARXIV_NEW and ARXIV_REPLACE tables have been moved from the main MySQL datab
    - Updated to use ArxivDatabase class instead of direct MySQL queries
    - Maintains same functionality with improved performance
 
-2. **`arxiv_harvest.php`**
-   - Updated to use ArxivDatabase class
-   - Handles paper insertions and deletions via SQLite
-
-3. **`arxiv_new.php`**
+2. **`arxiv_new.php`**
    - Removed LEFT JOIN with phpbb_papers table as requested
    - Updated to query SQLite database directly
    - Paper_id-dependent output skipped (assumes not defined)
    - Maintains same user interface and functionality
 
-4. **`arxiv_start.pl`**
+3. **`arxiv_start.pl`**
    - Updated to use SQLite instead of MySQL
    - Uses DBI::SQLite for database connectivity
 
@@ -102,7 +98,7 @@ sudo apt install sqlite3 php-sqlite3 libdbd-sqlite3-perl
 
 4. **Verify functionality**
    - Test arxiv_new.php in browser
-   - Test arxiv_cron.php and arxiv_harvest.php scripts
+   - Test arxiv_cron.php script
    - Verify Perl scripts work correctly
 
 5. **Optional: Drop MySQL tables** (after verification)
