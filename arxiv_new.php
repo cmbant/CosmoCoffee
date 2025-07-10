@@ -45,12 +45,14 @@ $latestArxiv = new DateTime($config['arxiv_new_date']);
 
 
 $text = '';
+$logged_in = !empty($user->profile_fields['pf_user_arxives']);
 
-if (empty($user->profile_fields['pf_user_arxives'])) {
+if (!$logged_in) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
+    $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
+} else {
+    $links = '';
 }
-
-$links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
 $text .= $links;
 $text .= '<dl>';
 
@@ -73,8 +75,10 @@ $text .= "<dt><hr><h3>Replacements</h3></dt>";
 $text .= get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives);
 $text .= "</dl><hr>";
 
-$links .= '<p>' . get_month_links($latestArxiv) . '</p>';
-$links .= "<p>";
+if ($logged_in) {
+    $links .= '<p>' . get_month_links($latestArxiv) . '</p>';
+    $links .= "<p>";
+}
 
 $links .= '<span class ="gensmall">Search time: ' . number_format((microtime_float() - $starttime), 3, '.', '') . ' seconds</span>';
 $links .= '<br><span class="gensmall">Papers matching: ' . htmlspecialchars(implode(', ', $keywords)) . '</span>';
@@ -331,7 +335,7 @@ function get_month_links($latestArxiv)
     $latestArxivMonth = $latestArxiv->format('m');
     $latestArxivYear = $latestArxiv->format('Y');
 
-    for ($y = 2007; $y <= $latestArxivYear; $y++) {
+    for ($y = date('Y') - 2; $y <= $latestArxivYear; $y++) {
         $monthlinks .= '<p>' . $y . ': ';
         for ($m = 1; $m <= 12; $m++) {
             if ($y == $latestArxivYear && $m > $latestArxivMonth) break;
