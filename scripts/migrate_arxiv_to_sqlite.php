@@ -30,6 +30,13 @@ $sqlite_path = $data_dir . '/arxiv.db';
 echo "ArXiv MySQL to SQLite Migration Script\n";
 echo "=====================================\n\n";
 
+// Debug: Check database connection
+echo "Checking MySQL database connection...\n";
+if (!$db || !$db->sql_connect_id) {
+    throw new Exception("Failed to connect to MySQL database");
+}
+echo "✓ MySQL database connected successfully\n";
+
 // Remove existing SQLite database if it exists
 if (file_exists($sqlite_path)) {
     echo "Removing existing SQLite database...\n";
@@ -43,8 +50,13 @@ try {
 
     // Check if ARXIV_NEW table exists first
     echo "\nChecking if ARXIV_NEW table exists...\n";
-    $table_check_sql = "SHOW TABLES LIKE '" . $table_prefix . "ARXIV_NEW'";
+    $table_check_sql = "SHOW TABLES LIKE 'ARXIV_NEW'";
     $table_result = $db->sql_query($table_check_sql);
+
+    if (!$table_result) {
+        throw new Exception("Failed to check for ARXIV_NEW table: " . $db->sql_error());
+    }
+
     $table_exists = $db->sql_fetchrow($table_result);
     $db->sql_freeresult($table_result);
 
@@ -52,9 +64,10 @@ try {
         echo "ARXIV_NEW table does not exist in MySQL database. Skipping...\n";
         $count_new = 0;
     } else {
+        echo "✓ ARXIV_NEW table found in MySQL database\n";
         // Migrate ARXIV_NEW table
         echo "\nMigrating ARXIV_NEW table...\n";
-        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments, abstract FROM " . $table_prefix . "ARXIV_NEW";
+        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments, abstract FROM ARXIV_NEW";
         $result = $db->sql_query($sql);
 
         if (!$result) {
@@ -63,24 +76,25 @@ try {
 
         $count_new = 0;
         while ($row = $db->sql_fetchrow($result)) {
-        $success = $arxiv_db->replaceArxivNew(
-            $row['arxiv_tag'],
-            $row['date'],
-            $row['arxiv'],
-            $row['number'],
-            $row['title'],
-            $row['authors'],
-            $row['comments'],
-            $row['abstract']
-        );
+            $success = $arxiv_db->replaceArxivNew(
+                $row['arxiv_tag'],
+                $row['date'],
+                $row['arxiv'],
+                $row['number'],
+                $row['title'],
+                $row['authors'],
+                $row['comments'],
+                $row['abstract']
+            );
 
-        if ($success) {
-            $count_new++;
-            if ($count_new % 100 == 0) {
-                echo "Migrated $count_new records from ARXIV_NEW...\n";
+            if ($success) {
+                $count_new++;
+                if ($count_new % 100 == 0) {
+                    echo "Migrated $count_new records from ARXIV_NEW...\n";
+                }
+            } else {
+                echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
             }
-        } else {
-            echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
         }
         $db->sql_freeresult($result);
     }
@@ -89,8 +103,13 @@ try {
 
     // Check if ARXIV_REPLACE table exists first
     echo "\nChecking if ARXIV_REPLACE table exists...\n";
-    $table_check_sql = "SHOW TABLES LIKE '" . $table_prefix . "ARXIV_REPLACE'";
+    $table_check_sql = "SHOW TABLES LIKE 'ARXIV_REPLACE'";
     $table_result = $db->sql_query($table_check_sql);
+
+    if (!$table_result) {
+        throw new Exception("Failed to check for ARXIV_REPLACE table: " . $db->sql_error());
+    }
+
     $table_exists = $db->sql_fetchrow($table_result);
     $db->sql_freeresult($table_result);
 
@@ -98,9 +117,10 @@ try {
         echo "ARXIV_REPLACE table does not exist in MySQL database. Skipping...\n";
         $count_replace = 0;
     } else {
+        echo "✓ ARXIV_REPLACE table found in MySQL database\n";
         // Migrate ARXIV_REPLACE table
         echo "\nMigrating ARXIV_REPLACE table...\n";
-        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments FROM " . $table_prefix . "ARXIV_REPLACE";
+        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments FROM ARXIV_REPLACE";
         $result = $db->sql_query($sql);
 
         if (!$result) {
@@ -109,23 +129,24 @@ try {
 
         $count_replace = 0;
         while ($row = $db->sql_fetchrow($result)) {
-        $success = $arxiv_db->replaceArxivReplace(
-            $row['arxiv_tag'],
-            $row['date'],
-            $row['arxiv'],
-            $row['number'],
-            $row['title'],
-            $row['authors'],
-            $row['comments']
-        );
+            $success = $arxiv_db->replaceArxivReplace(
+                $row['arxiv_tag'],
+                $row['date'],
+                $row['arxiv'],
+                $row['number'],
+                $row['title'],
+                $row['authors'],
+                $row['comments']
+            );
 
-        if ($success) {
-            $count_replace++;
-            if ($count_replace % 100 == 0) {
-                echo "Migrated $count_replace records from ARXIV_REPLACE...\n";
+            if ($success) {
+                $count_replace++;
+                if ($count_replace % 100 == 0) {
+                    echo "Migrated $count_replace records from ARXIV_REPLACE...\n";
+                }
+            } else {
+                echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
             }
-        } else {
-            echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
         }
         $db->sql_freeresult($result);
     }
