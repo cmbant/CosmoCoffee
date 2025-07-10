@@ -185,7 +185,7 @@ function doclean($text)
     $text = preg_replace('/\<\/b\>/is', '', $text);
     # $text = iconv("utf-8", "ascii//ignore", $text);
 
-    $text = clean_sql($text);
+    $text = trim($text);
     return $text;
 }
 
