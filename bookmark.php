@@ -17,7 +17,11 @@ include($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 anti_hack($phpEx);
 
 // Initialize ArXiv database
-$arxiv_db = new ArxivDatabase();
+try {
+    $arxiv_db = new ArxivDatabase();
+} catch (Exception $e) {
+    trigger_error('Could not initialize ArXiv database: ' . $e->getMessage());
+}
 
 $user->session_begin();
 $auth->acl($user->data);
@@ -270,13 +274,17 @@ if(!empty($addref) && $user_id > 1) {
             $db->sql_freeresult($result);
 
             // Check if paper exists in ArXiv SQLite database
-            if($arxiv_db->existsInArxivNew($addref)) {
-                if(!$result = $db->sql_query("insert into bookmarks (user_id,arxiv_tag) values ($user_id,'$addref')")) {
-                    trigger_error('Could not query existing bookmarks');
+            try {
+                if($arxiv_db->existsInArxivNew($addref)) {
+                    if(!$result = $db->sql_query("insert into bookmarks (user_id,arxiv_tag) values ($user_id,'$addref')")) {
+                        trigger_error('Could not query existing bookmarks');
+                    }
+                    $db->sql_freeresult($result);
+                } else {
+                    $error = "Paper $addref is not in the arXiv new database.";
                 }
-                $db->sql_freeresult($result);
-            } else {
-                $error = "Paper $addref is not in the arXiv new database.";
+            } catch (Exception $e) {
+                $error = "Could not check arXiv database: " . $e->getMessage();
             }
         }
     } else {
@@ -487,7 +495,8 @@ if($club >= 0) {
     if($paper_status > 0) {
         $status = "ps.status=$paper_status";
     } else {
-        $status = '(ps.status is null || ps.status=0)';
+        // Original default for current papers (paper_status <= 0)
+        $status = '(ps.status is null OR ps.status=0)';
     }
 
     // Get ALL bookmark data from MySQL first (without ARXIV_NEW join and without LIMIT)
@@ -504,7 +513,11 @@ if($club >= 0) {
     $db->sql_freeresult($bookmark_result);
 
     // Merge with paper details from SQLite
-    $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+    try {
+        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+    } catch (Exception $e) {
+        trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
+    }
 
     // Sort the merged results exactly like the original SQL
     // Original: $sort = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, n.date DESC' : 'n.date DESC, bookdate DESC, book_id DESC';
@@ -548,20 +561,23 @@ if($club >= 0) {
         $db->sql_freeresult($bookmark_result);
 
         // Merge with paper details from SQLite
-        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
-
-        // Apply count filter if specified
-        if ($countcond) {
-            $all_rows = array_filter($all_rows, function($row) use ($countcond) {
-                return $row['ac'] >= $countcond;
-            });
+        try {
+            $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+        } catch (Exception $e) {
+            trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
         }
 
-        // Filter by date if needed (replicating the original SQL date_cond)
+        // Apply filters based on original if/elseif logic
         if($top_months) {
+            // Filter by date (replicating the original SQL date_cond)
             $cutoff_date = date('Y-m-d', strtotime("-$top_months months"));
             $all_rows = array_filter($all_rows, function($row) use ($cutoff_date) {
                 return isset($row['date']) && $row['date'] >= $cutoff_date;
+            });
+        } elseif ($countcond) {
+            // Apply count filter only if top_months is not active (original elseif logic)
+            $all_rows = array_filter($all_rows, function($row) use ($countcond) {
+                return $row['ac'] >= $countcond;
             });
         }
 
@@ -608,7 +624,11 @@ if($club >= 0) {
         $db->sql_freeresult($bookmark_result);
 
         // Merge with paper details from SQLite
-        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+        try {
+            $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+        } catch (Exception $e) {
+            trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
+        }
 
         // Sort results exactly like original SQL
         // Original: $order = 'n.date DESC, ac DESC' with special case for addref
