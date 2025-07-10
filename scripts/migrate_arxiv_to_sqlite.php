@@ -32,10 +32,18 @@ echo "=====================================\n\n";
 
 // Debug: Check database connection
 echo "Checking MySQL database connection...\n";
-if (!$db || !$db->sql_connect_id) {
+if (!$db) {
     throw new Exception("Failed to connect to MySQL database");
 }
 echo "✓ MySQL database connected successfully\n";
+
+// Increase memory limit for migration
+ini_set('memory_limit', '512M');
+echo "✓ Memory limit increased to 512M\n";
+
+// Set batch size for processing large datasets
+$batch_size = 10000;
+echo "✓ Using batch size of $batch_size records\n";
 
 // Remove existing SQLite database if it exists
 if (file_exists($sqlite_path)) {
@@ -65,38 +73,59 @@ try {
         $count_new = 0;
     } else {
         echo "✓ ARXIV_NEW table found in MySQL database\n";
-        // Migrate ARXIV_NEW table
-        echo "\nMigrating ARXIV_NEW table...\n";
-        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments, abstract FROM ARXIV_NEW";
-        $result = $db->sql_query($sql);
 
-        if (!$result) {
-            throw new Exception("Failed to query ARXIV_NEW table: " . $db->sql_error());
-        }
+        // First, get total count for progress tracking
+        $count_sql = "SELECT COUNT(*) as total FROM ARXIV_NEW";
+        $count_result = $db->sql_query($count_sql);
+        $count_row = $db->sql_fetchrow($count_result);
+        $total_records = $count_row['total'];
+        $db->sql_freeresult($count_result);
 
+        echo "Total records to migrate from ARXIV_NEW: $total_records\n";
+
+        // Migrate ARXIV_NEW table in batches
+        echo "\nMigrating ARXIV_NEW table in batches...\n";
         $count_new = 0;
-        while ($row = $db->sql_fetchrow($result)) {
-            $success = $arxiv_db->replaceArxivNew(
-                $row['arxiv_tag'],
-                $row['date'],
-                $row['arxiv'],
-                $row['number'],
-                $row['title'],
-                $row['authors'],
-                $row['comments'],
-                $row['abstract']
-            );
+        $offset = 0;
 
-            if ($success) {
-                $count_new++;
-                if ($count_new % 100 == 0) {
-                    echo "Migrated $count_new records from ARXIV_NEW...\n";
+        while ($offset < $total_records) {
+            $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments, abstract FROM ARXIV_NEW LIMIT $batch_size OFFSET $offset";
+            $result = $db->sql_query($sql);
+
+            if (!$result) {
+                throw new Exception("Failed to query ARXIV_NEW table: " . $db->sql_error());
+            }
+
+            $batch_count = 0;
+            while ($row = $db->sql_fetchrow($result)) {
+                $success = $arxiv_db->replaceArxivNew(
+                    $row['arxiv_tag'],
+                    $row['date'],
+                    $row['arxiv'],
+                    $row['number'],
+                    $row['title'],
+                    $row['authors'],
+                    $row['comments'],
+                    $row['abstract']
+                );
+
+                if ($success) {
+                    $count_new++;
+                    $batch_count++;
+                } else {
+                    echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
                 }
-            } else {
-                echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
+            }
+            $db->sql_freeresult($result);
+
+            $offset += $batch_size;
+            echo "Migrated $count_new / $total_records records from ARXIV_NEW (batch of $batch_count)...\n";
+
+            // Force garbage collection after each batch
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
             }
         }
-        $db->sql_freeresult($result);
     }
 
     echo "Successfully migrated $count_new records from ARXIV_NEW\n";
@@ -118,37 +147,58 @@ try {
         $count_replace = 0;
     } else {
         echo "✓ ARXIV_REPLACE table found in MySQL database\n";
-        // Migrate ARXIV_REPLACE table
-        echo "\nMigrating ARXIV_REPLACE table...\n";
-        $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments FROM ARXIV_REPLACE";
-        $result = $db->sql_query($sql);
 
-        if (!$result) {
-            throw new Exception("Failed to query ARXIV_REPLACE table: " . $db->sql_error());
-        }
+        // First, get total count for progress tracking
+        $count_sql = "SELECT COUNT(*) as total FROM ARXIV_REPLACE";
+        $count_result = $db->sql_query($count_sql);
+        $count_row = $db->sql_fetchrow($count_result);
+        $total_records = $count_row['total'];
+        $db->sql_freeresult($count_result);
 
+        echo "Total records to migrate from ARXIV_REPLACE: $total_records\n";
+
+        // Migrate ARXIV_REPLACE table in batches
+        echo "\nMigrating ARXIV_REPLACE table in batches...\n";
         $count_replace = 0;
-        while ($row = $db->sql_fetchrow($result)) {
-            $success = $arxiv_db->replaceArxivReplace(
-                $row['arxiv_tag'],
-                $row['date'],
-                $row['arxiv'],
-                $row['number'],
-                $row['title'],
-                $row['authors'],
-                $row['comments']
-            );
+        $offset = 0;
 
-            if ($success) {
-                $count_replace++;
-                if ($count_replace % 100 == 0) {
-                    echo "Migrated $count_replace records from ARXIV_REPLACE...\n";
+        while ($offset < $total_records) {
+            $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments FROM ARXIV_REPLACE LIMIT $batch_size OFFSET $offset";
+            $result = $db->sql_query($sql);
+
+            if (!$result) {
+                throw new Exception("Failed to query ARXIV_REPLACE table: " . $db->sql_error());
+            }
+
+            $batch_count = 0;
+            while ($row = $db->sql_fetchrow($result)) {
+                $success = $arxiv_db->replaceArxivReplace(
+                    $row['arxiv_tag'],
+                    $row['date'],
+                    $row['arxiv'],
+                    $row['number'],
+                    $row['title'],
+                    $row['authors'],
+                    $row['comments']
+                );
+
+                if ($success) {
+                    $count_replace++;
+                    $batch_count++;
+                } else {
+                    echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
                 }
-            } else {
-                echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
+            }
+            $db->sql_freeresult($result);
+
+            $offset += $batch_size;
+            echo "Migrated $count_replace / $total_records records from ARXIV_REPLACE (batch of $batch_count)...\n";
+
+            // Force garbage collection after each batch
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
             }
         }
-        $db->sql_freeresult($result);
     }
 
     echo "Successfully migrated $count_replace records from ARXIV_REPLACE\n";
