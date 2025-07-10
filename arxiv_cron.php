@@ -7,6 +7,7 @@ $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
+include_once($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 
 anti_hack($phpEx);
 
@@ -18,6 +19,9 @@ anti_hack($phpEx);
 $date = '';
 $firstpaper = true;
 $arxiv = '';
+
+// Initialize ArXiv SQLite database
+$arxiv_db = new ArxivDatabase();
 
 do_arxiv('astro-ph');
 do_arxiv('hep-ph');
@@ -145,25 +149,21 @@ function parse_post($post, $isreplace) {
 
             if ($firstpaper && !$isreplace) {
                 $firstpaper = false;
-                $sql = "select arxiv_tag from ARXIV_NEW where arxiv_tag ='" . $arxiv_tag . "';";
-                if (!$db->sql_query($sql)) {
-                    print( 'Error looking old');
+                // Check if paper already exists in SQLite database
+                if (!$arxiv_db->existsInArxivNew($arxiv_tag)) {
+                    // Paper doesn't exist, continue processing
                 }
             }
 ##	    $title = (strlen($title) > 255) ? substr($title,0,252).'...' : $title;		
 
             if ($isreplace) {
-                $sql = "REPLACE INTO ARXIV_REPLACE (arxiv_tag, date, arxiv, number,title,authors,comments) values" .
-                    " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments');";
-	#	    echo $sql; exit;
+                if (!$arxiv_db->replaceArxivReplace($arxiv_tag, $date, $arxiv, $number, $title, $authors, $comments)) {
+                    print('Error in adding replacement paper to db');
+                }
             } else {
-	        
-                $sql = "REPLACE INTO ARXIV_NEW (arxiv_tag, date, arxiv, number,title,authors,comments,abstract) values" .
-                    " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments','$abstract');";
-#                 echo $sql;   
-}
-            if (!$db->sql_query($sql)) {
-                print( 'Error in adding paper to db');
+                if (!$arxiv_db->replaceArxivNew($arxiv_tag, $date, $arxiv, $number, $title, $authors, $comments, $abstract)) {
+                    print('Error in adding new paper to db');
+                }
             }
 //print ("$arxiv_tag\n$formats\n$title\n$authors\n$comments\n$abstract"); 
         } else {

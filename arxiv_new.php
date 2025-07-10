@@ -8,6 +8,7 @@ define('BOOKMARK_LINK', '/bookmark.php');
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
+include_once($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 
 anti_hack($phpEx);
 
@@ -24,6 +25,9 @@ $template->set_filenames(array(
 ));
 
 $starttime = microtime_float();
+
+// Initialize ArXiv SQLite database
+$arxiv_db = new ArxivDatabase();
 
 $arxivesString = ($user->profile_fields['pf_user_arxives'] ?? '') ? $user->profile_fields['pf_user_arxives'] : $config['default_arxives'];
 $arxives = to_array($arxivesString);
@@ -161,33 +165,24 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives)
 
 function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
 {
-    global $db;
+    global $arxiv_db;
 
     $scores = [];
     $items = [];
 
-    $sql = "SELECT
-                phpbb_papers.paper_id, a.arxiv_tag, a.arxiv, a.title, a.authors, a.comments, a.abstract
-            FROM
-                ARXIV_NEW as a
-            LEFT JOIN
-                phpbb_papers using(arxiv_tag)
-            WHERE
-                $date_range
-            AND
-                $arxiv_sql
-            ";
+    // Query SQLite database directly without phpbb_papers join
+    $rows = $arxiv_db->queryArxivNew($date_range, $arxiv_sql);
 
-    $result = $db->sql_query($sql);
-
-    while ($row = $db->sql_fetchrow($result)) {
+    foreach ($rows as $row) {
+        // Set paper_id to null since we're not joining with phpbb_papers
+        $row['paper_id'] = null;
         $rowResult = print_relevant($row, false, $keywords, $arxives);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
     }
-    $db->sql_freeresult($result);
+
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);
@@ -195,33 +190,24 @@ function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
 
 function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives)
 {
-    global $db;
+    global $arxiv_db;
 
     $scores = [];
     $items = [];
 
-    $sql = "SELECT
-                phpbb_papers.paper_id, a.arxiv_tag, a.title, a.authors, a.comments
-            FROM
-                ARXIV_REPLACE as a
-            LEFT JOIN
-                phpbb_papers using(arxiv_tag)
-            WHERE
-                $date_range_replace
-            AND
-                $arxiv_sql
-            ";
+    // Query SQLite database directly without phpbb_papers join
+    $rows = $arxiv_db->queryArxivReplace($date_range_replace, $arxiv_sql);
 
-    $result = $db->sql_query($sql);
-
-    while ($row = $db->sql_fetchrow($result)) {
+    foreach ($rows as $row) {
+        // Set paper_id to null since we're not joining with phpbb_papers
+        $row['paper_id'] = null;
         $rowResult = print_relevant($row, true, $keywords, $arxives);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
     }
-    $db->sql_freeresult($result);
+
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);

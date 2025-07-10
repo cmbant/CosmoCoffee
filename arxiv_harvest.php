@@ -5,6 +5,7 @@ define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
+include_once($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 
 anti_hack($phpEx);
 
@@ -14,6 +15,9 @@ $user->setup();
 $user->get_profile_fields($user->data['user_id']);
 
 $date = '';
+
+// Initialize ArXiv SQLite database
+$arxiv_db = new ArxivDatabase();
 
 //do_arxiv('astro-ph');
 //do_arxiv('hep-ph');
@@ -173,24 +177,21 @@ function parse_post($post) {
 //  print ("OK: $date\n$arxiv_tag\n$title\n$authors\n$comments\n$abstract\n\n");
 
         if ($isreplace) {
-            $sql = "REPLACE INTO ARXIV_REPLACE (arxiv_tag, date, arxiv, number,title,authors,comments) values" .
-                " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments');";
+            if (!$arxiv_db->replaceArxivReplace($arxiv_tag, $date, $arxiv, $number, $title, $authors, $comments)) {
+                print($date . ": Error in adding replacement paper to db\n");
+            }
         } else {
-            $sql = "REPLACE INTO ARXIV_NEW (arxiv_tag, date, arxiv, number,title,authors,comments,abstract) values" .
-                " ('$arxiv_tag','$date','$arxiv','$number','$title','$authors','$comments','$abstract');";
-        }
-        if (!$db->sql_query($sql)) {
-            print($date . ": Error in adding paper to db\n");
+            if (!$arxiv_db->replaceArxivNew($arxiv_tag, $date, $arxiv, $number, $title, $authors, $comments, $abstract)) {
+                print($date . ": Error in adding new paper to db\n");
+            }
         }
     } else {
 
         $match = '#<header status=\"deleted\".*?oai:arXiv.org:(.*?)\<#is';
         if (preg_match($match, $post, $ref)) {
             $arxiv_tag = $ref[1];
-            $sql = "delete from ARXIV_NEW where arxiv_tag = '$arxiv_tag';";
-            $db->sql_query($sql);
-            $sql = "delete from ARXIV_REPALCE where arxiv_tag = '$arxiv_tag';";
-            $db->sql_query($sql);
+            $arxiv_db->deleteArxivNew($arxiv_tag);
+            $arxiv_db->deleteArxivReplace($arxiv_tag);
         } else {
             echo "No match: $post\n\n";
         }
