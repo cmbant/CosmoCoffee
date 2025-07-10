@@ -49,9 +49,9 @@ $logged_in = !empty($user->profile_fields['pf_user_arxives']);
 
 if (!$logged_in) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
-    $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
-} else {
     $links = '';
+} else {
+    $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
 }
 $text .= $links;
 $text .= '<dl>';
