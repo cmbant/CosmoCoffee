@@ -53,6 +53,7 @@ $text = '';
 $not_logged_in = empty($user->profile_fields['pf_user_arxives']);
 
 if ($not_logged_in) {
+    $links = '';
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
 } else {
     $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
@@ -330,7 +331,7 @@ function get_month_links($latestArxiv)
     $latestArxivMonth = $latestArxiv->format('m');
     $latestArxivYear = $latestArxiv->format('Y');
 
-    for ($y = 2023; $y <= $latestArxivYear; $y++) {
+    for ($y = date('Y') - 2; $y <= $latestArxivYear; $y++) {
         $monthlinks .= '<p>' . $y . ': ';
         for ($m = 1; $m <= 12; $m++) {
             if ($y == $latestArxivYear && $m > $latestArxivMonth) break;
