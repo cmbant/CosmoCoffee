@@ -31,7 +31,7 @@ do_arxiv('gr-qc');
 if (!empty($date)) {
     $sql = "update phpbb_config set config_value = '$date' where config_name = 'arxiv_new_date'";
     if (!$db->sql_query($sql)) {
-        print( 'Error adding new date');
+        print('Error adding new date');
     }
 }
 do_arxiv('quant-ph');
@@ -45,16 +45,17 @@ do_arxiv('stat');
 delete_forum_cache();
 
 
-function do_arxiv($in) {
+function do_arxiv($in)
+{
     global $date, $arxiv;
 
     $arxiv = $in;
 
     $url = "http://arxiv.org/list/$arxiv/new";
     $html = get_url($url);
- 
+
     $parts = explode('<h3>', $html, 5);
-  
+
     if (preg_match('#new listings for.*?(\d+ \w* \d*)#is', $parts[1], $date_file)) {
 
         $adate = date("Y-m-d", strtotime($date_file[1]));
@@ -63,32 +64,32 @@ function do_arxiv($in) {
             return;
         }
 
-        print "$arxiv ".$adate;
+        print "$arxiv " . $adate;
 
         $date = $adate;
 
         $posts = $parts[2];
 
-       if (preg_match('#.*Cross submissions#is', $parts[3])) {
+        if (preg_match('#.*Cross submissions#is', $parts[3])) {
             $rest = $parts[4];
         } else {
             $rest = $parts[3];
         }
 
         do_section($posts, false);
-   
+
         if (preg_match('#.*?Replacement submissions.*?(\<dt\>.*?)\<\/dl#is', $rest, $parts)) {
-   
+
             $replace = $parts[1];
             do_section($replace, true);
         }
-
     } else {
-        print ("no match: $url\n");
+        print("no match: $url\n");
     }
 }
 
-function do_section($chunk, $isreplace) {
+function do_section($chunk, $isreplace)
+{
     $match_count = preg_match_all("#\<DT\>(.*?)\<\/DD\>#is", $chunk, $matches);
 
     for ($i = 0; $i < $match_count; $i++) {
@@ -97,15 +98,16 @@ function do_section($chunk, $isreplace) {
     }
 }
 
-function parse_post($post, $isreplace) {
-    global $db, $date, $firstpaper, $arxiv;
+function parse_post($post, $isreplace)
+{
+    global $arxiv_db, $date, $firstpaper, $arxiv;
 
     if ($isreplace) {
-#        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div)#is';
-         $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(.*?<\/div\>)#is';
-} else {
-#        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div).*?\<p .*?\>(.*?)\<\/p#is';
-         $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(<div.*?<\/div\>).*?\<p.*?\>\s*(.*?)\s*\<\/p#is';
+        #        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div)#is';
+        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(.*?<\/div\>)#is';
+    } else {
+        #        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?Authors\:.*?\>\s*(.*?)\<\/div(.*?\<\/div).*?\<p .*?\>(.*?)\<\/p#is';
+        $match = '#arxiv:(.*?)<\/a.*?Title\:.*?\>\s*(.*?)\<.*?\<div class=.list\-authors.\>\s*(.*?)\<\/div.*?(<div.*?<\/div\>).*?\<p.*?\>\s*(.*?)\s*\<\/p#is';
     }
 
     if (preg_match($match, $post, $ref)) {
@@ -116,29 +118,29 @@ function parse_post($post, $isreplace) {
         $authors = $ref[3];
         $authors = preg_replace("'\<[\/\!]*[^\<\>]*?\>'si", "", $authors);
         $authors = doclean($authors);
-        
+
         $extra = $ref[4];
-        
+
         if ($isreplace) {
             $abstract = '';
-        } else{
-        $abstract = preg_replace('#\<a href\s*=\s*\"(.*?)\".*?\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $ref[5]);
-        $abstract = preg_replace("'\<[\/\!]*?[^\<\>]*?\>'si", "", $abstract);
-        $abstract = doclean($abstract);
+        } else {
+            $abstract = preg_replace('#\<a href\s*=\s*\"(.*?)\".*?\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $ref[5]);
+            $abstract = preg_replace("'\<[\/\!]*?[^\<\>]*?\>'si", "", $abstract);
+            $abstract = doclean($abstract);
         }
-#print "$authors\n$title\n$abstract\n$extra\n\n";
-#exit;
+        #print "$authors\n$title\n$abstract\n$extra\n\n";
+        #exit;
 
         if (preg_match('#Comments:.*?\>\s*(.*?)\<\/div#is', $extra, $ref)) {
             $comments = $ref[1];
             $comments = preg_replace('#\<a href\s*=\s*\"([^\"]*?)\"\>\s*this https? URL\s*\<\/a\s*\>#is', '\\1', $comments);
- 	    $comments = doclean(preg_replace('#\<[\/\!]*?[^\<\>]*?\>#si', '', $comments));
-	} else {
+            $comments = doclean(preg_replace('#\<[\/\!]*?[^\<\>]*?\>#si', '', $comments));
+        } else {
             $comments = '';
         }
 
-#print "$authors\n$title\n$abstract\n$comments\n\n";
-#exit;
+        #print "$authors\n$title\n$abstract\n$comments\n\n";
+        #exit;
 
 
 
@@ -154,7 +156,7 @@ function parse_post($post, $isreplace) {
                     // Paper doesn't exist, continue processing
                 }
             }
-##	    $title = (strlen($title) > 255) ? substr($title,0,252).'...' : $title;		
+            ##	    $title = (strlen($title) > 255) ? substr($title,0,252).'...' : $title;
 
             if ($isreplace) {
                 if (!$arxiv_db->replaceArxivReplace($arxiv_tag, $date, $arxiv, $number, $title, $authors, $comments)) {
@@ -165,7 +167,7 @@ function parse_post($post, $isreplace) {
                     print('Error in adding new paper to db');
                 }
             }
-//print ("$arxiv_tag\n$formats\n$title\n$authors\n$comments\n$abstract"); 
+            //print ("$arxiv_tag\n$formats\n$title\n$authors\n$comments\n$abstract");
         } else {
             print("arxiv tag fail\n");
         }
@@ -176,19 +178,21 @@ function parse_post($post, $isreplace) {
 }
 
 
-function doclean($text) {
-  # echo $text;
+function doclean($text)
+{
+    # echo $text;
     $text = preg_replace('/(\s)\s+/s', '$1', $text);
     $text = preg_replace('/\<\/b\>/is', '', $text);
-   # $text = iconv("utf-8", "ascii//ignore", $text);
- 
+    # $text = iconv("utf-8", "ascii//ignore", $text);
+
     $text = clean_sql($text);
     return $text;
 }
 
-function delete_forum_cache() {
+function delete_forum_cache()
+{
     global $config, $cache, $phpbb_container, $auth, $phpbb_log, $db;
-        
+
     $config->increment('assets_version', 1);
     $cache->purge();
 
@@ -200,6 +204,6 @@ function delete_forum_cache() {
     // Clear permissions
     $auth->acl_clear_prefetch();
     phpbb_cache_moderators($db, $cache, $auth);
-    
+
     $phpbb_log->add('admin', ANONYMOUS, '', 'LOG_PURGE_CACHE');
 }
