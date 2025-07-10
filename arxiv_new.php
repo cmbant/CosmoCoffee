@@ -61,32 +61,38 @@ if ($not_logged_in) {
 }
 $text .= '<dl>';
 
+// Prepare query parameters for SQLite database
+$date_start = null;
+$date_end = null;
+$arxiv_tag_pattern = null;
+
 if (!empty($month)) {
-    $date_range = "arxiv_tag like '" . date("ym", strtotime("$year-$month-01")) . "%'";
-    // SQLite-compatible date range for month
+    // Month-based query using arxiv_tag pattern
+    $arxiv_tag_pattern = date("ym", strtotime("$year-$month-01")) . "%";
+    // For replacements, use date range
     $month_start = "$year-$month-01";
     $month_end = date('Y-m-d', strtotime("$month_start +1 month"));
-    $date_range_replace = "date >= '$month_start' and date < '$month_end'";
+    $replace_date_start = $month_start;
+    $replace_date_end = date('Y-m-d', strtotime("$month_end -1 day"));
 } elseif ($interval > 1) {
-    // SQLite-compatible date range for interval
+    // Date range for interval
     $start_date = date('Y-m-d', strtotime("$new_date -$interval days"));
-    $date_range = "date <= '$new_date' and date > '$start_date'";
-    $date_range_replace = $date_range;
+    $date_start = $start_date;
+    $date_end = $new_date;
+    $replace_date_start = $date_start;
+    $replace_date_end = $date_end;
 } else {
-    $date_range = "date = '$new_date'";
-    $date_range_replace = $date_range;
+    // Single date
+    $date_start = $new_date;
+    $date_end = $new_date;
+    $replace_date_start = $date_start;
+    $replace_date_end = $date_end;
 }
-// Create SQLite-compatible IN clause for arxiv filter
-$arxiv_quoted = array_map(function ($arxiv) {
-    return "'" . SQLite3::escapeString($arxiv) . "'";
-}, $arxives);
-$arxiv_sql = "arxiv IN (" . implode(', ', $arxiv_quoted) . ")";
 
-
-$text .= get_archives_html($arxiv_sql, $date_range, $keywords, $arxives);
+$text .= get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords, $arxives);
 
 $text .= "<dt><hr><h3>Replacements</h3></dt>";
-$text .= get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives);
+$text .= get_replacements_html($replace_date_start, $replace_date_end, $keywords, $arxives);
 $text .= "</dl><hr>";
 
 if (!$not_logged_in) {
@@ -177,15 +183,15 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives)
     return $linksHtml;
 }
 
-function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
+function get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords, $arxives)
 {
     global $arxiv_db;
 
     $scores = [];
     $items = [];
 
-    // Query SQLite database directly without phpbb_papers join
-    $rows = $arxiv_db->queryArxivNew($date_range, $arxiv_sql);
+    // Query SQLite database using proper prepared statements
+    $rows = $arxiv_db->queryArxivNew($date_start, $date_end, $arxives, $arxiv_tag_pattern);
 
     foreach ($rows as $row) {
         // Set paper_id to null since we're not joining with phpbb_papers
@@ -202,15 +208,15 @@ function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
     return implode('', $items);
 }
 
-function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives)
+function get_replacements_html($date_start, $date_end, $keywords, $arxives)
 {
     global $arxiv_db;
 
     $scores = [];
     $items = [];
 
-    // Query SQLite database directly without phpbb_papers join
-    $rows = $arxiv_db->queryArxivReplace($date_range_replace, $arxiv_sql);
+    // Query SQLite database using proper prepared statements
+    $rows = $arxiv_db->queryArxivReplace($date_start, $date_end, $arxives);
 
     foreach ($rows as $row) {
         // Set paper_id to null since we're not joining with phpbb_papers

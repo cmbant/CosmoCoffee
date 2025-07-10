@@ -178,14 +178,58 @@ class ArxivDatabase
     /**
      * Query ARXIV_NEW table with date range and arxiv filter
      */
-    public function queryArxivNew($date_range_sql, $arxiv_sql)
+    public function queryArxivNew($date_start, $date_end, $arxiv_list, $arxiv_tag_pattern = null)
     {
+        $where_conditions = [];
+        $params = [];
+        $param_count = 0;
+
+        // Handle date range
+        if ($date_start && $date_end && $date_start === $date_end) {
+            // Single date
+            $where_conditions[] = "date = ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_start && $date_end) {
+            // Date range
+            $where_conditions[] = "date >= ? AND date <= ?";
+            $params[++$param_count] = $date_start;
+            $params[++$param_count] = $date_end;
+        } elseif ($date_start) {
+            // From date onwards
+            $where_conditions[] = "date >= ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_end) {
+            // Up to date
+            $where_conditions[] = "date <= ?";
+            $params[++$param_count] = $date_end;
+        }
+
+        // Handle arxiv tag pattern (for month-based queries)
+        if ($arxiv_tag_pattern) {
+            $where_conditions[] = "arxiv_tag LIKE ?";
+            $params[++$param_count] = $arxiv_tag_pattern;
+        }
+
+        // Handle arxiv list
+        if (!empty($arxiv_list)) {
+            $placeholders = str_repeat('?,', count($arxiv_list) - 1) . '?';
+            $where_conditions[] = "arxiv IN ($placeholders)";
+            foreach ($arxiv_list as $arxiv) {
+                $params[++$param_count] = $arxiv;
+            }
+        }
+
+        $where_clause = implode(' AND ', $where_conditions);
         $sql = "SELECT arxiv_tag, arxiv, title, authors, comments, abstract
-                FROM ARXIV_NEW
-                WHERE $date_range_sql AND $arxiv_sql";
+                FROM ARXIV_NEW" . ($where_clause ? " WHERE $where_clause" : "");
 
         try {
-            $result = $this->db->query($sql);
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $index => $value) {
+                $stmt->bindValue($index, $value, SQLITE3_TEXT);
+            }
+
+            $result = $stmt->execute();
             if (!$result) {
                 throw new Exception("Query failed: " . $this->db->lastErrorMsg());
             }
@@ -194,6 +238,7 @@ class ArxivDatabase
             while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
                 $rows[] = $row;
             }
+            $stmt->close();
             return $rows;
         } catch (Exception $e) {
             // Log error for debugging
@@ -205,14 +250,52 @@ class ArxivDatabase
     /**
      * Query ARXIV_REPLACE table with date range and arxiv filter
      */
-    public function queryArxivReplace($date_range_sql, $arxiv_sql)
+    public function queryArxivReplace($date_start, $date_end, $arxiv_list)
     {
+        $where_conditions = [];
+        $params = [];
+        $param_count = 0;
+
+        // Handle date range
+        if ($date_start && $date_end && $date_start === $date_end) {
+            // Single date
+            $where_conditions[] = "date = ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_start && $date_end) {
+            // Date range
+            $where_conditions[] = "date >= ? AND date <= ?";
+            $params[++$param_count] = $date_start;
+            $params[++$param_count] = $date_end;
+        } elseif ($date_start) {
+            // From date onwards
+            $where_conditions[] = "date >= ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_end) {
+            // Up to date
+            $where_conditions[] = "date <= ?";
+            $params[++$param_count] = $date_end;
+        }
+
+        // Handle arxiv list
+        if (!empty($arxiv_list)) {
+            $placeholders = str_repeat('?,', count($arxiv_list) - 1) . '?';
+            $where_conditions[] = "arxiv IN ($placeholders)";
+            foreach ($arxiv_list as $arxiv) {
+                $params[++$param_count] = $arxiv;
+            }
+        }
+
+        $where_clause = implode(' AND ', $where_conditions);
         $sql = "SELECT arxiv_tag, title, authors, comments
-                FROM ARXIV_REPLACE
-                WHERE $date_range_sql AND $arxiv_sql";
+                FROM ARXIV_REPLACE" . ($where_clause ? " WHERE $where_clause" : "");
 
         try {
-            $result = $this->db->query($sql);
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $index => $value) {
+                $stmt->bindValue($index, $value, SQLITE3_TEXT);
+            }
+
+            $result = $stmt->execute();
             if (!$result) {
                 throw new Exception("Query failed: " . $this->db->lastErrorMsg());
             }
@@ -221,6 +304,7 @@ class ArxivDatabase
             while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
                 $rows[] = $row;
             }
+            $stmt->close();
             return $rows;
         } catch (Exception $e) {
             // Log error for debugging
