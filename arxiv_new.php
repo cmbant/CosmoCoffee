@@ -49,16 +49,16 @@ $latestArxiv = new DateTime($config['arxiv_new_date']);
 
 
 $text = '';
+$logged_in = !empty($user->profile_fields['pf_user_arxives']);
 
-$not_logged_in = empty($user->profile_fields['pf_user_arxives']);
-
-if ($not_logged_in) {
-    $links = '';
+if (!$logged_in) {
     $text .= '<p class="gen" style="text-align: center; color: #FF0000">Log in to use a customized arxiv and keyword list set in your profile.<br />You can then also make bookmarks and set up or join journal clubs.</p>';
+    $links = '';
 } else {
     $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
-    $text .= $links;
 }
+$text .= $links;
+
 $text .= '<dl>';
 
 // Prepare query parameters for SQLite database
@@ -95,7 +95,7 @@ $text .= "<dt><hr><h3>Replacements</h3></dt>";
 $text .= get_replacements_html($replace_date_start, $replace_date_end, $keywords, $arxives);
 $text .= "</dl><hr>";
 
-if (!$not_logged_in) {
+if ($logged_in) { 
     $links .= '<p>' . get_month_links($latestArxiv) . '</p>';
     $links .= "<p>";
 }
