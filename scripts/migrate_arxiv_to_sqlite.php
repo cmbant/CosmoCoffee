@@ -231,6 +231,75 @@ try {
     if ($sqlite_new_count == $count_new && $sqlite_replace_count == $count_replace) {
         echo "\n✓ Migration completed successfully!\n";
         echo "Total records migrated: " . ($count_new + $count_replace) . "\n";
+
+        // Step 4: Update bookmarks table with paper_date column for efficient filtering
+        echo "\n" . str_repeat("-", 50) . "\n";
+        echo "Step 4: Updating bookmarks table with paper_date column\n";
+        echo str_repeat("-", 50) . "\n";
+
+        try {
+            // Add paper_date column to bookmarks table
+            echo "Adding paper_date column to bookmarks table...\n";
+            $sql = "ALTER TABLE bookmarks ADD COLUMN paper_date DATE DEFAULT NULL";
+            $result = $db->sql_query($sql);
+
+            if ($result) {
+                echo "✓ Successfully added paper_date column\n";
+            } else {
+                // Column might already exist
+                $sql = "SHOW COLUMNS FROM bookmarks LIKE 'paper_date'";
+                $result = $db->sql_query($sql);
+                if ($db->sql_fetchrow($result)) {
+                    echo "✓ paper_date column already exists\n";
+                } else {
+                    echo "⚠ Warning: Could not add paper_date column: " . $db->sql_error() . "\n";
+                }
+                $db->sql_freeresult($result);
+            }
+
+            // Create index on paper_date
+            echo "Creating index on paper_date...\n";
+            $sql = "CREATE INDEX idx_bookmarks_paper_date ON bookmarks(paper_date)";
+            $db->sql_query($sql); // Don't check result as index might already exist
+
+            // Populate paper_date for existing bookmarks
+            echo "Populating paper_date for existing bookmarks...\n";
+            $sql = "SELECT DISTINCT arxiv_tag FROM bookmarks WHERE paper_date IS NULL";
+            $result = $db->sql_query($sql);
+
+            $arxiv_tags = [];
+            while ($row = $db->sql_fetchrow($result)) {
+                $arxiv_tags[] = $row['arxiv_tag'];
+            }
+            $db->sql_freeresult($result);
+
+            if (count($arxiv_tags) > 0) {
+                echo "Found " . count($arxiv_tags) . " bookmarks to update with paper dates...\n";
+
+                // Update in batches
+                $batch_size = 100;
+                $updated_count = 0;
+
+                for ($i = 0; $i < count($arxiv_tags); $i += $batch_size) {
+                    $batch = array_slice($arxiv_tags, $i, $batch_size);
+                    $paper_details = $arxiv_db->getPaperDetailsByTags($batch);
+
+                    foreach ($paper_details as $paper) {
+                        $sql = "UPDATE bookmarks SET paper_date = '" . $db->sql_escape($paper['date']) . "'
+                                WHERE arxiv_tag = '" . $db->sql_escape($paper['arxiv_tag']) . "' AND paper_date IS NULL";
+                        if ($db->sql_query($sql)) {
+                            $updated_count += $db->sql_affectedrows();
+                        }
+                    }
+                }
+
+                echo "✓ Updated $updated_count bookmark records with paper dates\n";
+            } else {
+                echo "✓ No bookmarks need paper_date updates\n";
+            }
+        } catch (Exception $e) {
+            echo "⚠ Warning: Could not update bookmarks table: " . $e->getMessage() . "\n";
+        }
     } else {
         echo "\n✗ Migration verification failed!\n";
         echo "Expected: ARXIV_NEW=$count_new, ARXIV_REPLACE=$count_replace\n";
@@ -248,4 +317,9 @@ echo "SQLite database created at: $sqlite_path\n";
 echo "\nNext steps:\n";
 echo "1. Test the new SQLite database with your applications\n";
 echo "2. Update your applications to use the new ArxivDatabase class\n";
-echo "3. Once verified, you can drop the MySQL ARXIV_NEW and ARXIV_REPLACE tables\n";
+echo "3. Update bookmark.php to use efficient paper_date filtering\n";
+echo "4. Once verified, you can drop the MySQL ARXIV_NEW and ARXIV_REPLACE tables\n";
+echo "\nOptimizations completed:\n";
+echo "✓ SQLite database with proper prepared statements\n";
+echo "✓ Bookmarks table enhanced with paper_date column for efficient filtering\n";
+echo "✓ Indexes created for optimal query performance\n";

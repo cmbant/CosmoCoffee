@@ -50,7 +50,7 @@ $error = '';
 $clubtxt = '';
 
 
-if($request->is_set('export')) {
+if ($request->is_set('export')) {
     $do_export = $request->variable('export', '');
     $maxrows = 10000;
     $separator = ($request->is_set('separator')) ? $request->variable('separator', '') : ' ';
@@ -70,11 +70,11 @@ $bookmark_id = $request->variable('book_id', 0);
 $top_months = $request->variable('top_months', 0);
 
 $category = $request->variable('category', '');
-if($category != 'null') {
+if ($category != 'null') {
     $category = $request->variable('category', 0);
 }
 
-$edit_categories = (boolean) $request->variable('editcategory', 0);
+$edit_categories = (bool) $request->variable('editcategory', 0);
 $addcategory = $request->variable('addcategory', '');
 $delcategory = $request->variable('delcategory', 0);
 
@@ -82,7 +82,7 @@ $deltag = $request->variable('deltag', 0);
 $editnote = $request->variable('editnote', 0);
 $sort_by = $request->variable('sort_by', 'paper_date');
 
-if($club >= 0) {
+if ($club >= 0) {
     $delref = '';
     $addref = '';
     $canchange = 0;
@@ -96,7 +96,7 @@ if($club >= 0) {
                 club_id = $club";
 
     $result = $db->sql_query($sqlClub);
-    if($row = $db->sql_fetchrow($result)) {
+    if ($row = $db->sql_fetchrow($result)) {
         $db->sql_freeresult($result);
         $page_title = $row['name'];
         $inner_page_title = $row['name'];
@@ -119,13 +119,13 @@ if($club >= 0) {
             $managers  = [];
             $members   = [];
             $emailsArr = [];
-        
+
             while ($row = $db->sql_fetchrow($result)) {
                 // Build the profile‐link HTML
                 $link = "<a href='memberlist.php?mode=viewprofile&u={$row['user_id']}'>"
-                      . htmlspecialchars($row['username'], ENT_QUOTES)
-                      . "</a>";
-        
+                    . htmlspecialchars($row['username'], ENT_QUOTES)
+                    . "</a>";
+
                 // Track managers vs members
                 if ($row['manager'] === '1') {
                     $managers[] = $link;
@@ -136,7 +136,7 @@ if($club >= 0) {
                 } else {
                     $members[] = $link;
                 }
-        
+
                 // Track emails (skip your own)
                 if ($row['user_id'] !== $user->data['user_id']) {
                     $emailsArr[] = $row['user_email'];
@@ -144,17 +144,17 @@ if($club >= 0) {
                 }
             }
             $db->sql_freeresult($result);
-        
+
             // Implode with comma+space
             $managersLinks = implode(', ', $managers);
             $membersLinks  = implode(', ', $members);
             $emails        = implode(';',  $emailsArr);
-        
+
             // Output
             $clubtxt .= "<p class='genmed'>Managers: $managersLinks</p>";
             $clubtxt .= "<p class='genmed'>Members:  $membersLinks</p>";
         }
-        if($isadmin === 1) {
+        if ($isadmin === 1) {
             $clubtxt .= "<p class='genmed'><a href='mailto:$emails?subject=$page_title'>Emails</a></p>";
         }
     }
@@ -164,18 +164,18 @@ if ($user->data['user_id'] != ANONYMOUS  && $canchange) {
     $text .= get_arXiv_ref_html();
 }
 
-if($club < 0 && $request->is_set('user_id')) {
+if ($club < 0 && $request->is_set('user_id')) {
 
     $user_id = $request->variable('user_id', '');
-    if($category != 'all') {
+    if ($category != 'all') {
         $user_id = $request->variable('user_id', 0);
     }
 
-    if($user_id !== $user->data['user_id']) {
+    if ($user_id !== $user->data['user_id']) {
         $delref = '';
         $addref = '';
 
-        if ($user_id == 'all'){
+        if ($user_id == 'all') {
             $username = 'Everyone';
         } else {
             $username = get_username_by_id($user_id);
@@ -183,11 +183,11 @@ if($club < 0 && $request->is_set('user_id')) {
     }
 }
 
-if($user_id === 'all' && $club < 0) {
+if ($user_id === 'all' && $club < 0) {
     $page_title = "Everyone's bookmarks";
 }
 
-if(
+if (
     $club < 0 &&
     $request->is_set('notepaper', \phpbb\request\request_interface::POST) &&
     $user->data['user_id'] != ANONYMOUS &&
@@ -198,29 +198,29 @@ if(
     $tag = $request->variable('notepaper', '', false, \phpbb\request\request_interface::POST);
     $note = $request->variable('note', '', false, \phpbb\request\request_interface::POST);
 
-    if(!$result = $db->sql_query("UPDATE bookmarks SET note = '$note' WHERE bookmark_id = $bookmark_id AND user_id = $user_id")) {
+    if (!$result = $db->sql_query("UPDATE bookmarks SET note = '$note' WHERE bookmark_id = $bookmark_id AND user_id = $user_id")) {
         trigger_error('Could not change note');
     }
     $db->sql_freeresult($result);
 }
 
-if(
+if (
     $club < 0 &&
     $request->is_set('add_book_tag', \phpbb\request\request_interface::POST) &&
     $user->data['user_id'] != ANONYMOUS &&
     $user->data['user_id'] == $user_id  &&
     $bookmark_id
-){
+) {
     $tag = $request->variable('add_book_tag', 0, false, \phpbb\request\request_interface::POST);
-    if($tag) {
-        if(!$result = $db->sql_query("insert ignore into paper_bookmark_tags(bookmark_id,tag_id) values ($bookmark_id, $tag)")) {
+    if ($tag) {
+        if (!$result = $db->sql_query("insert ignore into paper_bookmark_tags(bookmark_id,tag_id) values ($bookmark_id, $tag)")) {
             trigger_error('Could not add tag');
         }
         $db->sql_freeresult($result);
 
         $tag = $request->variable('add_book_tag2', 0, false, \phpbb\request\request_interface::POST);
-        if($tag) {
-            if(!$result = $db->sql_query("insert ignore into paper_bookmark_tags(bookmark_id,tag_id) values ($bookmark_id, $tag)")) {
+        if ($tag) {
+            if (!$result = $db->sql_query("insert ignore into paper_bookmark_tags(bookmark_id,tag_id) values ($bookmark_id, $tag)")) {
                 trigger_error('Could not add tag2');
             }
         }
@@ -228,24 +228,24 @@ if(
     }
 }
 
-if(
+if (
     $club < 0 &&
     $deltag &&
     $user->data['user_id'] != ANONYMOUS &&
     $user->data['user_id'] == $user_id  &&
     $bookmark_id
-){
-    if(!$result = $db->sql_query("delete from paper_bookmark_tags where bookmark_id=$bookmark_id and tag_id=$deltag")) {
+) {
+    if (!$result = $db->sql_query("delete from paper_bookmark_tags where bookmark_id=$bookmark_id and tag_id=$deltag")) {
         trigger_error('Could not delete tag');
     }
     $db->sql_freeresult($result);
 }
 
-if($club < 0 && $addcategory) {
-    if($result = $db->sql_query("select * from bookmark_tags where user_id=$user_id and tag='$addcategory'")) {
-        if(!$row = $db->sql_fetchrow($result)) {
+if ($club < 0 && $addcategory) {
+    if ($result = $db->sql_query("select * from bookmark_tags where user_id=$user_id and tag='$addcategory'")) {
+        if (!$row = $db->sql_fetchrow($result)) {
             $db->sql_freeresult($result);
-            if(!$result = $db->sql_query("insert into bookmark_tags(user_id,tag) values($user_id,'$addcategory')")) {
+            if (!$result = $db->sql_query("insert into bookmark_tags(user_id,tag) values($user_id,'$addcategory')")) {
                 trigger_error('Error adding category');
             }
         }
@@ -255,29 +255,40 @@ if($club < 0 && $addcategory) {
     $db->sql_freeresult($result);
 }
 
-if($club < 0 && $delcategory) {
-    if(!$result = $db->sql_query("delete from paper_bookmark_tags where tag_id in (select tag_id from bookmark_tags where  user_id=$user_id and tag_id=$delcategory)")) {
+if ($club < 0 && $delcategory) {
+    if (!$result = $db->sql_query("delete from paper_bookmark_tags where tag_id in (select tag_id from bookmark_tags where  user_id=$user_id and tag_id=$delcategory)")) {
         trigger_error('Error deleting bookmarked categories');
     }
     $db->sql_freeresult($result);
 
-    if(!$result = $db->sql_query("delete from bookmark_tags where user_id=$user_id and tag_id=$delcategory")) {
+    if (!$result = $db->sql_query("delete from bookmark_tags where user_id=$user_id and tag_id=$delcategory")) {
         trigger_error('Error deleting category');
     }
     $db->sql_freeresult($result);
 }
 
-if(!empty($addref) && $user_id > 1) {
+if (!empty($addref) && $user_id > 1) {
 
-   if($result = $db->sql_query("select user_id from bookmarks where user_id = $user_id and arxiv_tag='$addref'")) {
-        if(!$row = $db->sql_fetchrow($result)) {
+    if ($result = $db->sql_query("select user_id from bookmarks where user_id = $user_id and arxiv_tag='$addref'")) {
+        if (!$row = $db->sql_fetchrow($result)) {
             $db->sql_freeresult($result);
 
             // Check if paper exists in ArXiv SQLite database
             try {
-                if($arxiv_db->existsInArxivNew($addref)) {
-                    if(!$result = $db->sql_query("insert into bookmarks (user_id,arxiv_tag) values ($user_id,'$addref')")) {
-                        trigger_error('Could not query existing bookmarks');
+                if ($arxiv_db->existsInArxivNew($addref)) {
+                    // Get the paper date from SQLite for efficient filtering
+                    $paper_details = $arxiv_db->getPaperDetailsByTags([$addref]);
+                    $paper_date = !empty($paper_details) ? $paper_details[0]['date'] : null;
+
+                    if ($paper_date) {
+                        $sql = "insert into bookmarks (user_id, arxiv_tag, paper_date) values ($user_id, '$addref', '$paper_date')";
+                    } else {
+                        // Fallback if date not found
+                        $sql = "insert into bookmarks (user_id, arxiv_tag) values ($user_id, '$addref')";
+                    }
+
+                    if (!$result = $db->sql_query($sql)) {
+                        trigger_error('Could not add bookmark');
                     }
                     $db->sql_freeresult($result);
                 } else {
@@ -292,31 +303,31 @@ if(!empty($addref) && $user_id > 1) {
     }
 }
 
-if($noclub && $user->data['user_id'] != ANONYMOUS) {
-    if(!$result = $db->sql_query("update bookmarks set club_id=0 where arxiv_tag='$noclub' and user_id={$user->data['user_id']}")) {
+if ($noclub && $user->data['user_id'] != ANONYMOUS) {
+    if (!$result = $db->sql_query("update bookmarks set club_id=0 where arxiv_tag='$noclub' and user_id={$user->data['user_id']}")) {
         trigger_error('Could not clear club-paper association');
     }
     $db->sql_freeresult($result);
 }
 
-if($addclub && $user->data['user_id'] != ANONYMOUS) {
-    if(!$result = $db->sql_query("update bookmarks set club_id=$addclub where arxiv_tag='$paper' and user_id={$user->data['user_id']}")) {
+if ($addclub && $user->data['user_id'] != ANONYMOUS) {
+    if (!$result = $db->sql_query("update bookmarks set club_id=$addclub where arxiv_tag='$paper' and user_id={$user->data['user_id']}")) {
         trigger_error('Could not add paper to club association');
     }
     $db->sql_freeresult($result);
 }
 
-if($user->data['user_id'] == ANONYMOUS && $club < 0){
+if ($user->data['user_id'] == ANONYMOUS && $club < 0) {
     $error = 'You need to be logged in to view your bookmarks';
 }
 
-if(!empty($delref) && $user_id > 1) {
-    if(!$result = $db->sql_query("delete paper_bookmark_tags from paper_bookmark_tags,bookmarks where user_id = $user_id and arxiv_tag='$delref' and paper_bookmark_tags.bookmark_id = bookmarks.bookmark_id")) {
+if (!empty($delref) && $user_id > 1) {
+    if (!$result = $db->sql_query("delete paper_bookmark_tags from paper_bookmark_tags,bookmarks where user_id = $user_id and arxiv_tag='$delref' and paper_bookmark_tags.bookmark_id = bookmarks.bookmark_id")) {
         trigger_error('Could not delete bookmark tags');
     }
     $db->sql_freeresult($result);
 
-    if(!$result = $db->sql_query("delete from bookmarks where user_id = $user_id and arxiv_tag='$delref'")) {
+    if (!$result = $db->sql_query("delete from bookmarks where user_id = $user_id and arxiv_tag='$delref'")) {
         trigger_error('Could not delete bookmark');
     }
     $db->sql_freeresult($result);
@@ -325,10 +336,10 @@ if(!empty($delref) && $user_id > 1) {
 $change_status = $request->variable('change_status', '');
 $flag = $request->variable('flag', 0);
 
-if($club >= 0 && $isadmin == 1 && $change_status) {
-    if($result = $db->sql_query("delete from club_paper_status where arxiv_tag='$change_status' and club_id=$club")) {
+if ($club >= 0 && $isadmin == 1 && $change_status) {
+    if ($result = $db->sql_query("delete from club_paper_status where arxiv_tag='$change_status' and club_id=$club")) {
         $db->sql_freeresult($result);
-        if(!$result = $db->sql_query("insert into club_paper_status values('$change_status', $club, $flag)")) {
+        if (!$result = $db->sql_query("insert into club_paper_status values('$change_status', $club, $flag)")) {
             trigger_error('Could not change status');
         }
         $db->sql_freeresult($result);
@@ -340,14 +351,14 @@ if($club >= 0 && $isadmin == 1 && $change_status) {
 $bookmark_tags = array();
 $category_sel = '';
 
-if($club < 0 && $canchange == 1 && $user_id != 'all') {
-    if($result = $db->sql_query("select tag, tag_id from bookmark_tags where user_id = $user_id order by 1")) {
-        while($row = $db->sql_fetchrow($result)){
+if ($club < 0 && $canchange == 1 && $user_id != 'all') {
+    if ($result = $db->sql_query("select tag, tag_id from bookmark_tags where user_id = $user_id order by 1")) {
+        while ($row = $db->sql_fetchrow($result)) {
             $bookmark_tags[$row['tag_id']] = $row['tag'];
         }
 
-        if(!empty($bookmark_tags)) {
-            foreach($bookmark_tags as $btag => $tag) {
+        if (!empty($bookmark_tags)) {
+            foreach ($bookmark_tags as $btag => $tag) {
                 $category_sel .= "<option value='$btag'>$tag</option>";
             }
         }
@@ -357,8 +368,8 @@ if($club < 0 && $canchange == 1 && $user_id != 'all') {
     $db->sql_freeresult($result);
 }
 
-if($error !='') {
-    $text .= '<p align="center"><font color="red">'. $error .'</font></p>';
+if ($error != '') {
+    $text .= '<p align="center"><font color="red">' . $error . '</font></p>';
 }
 
 $text .= '<p>';
@@ -368,10 +379,10 @@ $isMember = array();
 $clubs_shortname = array();
 $clubs_id = array();
 
-if($user->data['user_id'] != ANONYMOUS) {
+if ($user->data['user_id'] != ANONYMOUS) {
     $text .= '<TABLE BORDER=0 CELLPADDING=0 WIDTH=100%><tr><td class="genmed">';
 
-    if($club >= 0 || $user_id == 'all') {
+    if ($club >= 0 || $user_id == 'all') {
         $text .= "[<a href='$fname'>Bookmarks</A>] ";
     }
 
@@ -388,13 +399,13 @@ if($user->data['user_id'] != ANONYMOUS) {
             order by
                 j.name";
 
-    if($result = $db->sql_query($sql)) {
-        while($row = $db->sql_fetchrow($result)){
+    if ($result = $db->sql_query($sql)) {
+        while ($row = $db->sql_fetchrow($result)) {
             $hasclubs++;
 
             $text .= " [<a href='$fname?club={$row['club_id']}'>{$row['name']}</a>]";
 
-            if(!empty($row['shortname'])) {
+            if (!empty($row['shortname'])) {
                 $clubs_shortname[$hasclubs] = $row['shortname'];
             } else {
                 $clubs_shortname[$hasclubs] = $row['name'];
@@ -408,10 +419,10 @@ if($user->data['user_id'] != ANONYMOUS) {
 
     $text .= ' (<a href="journalclub.php">Start new or edit</a>)</td><td align="right" class ="genmed">';
 
-    if($club < 0 && $user->data['user_id'] == $user_id) {
+    if ($club < 0 && $user->data['user_id'] == $user_id) {
         $setcat = ($category) ? "&category=$category" : "";
 
-        if($editnote == 1){
+        if ($editnote == 1) {
             $text .= "[<a href='$fname?$setcat'>Hide tag editors</a>]";
         } else {
             $text .= "[<a href='$fname?editnote=1$setcat'>Edit/Add tags</a>]";
@@ -421,47 +432,47 @@ if($user->data['user_id'] != ANONYMOUS) {
     $text .= '</td></tr></table>';
 }
 
-if($user_id == 'all') {
-   $text .= '<TABLE BORDER=0 CELLPADDING=0 WIDTH=100%><TR><TD class="genmed">';
-   $text .= "<br>Most Popular: [<A HREF=\"$fname?user_id=all&top_months=1\">Month</a>] [<A HREF=\"$fname?user_id=all&top_months=3\">Quarter</a>] [<A HREF=\"$fname?user_id=all&top_months=12\">Year</a>]</TR></TD></TABLE>";
-   $inner_page_title = 'All CosmoCoffee Bookmarks';
+if ($user_id == 'all') {
+    $text .= '<TABLE BORDER=0 CELLPADDING=0 WIDTH=100%><TR><TD class="genmed">';
+    $text .= "<br>Most Popular: [<A HREF=\"$fname?user_id=all&top_months=1\">Month</a>] [<A HREF=\"$fname?user_id=all&top_months=3\">Quarter</a>] [<A HREF=\"$fname?user_id=all&top_months=12\">Year</a>]</TR></TD></TABLE>";
+    $inner_page_title = 'All CosmoCoffee Bookmarks';
 }
 
-if($club > 0) {
+if ($club > 0) {
     $text .= $clubtxt;
 } elseif ($user_id > 1) {
     $inner_page_title = "$username's Bookmarks";
 
-    if($canchange && $user_id != 'all'){
+    if ($canchange && $user_id != 'all') {
 
         $text .= '<p class="genmed">Categories: ';
 
-        if(!empty($category)) {
+        if (!empty($category)) {
             $text .= "[<A HREF='$fname'>All</A>] ";
         }
 
-        if(!empty($bookmark_tags)){
-            if($category == 'null') {
+        if (!empty($bookmark_tags)) {
+            if ($category == 'null') {
                 $text .= "[<B>None</B>] ";
             } else {
                 $text .= "[<A HREF='$fname?category=null'>None</A>] ";
             }
         }
 
-        foreach($bookmark_tags as $btag => $tag) {
+        foreach ($bookmark_tags as $btag => $tag) {
             $tmp = ($edit_categories) ? " (<A HREF='$fname?editcategory=1&delcategory=$btag'>delete</A>)" : "";
-            $text .= ($btag == $category) ? "[<B>$tag</B>$tmp] ": "[<A HREF=\"$fname?category=$btag\">$tag</A>$tmp] ";
+            $text .= ($btag == $category) ? "[<B>$tag</B>$tmp] " : "[<A HREF=\"$fname?category=$btag\">$tag</A>$tmp] ";
         }
 
-        if($edit_categories) {
+        if ($edit_categories) {
             $text .= " <a href='$fname'>Done</A><br>";
-            $text.= "<form method='get' action='$fname'>";
-            $text.=     '<SPAN class="genmed">New Category:';
-            $text.=     '<input class="post" type="text" name="addcategory" size="25" maxlength="30" value="">';
-            $text.=     '<input type="hidden" name="editcategory" value="1">';
-            $text.=     '<input type="submit" value="Add" class="button">';
-            $text.=     '</span>';
-            $text.= '</form>';
+            $text .= "<form method='get' action='$fname'>";
+            $text .=     '<SPAN class="genmed">New Category:';
+            $text .=     '<input class="post" type="text" name="addcategory" size="25" maxlength="30" value="">';
+            $text .=     '<input type="hidden" name="editcategory" value="1">';
+            $text .=     '<input type="submit" value="Add" class="button">';
+            $text .=     '</span>';
+            $text .= '</form>';
         } else {
             $text .= " <a href='$fname?editcategory=1'>Edit</A>";
         }
@@ -470,9 +481,9 @@ if($club > 0) {
     }
 }
 
-if($club >= 0) {
+if ($club >= 0) {
     $text .= "<h4>";
-    if($paper_status == $status_read) {
+    if ($paper_status == $status_read) {
         $text .= "Old Papers";
         $text .= " [<a href='$fname?club=$club&status=0&sort_by=$sort_by'>Current papers</a>]";
         $text .= " [<a href='$fname?club=$club&status=$status_ignore&sort_by=$sort_by'>Ignored papers</a>]";
@@ -492,121 +503,120 @@ if($club >= 0) {
     $text .= " (<a href='{$fname}?club=$club&status=$paper_status&sort_by={$opposite_sort}'>$sort_text</a>)";
     $text .= "</h4><p class='genmed'>";
 
-    if($paper_status > 0) {
+    if ($paper_status > 0) {
         $status = "ps.status=$paper_status";
     } else {
         // Original default for current papers (paper_status <= 0)
         $status = '(ps.status is null OR ps.status=0)';
     }
 
-    // Get ALL bookmark data from MySQL first (without ARXIV_NEW join and without LIMIT)
-    // We need to get all data, merge with SQLite, sort, then paginate
-    $bookmark_sql = "select temp.arxiv_tag, temp.ac, temp.who, temp.notes, temp.bookdate, temp.book_id from
+    // OPTIMIZED: Recreate original master branch efficiency using paper_date column
+    // Original master: JOIN with ARXIV_NEW, filter/sort/paginate in SQL
+    // New approach: Use paper_date from bookmarks, fetch paper details separately
+
+    $sort_sql = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, paper_date DESC' : 'paper_date DESC, bookdate DESC, book_id DESC';
+
+    $bookmark_sql = "select temp.arxiv_tag, temp.ac, temp.who, temp.notes, temp.bookdate, temp.book_id, temp.paper_date from
     (select b.arxiv_tag, count(*) as ac,group_concat(u.username order by u.username SEPARATOR '\n') as who,
-    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate,MAX(b.bookmark_id) AS book_id from bookmarks b,club_members as c,
+    group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate,MAX(b.bookmark_id) AS book_id, MAX(b.paper_date) AS paper_date from bookmarks b,club_members as c,
     phpbb_users as u where b.club_id=$club and u.user_id=c.user_id and c.user_id=b.user_id and c.club_id=$club
     group by b.arxiv_tag) as temp left join club_paper_status as ps on (ps.arxiv_tag=temp.arxiv_tag and ps.club_id=$club)
-    where $status";
+    where $status
+    ORDER BY $sort_sql
+    LIMIT $startc,$maxrows";
 
     $bookmark_result = $db->sql_query($bookmark_sql);
     $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
     $db->sql_freeresult($bookmark_result);
 
-    // Merge with paper details from SQLite
-    try {
-        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
-    } catch (Exception $e) {
-        trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
-    }
+    // Fetch paper details only for the paginated results (just like master branch efficiency!)
+    $arxiv_tags = array_column($bookmark_rows, 'arxiv_tag');
+    if (!empty($arxiv_tags)) {
+        try {
+            $paper_details = $arxiv_db->getPaperDetailsByTags($arxiv_tags);
 
-    // Sort the merged results exactly like the original SQL
-    // Original: $sort = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, n.date DESC' : 'n.date DESC, bookdate DESC, book_id DESC';
-    usort($all_rows, function($a, $b) use ($sort_by) {
-        if ($sort_by == 'bookmark_date') {
-            // bookdate DESC, book_id DESC, n.date DESC
-            $bookdate_cmp = strcmp($b['bookdate'], $a['bookdate']);
-            if ($bookdate_cmp !== 0) return $bookdate_cmp;
-
-            $book_id_cmp = ($b['book_id'] ?? 0) - ($a['book_id'] ?? 0);
-            if ($book_id_cmp !== 0) return $book_id_cmp;
-
-            return strcmp($b['date'], $a['date']);
-        } else {
-            // n.date DESC, bookdate DESC, book_id DESC
-            $date_cmp = strcmp($b['date'], $a['date']);
-            if ($date_cmp !== 0) return $date_cmp;
-
-            $bookdate_cmp = strcmp($b['bookdate'], $a['bookdate']);
-            if ($bookdate_cmp !== 0) return $bookdate_cmp;
-
-            return ($b['book_id'] ?? 0) - ($a['book_id'] ?? 0);
+            // Merge results maintaining original structure
+            $rows = [];
+            foreach ($bookmark_rows as $bookmark) {
+                $arxiv_tag = $bookmark['arxiv_tag'];
+                if (isset($paper_details[$arxiv_tag])) {
+                    // Use paper_date from bookmarks (replaces n.date from original ARXIV_NEW join)
+                    $merged_row = array_merge($bookmark, $paper_details[$arxiv_tag]);
+                    $merged_row['date'] = $bookmark['paper_date']; // Override with bookmarks table date
+                    $rows[] = $merged_row;
+                }
+            }
+        } catch (Exception $e) {
+            trigger_error('Could not get paper details from ArXiv database: ' . $e->getMessage());
         }
-    });
-
-    // Apply pagination after sorting
-    $rows = array_slice($all_rows, $startc, $maxrows);
-
+    } else {
+        $rows = [];
+    }
 } else {
     $text .= '<p class="genmed">';
     $usercond = "user_id = $user_id and ";
 
-    if($user_id == 'all') {
+    if ($user_id == 'all') {
         $usercond = '';
         $countcond = $request->variable('min_count', 0);
 
-        // Get ALL bookmark data first (no LIMIT yet)
-        $bookmark_sql = "select b.arxiv_tag, count(*) as ac from bookmarks as b where 1=1 group by b.arxiv_tag";
+        // OPTIMIZED: Recreate original master branch query pattern with paper_date
+        // Original master: "select b.arxiv_tag,n.title, n.authors,n.date, count(*) as ac from bookmarks as b, ARXIV_NEW as n where $usercond b.arxiv_tag=n.arxiv_tag $date_cond group by n.arxiv_tag order by $order LIMIT $startc, $maxrows"
+
+        $date_cond = '';
+        $order = 'b.paper_date DESC, ac DESC';  // Original: n.date DESC, ac DESC
+        $having_clause = '';
+
+        if ($top_months) {
+            // Original: date_cond = " and n.date >= date_sub(CURDATE(),interval $top_months month) "
+            $date_cond = " AND b.paper_date >= DATE_SUB(CURDATE(), INTERVAL $top_months MONTH) ";
+            $order = 'ac DESC, b.paper_date DESC';  // Original: ac DESC,n.date DESC
+        } elseif ($countcond) {
+            // Original: order = 'having ac >='. $countcond . ' order by n.date DESC, ac DESC'
+            $having_clause = "HAVING ac >= $countcond";
+        }
+
+        // Recreate the original efficient single query pattern
+        $bookmark_sql = "SELECT b.arxiv_tag, b.paper_date, COUNT(*) as ac
+                        FROM bookmarks as b
+                        WHERE b.paper_date IS NOT NULL $date_cond
+                        GROUP BY b.arxiv_tag
+                        $having_clause
+                        ORDER BY $order
+                        LIMIT $startc, $maxrows";
+
         $bookmark_result = $db->sql_query($bookmark_sql);
         $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
         $db->sql_freeresult($bookmark_result);
 
-        // Merge with paper details from SQLite
-        try {
-            $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
-        } catch (Exception $e) {
-            trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
-        }
+        // Fetch paper details only for paginated results (maintaining master branch efficiency)
+        $arxiv_tags = array_column($bookmark_rows, 'arxiv_tag');
+        if (!empty($arxiv_tags)) {
+            try {
+                $paper_details = $arxiv_db->getPaperDetailsByTags($arxiv_tags);
 
-        // Apply filters based on original if/elseif logic
-        if($top_months) {
-            // Filter by date (replicating the original SQL date_cond)
-            $cutoff_date = date('Y-m-d', strtotime("-$top_months months"));
-            $all_rows = array_filter($all_rows, function($row) use ($cutoff_date) {
-                return isset($row['date']) && $row['date'] >= $cutoff_date;
-            });
-        } elseif ($countcond) {
-            // Apply count filter only if top_months is not active (original elseif logic)
-            $all_rows = array_filter($all_rows, function($row) use ($countcond) {
-                return $row['ac'] >= $countcond;
-            });
-        }
-
-        // Sort results exactly like original SQL
-        // Original: $order = 'n.date DESC, ac DESC' or 'ac DESC,n.date DESC' for top_months
-        if($top_months) {
-            // ac DESC, n.date DESC
-            usort($all_rows, function($a, $b) {
-                $ac_cmp = $b['ac'] - $a['ac'];
-                if ($ac_cmp !== 0) return $ac_cmp;
-                return strcmp($b['date'], $a['date']);
-            });
+                // Merge results maintaining original structure
+                $rows = [];
+                foreach ($bookmark_rows as $bookmark) {
+                    $arxiv_tag = $bookmark['arxiv_tag'];
+                    if (isset($paper_details[$arxiv_tag])) {
+                        // Use paper_date from bookmarks (replaces n.date from original)
+                        $merged_row = array_merge($bookmark, $paper_details[$arxiv_tag]);
+                        $merged_row['date'] = $bookmark['paper_date'];
+                        $rows[] = $merged_row;
+                    }
+                }
+            } catch (Exception $e) {
+                trigger_error('Could not get paper details from ArXiv database: ' . $e->getMessage());
+            }
         } else {
-            // n.date DESC, ac DESC
-            usort($all_rows, function($a, $b) {
-                $date_cmp = strcmp($b['date'], $a['date']);
-                if ($date_cmp !== 0) return $date_cmp;
-                return $b['ac'] - $a['ac'];
-            });
+            $rows = [];
         }
-
-        // Apply pagination after filtering and sorting
-        $rows = array_slice($all_rows, $startc, $maxrows);
-
     } else {
         $catcond = "";
         $othertab = "";
-        if(!empty($category)) {
-            if($category == 'null') {
+        if (!empty($category)) {
+            if ($category == 'null') {
                 $catcond = "pbt.tag_id is null and ";
             } else {
                 $othertab = ", paper_bookmark_tags as pbt2";
@@ -614,61 +624,71 @@ if($club >= 0) {
             }
         }
 
-        // Get ALL bookmark data from MySQL (without ARXIV_NEW join and without LIMIT)
+        // OPTIMIZED: Recreate original master branch query pattern with paper_date
+        // Original master: "select group_concat(pbt.tag_id) as book_tags,b.bookmark_id,b.note,b.arxiv_tag, n.title, n.authors,n.date, j.shortname,b.club_id, count(*) as ac from (bookmarks as b,ARXIV_NEW as n$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id) where $usercond $catcond b.arxiv_tag = n.arxiv_tag group by n.arxiv_tag,pbt.bookmark_id order by $order LIMIT  $startc,$maxrows"
+
+        $order = 'b.paper_date DESC, ac DESC';  // Original: n.date DESC, ac DESC
+        if (!empty($addref) && $user_id > 1) {
+            // Original: $order= "b.arxiv_tag='$addref' DESC,$order";
+            $order = "b.arxiv_tag='$addref' DESC, $order";
+        }
+
         $bookmark_sql = "select group_concat(pbt.tag_id) as book_tags,b.bookmark_id,b.note,b.arxiv_tag,
-        j.shortname,b.club_id, count(*) as ac from (bookmarks as b$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id)
-        where $usercond $catcond 1=1 group by b.arxiv_tag,pbt.bookmark_id";
+        j.shortname,b.club_id, b.paper_date, count(*) as ac from (bookmarks as b$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id)
+        where $usercond $catcond b.paper_date IS NOT NULL
+        group by b.arxiv_tag,pbt.bookmark_id
+        order by $order
+        LIMIT $startc,$maxrows";
 
         $bookmark_result = $db->sql_query($bookmark_sql);
         $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
         $db->sql_freeresult($bookmark_result);
 
-        // Merge with paper details from SQLite
-        try {
-            $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
-        } catch (Exception $e) {
-            trigger_error('Could not merge bookmark data with ArXiv database: ' . $e->getMessage());
-        }
+        // Fetch paper details only for paginated results (maintaining master branch efficiency)
+        $arxiv_tags = array_column($bookmark_rows, 'arxiv_tag');
+        if (!empty($arxiv_tags)) {
+            try {
+                $paper_details = $arxiv_db->getPaperDetailsByTags($arxiv_tags);
 
-        // Sort results exactly like original SQL
-        // Original: $order = 'n.date DESC, ac DESC' with special case for addref
-        usort($all_rows, function($a, $b) use ($addref, $user_id) {
-            // Priority sort for newly added bookmark (original: "b.arxiv_tag='$addref' DESC")
-            if(!empty($addref) && $user_id > 1) {
-                if ($a['arxiv_tag'] === $addref && $b['arxiv_tag'] !== $addref) return -1;
-                if ($b['arxiv_tag'] === $addref && $a['arxiv_tag'] !== $addref) return 1;
+                // Merge results maintaining original structure
+                $rows = [];
+                foreach ($bookmark_rows as $bookmark) {
+                    $arxiv_tag = $bookmark['arxiv_tag'];
+                    if (isset($paper_details[$arxiv_tag])) {
+                        // Use paper_date from bookmarks (replaces n.date from original)
+                        $merged_row = array_merge($bookmark, $paper_details[$arxiv_tag]);
+                        $merged_row['date'] = $bookmark['paper_date'];
+                        $rows[] = $merged_row;
+                    }
+                }
+            } catch (Exception $e) {
+                trigger_error('Could not get paper details from ArXiv database: ' . $e->getMessage());
             }
-            // Then n.date DESC, ac DESC
-            $date_cmp = strcmp($b['date'], $a['date']);
-            if ($date_cmp !== 0) return $date_cmp;
-            return $b['ac'] - $a['ac'];
-        });
-
-        // Apply pagination after sorting
-        $rows = array_slice($all_rows, $startc, $maxrows);
-
+        } else {
+            $rows = [];
+        }
     }
 }
 
 // $rows is now populated by the new logic above
 
-foreach($rows as $row) {
+foreach ($rows as $row) {
     $count = $row['ac'];
     $tag = $row['arxiv_tag'];
     $date = $row['date'];
     $bookmark_id = $row['bookmark_id'] ?? '';
 
-    if(isset($do_export)) {
+    if (isset($do_export)) {
         $types = explode(",", $do_export);
         $txt = '';
 
-        foreach ($types as $type){
-            if($txt != '') $txt .= $separator;
-            if($type == 'arxiv') {
+        foreach ($types as $type) {
+            if ($txt != '') $txt .= $separator;
+            if ($type == 'arxiv') {
                 $txt .= "$tag";
-            } elseif($type == 'pdf') {
+            } elseif ($type == 'pdf') {
                 $txt .= "https://arxiv.org/pdf/$tag";
-            } elseif($type == 'date') {
+            } elseif ($type == 'date') {
                 $txt .= $date;
             } elseif ($type == 'authors') {
                 $txt .= $row['authors'];
@@ -676,136 +696,135 @@ foreach($rows as $row) {
                 $txt .= $row['title'];
             } elseif ($type == 'tags') {
                 $tags = explode(',', $row['book_tags']);
-                $tagtxt='';
-                if(!empty($tags)) {
-                    foreach($tags as $btag) {
-                        if($tagtxt != '') $tagtxt .= ';';
+                $tagtxt = '';
+                if (!empty($tags)) {
+                    foreach ($tags as $btag) {
+                        if ($tagtxt != '') $tagtxt .= ';';
                         $tagtxt .= $bookmark_tags[$btag];
                     }
                 }
                 $txt .= $tagtxt;
             } elseif ($type == 'note') {
                 $txt .= $row['note'];
-            } 
+            }
         }
-        $text .= trim($txt).'<br>';
+        $text .= trim($txt) . '<br>';
         continue;
     }
 
-    $text .=  '<a name="'.$tag.'"></a><p class="postbody2">'. "$date " . '<a href="/discuss/' . $tag . '">'. $tag .  '</a> ';
+    $text .=  '<a name="' . $tag . '"></a><p class="postbody2">' . "$date " . '<a href="/discuss/' . $tag . '">' . $tag .  '</a> ';
 
-    if($user_id == 'all') {
+    if ($user_id == 'all') {
         $text .= "[$count] ";
     }
 
-    if($user_id != 'all' && $club < 0) {
-        $text .= '[<a href="/'.$fname.'?delete='.$tag.'">X</a>] ';
+    if ($user_id != 'all' && $club < 0) {
+        $text .= '[<a href="/' . $fname . '?delete=' . $tag . '">X</a>] ';
     }
 
-    $text .=  '[<a href="https://arxiv.org/pdf/' .$tag. '">PDF</A>]';
+    $text .=  '[<a href="https://arxiv.org/pdf/' . $tag . '">PDF</A>]';
     $pdfs = "https://arxiv.org/pdf/$tag\n";
 
-#    if(!defined('IPHONE')) {
-#        $text.=' [<a href="https://arxiv.org/ps/' .$tag.'">PS</A>]';
-#    }
-    if($user_id == 'all' && $canchange) {
+    #    if(!defined('IPHONE')) {
+    #        $text.=' [<a href="https://arxiv.org/ps/' .$tag.'">PS</A>]';
+    #    }
+    if ($user_id == 'all' && $canchange) {
         $text .= " [<a href=\"/bookmark.php?add=$tag\">Bookmark</a>]";
     }
-    if($club < 1 && $hasclubs && $user_id != 'all') {
+    if ($club < 1 && $hasclubs && $user_id != 'all') {
         $text .= ' Club: ';
         $paper_club = $row['club_id'];
-        if($paper_club > 0) {
-            $text .= ' '. $row['shortname'] . " [<a href=\"$fname?noclub=$tag\">Clear</a>]";
+        if ($paper_club > 0) {
+            $text .= ' ' . $row['shortname'] . " [<a href=\"$fname?noclub=$tag\">Clear</a>]";
         } else {
-            for($i = 1; $i <= count($clubs_id); $i++) {
-                $text .= "<a href=\"$fname?paper=$tag&addclub=".$clubs_id[$i]."\">add to  ".$clubs_shortname[$i]."</a> ";
+            for ($i = 1; $i <= count($clubs_id); $i++) {
+                $text .= "<a href=\"$fname?paper=$tag&addclub=" . $clubs_id[$i] . "\">add to  " . $clubs_shortname[$i] . "</a> ";
             }
         }
     }
-    if($isadmin == 1 && $paper_status == 0) {
+    if ($isadmin == 1 && $paper_status == 0) {
         $text .= " [<a href=\"$fname?club=$club&change_status=$tag&flag=$status_read\">Mark old</A>] [<a href=\"$fname?club=$club&change_status=$tag&flag=$status_ignore\">Ignore</A>]";
     }
-    if($isadmin == 1 && $paper_status > 0 ) {
+    if ($isadmin == 1 && $paper_status > 0) {
         $text .= " [<a href=\"$fname?club=$club&change_status=$tag&flag=0\">Make current</A>]";
     }
-    $text .= '<br /><b>Title:</b> ' . $row['title'].'<br /><b>Authors:</b> ' . $row['authors'] ;
+    $text .= '<br /><b>Title:</b> ' . $row['title'] . '<br /><b>Authors:</b> ' . $row['authors'];
 
-    if(!empty($row['who'])){
+    if (!empty($row['who'])) {
         $people = explode("\n", $row['who']);
         $notes = explode("\n", $row['notes']);
         $text .= '<br /><span class="gensmall">';
-        for($i = 0; $i < count($people); $i++) {
-           $text .= $people[$i];
-           if($notes[$i] != '') {
-               $text .= ' [Note: ' .$notes[$i] .']<br />' ;
-           } elseif ($i < count($people)-1) {
-               $text .= ', ';
-           }
+        for ($i = 0; $i < count($people); $i++) {
+            $text .= $people[$i];
+            if ($notes[$i] != '') {
+                $text .= ' [Note: ' . $notes[$i] . ']<br />';
+            } elseif ($i < count($people) - 1) {
+                $text .= ', ';
+            }
         }
-        $text .= '</span>'; 
+        $text .= '</span>';
         if (!is_null($row['bookdate'])) {
             $text .= ' (' . date("Y-m-d", strtotime($row['bookdate'])) . ')';
-         }       
+        }
     }
 
-    if($club < 0 && $canchange == 1 && $user_id != 'all') {
+    if ($club < 0 && $canchange == 1 && $user_id != 'all') {
         $note = $row['note'];
         $tagtxt = '';
 
-        if(!empty($row['book_tags'])) {
-            $tags = explode(',',$row['book_tags']);
+        if (!empty($row['book_tags'])) {
+            $tags = explode(',', $row['book_tags']);
             $tagtxt = '';
 
-            if(!empty($tags)) {
-                foreach($tags as $btag) {
-                    if ($tagtxt <>'') $tagtxt.=', ';
+            if (!empty($tags)) {
+                foreach ($tags as $btag) {
+                    if ($tagtxt <> '') $tagtxt .= ', ';
 
                     $tagtxt .=  $bookmark_tags[$btag] .
-                    " [<A hREF=\"$fname?book_id=$bookmark_id&deltag=$btag&category=$category&editnote=".($HTTP_GET_VARS['editnote'] ?? '')."#$tag\">X</A>]";
+                        " [<A hREF=\"$fname?book_id=$bookmark_id&deltag=$btag&category=$category&editnote=" . ($HTTP_GET_VARS['editnote'] ?? '') . "#$tag\">X</A>]";
                 }
             }
-            $tagtxt="<br /><span  class=\"genmed\"><font color=\"navy\">Tag: $tagtxt</font></span>";
+            $tagtxt = "<br /><span  class=\"genmed\"><font color=\"navy\">Tag: $tagtxt</font></span>";
         }
 
-        if($editnote == 1 || $addref == $tag || $paper == $tag) {
+        if ($editnote == 1 || $addref == $tag || $paper == $tag) {
             $text .= $tagtxt;
 
-            $text .= '<form method="post" action="'."$fullfname#$tag".'" TARGET="_top"><SPAN class="genmed">Note: </SPAN>
-            <input class="post" type="text" name="note" size="50" maxlength="255" value="'.$note.'">
-            <input type="hidden" name="notepaper" value="'.$tag.'">';
+            $text .= '<form method="post" action="' . "$fullfname#$tag" . '" TARGET="_top"><SPAN class="genmed">Note: </SPAN>
+            <input class="post" type="text" name="note" size="50" maxlength="255" value="' . $note . '">
+            <input type="hidden" name="notepaper" value="' . $tag . '">';
 
-            if(!empty($bookmark_tags)) {
-                $text .= '<SPAN class="genmed">Add tags: </SPAN><select name="add_book_tag"><option value="none" selected></option>'.$category_sel.'</select> <select name="add_book_tag2"><option value="none" selected></option>'.$category_sel.'</select>';
-                $text .= '<input type="hidden" name="book_id" value="'.$bookmark_id.'">';
+            if (!empty($bookmark_tags)) {
+                $text .= '<SPAN class="genmed">Add tags: </SPAN><select name="add_book_tag"><option value="none" selected></option>' . $category_sel . '</select> <select name="add_book_tag2"><option value="none" selected></option>' . $category_sel . '</select>';
+                $text .= '<input type="hidden" name="book_id" value="' . $bookmark_id . '">';
             }
 
-            if(!empty($category)) {
-                $text .= '<input type="hidden" name="category" value="'.$category.'">';
+            if (!empty($category)) {
+                $text .= '<input type="hidden" name="category" value="' . $category . '">';
             }
-            $text.=' <input type="submit" value="Save" class="button"></form>';
-
+            $text .= ' <input type="submit" value="Save" class="button"></form>';
         } else {
-            $tagtxt .= " <span class=\"genmed\"><A HREF=\"".makeUrl($fname, $request->server('QUERY_STRING'), "deltag=&book_id=&paper=$tag#$tag") . "\">+</A>";
+            $tagtxt .= " <span class=\"genmed\"><A HREF=\"" . makeUrl($fname, $request->server('QUERY_STRING'), "deltag=&book_id=&paper=$tag#$tag") . "\">+</A>";
 
-            if(empty($row['book_tags'])) {
-                $tagtxt = '<br />'.$tagtxt;
+            if (empty($row['book_tags'])) {
+                $tagtxt = '<br />' . $tagtxt;
             }
             $text .= $tagtxt;
 
-            if(!empty($note)) {
-                $text.="<br />Note: $note";
+            if (!empty($note)) {
+                $text .= "<br />Note: $note";
             }
         }
     }
 
-    $text.= '</p>';
+    $text .= '</p>';
 }
 
-if($club >= 0) {
+if ($club >= 0) {
     $status = "&club=$club&status=$paper_status";
 } else {
-    $status = '&user_id='.$user_id;
-    if(!empty($category)) {
+    $status = '&user_id=' . $user_id;
+    if (!empty($category)) {
         $status .= "&category=$category";
     }
 }
@@ -814,20 +833,20 @@ $text .= '<table width="100%">';
 $text .= '<tr>';
 $text .= '<td class ="genmed">';
 
-if(count($rows) == $maxrows) {
-    $text .= '<p>[<a href ="/'.$fname.'?start=' . ($startc + $maxrows) .$status .'">Next '.$maxrows.'</a>]</p>';
+if (count($rows) == $maxrows) {
+    $text .= '<p>[<a href ="/' . $fname . '?start=' . ($startc + $maxrows) . $status . '">Next ' . $maxrows . '</a>]</p>';
 }
 
-if($startc > 0){
-    $text .= '<p>[<a href ="/'.$fname.'?start=' . ($startc - $maxrows) .$status . '">Previous '.$maxrows.'</a>]</p>';
+if ($startc > 0) {
+    $text .= '<p>[<a href ="/' . $fname . '?start=' . ($startc - $maxrows) . $status . '">Previous ' . $maxrows . '</a>]</p>';
 }
 
 $text .= '</td>';
 $text .= '<td  class ="genmed" align="right">';
 
-$text .= 'Export List: [<a href ="?export=pdf'.$status.'">PDFs</a>]';
-$text .= ' [<a href ="?export=arxiv'.$status.'">IDs</a>]';
-$text .= ' [<a href ="?export=arxiv,date,pdf,tags,note'.$status.'">All</a>]';
+$text .= 'Export List: [<a href ="?export=pdf' . $status . '">PDFs</a>]';
+$text .= ' [<a href ="?export=arxiv' . $status . '">IDs</a>]';
+$text .= ' [<a href ="?export=arxiv,date,pdf,tags,note' . $status . '">All</a>]';
 
 $text .= '</td>';
 $text .= '</tr>';
@@ -843,15 +862,16 @@ $template->set_filenames(array(
 ));
 
 $template->assign_vars(array(
-    'MESSAGE_TEXT'	=> $text,
-    'MESSAGE_TITLE'	=> $inner_page_title
+    'MESSAGE_TEXT'    => $text,
+    'MESSAGE_TITLE'    => $inner_page_title
 ));
 
 make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
 page_footer();
 
 
-function get_arXiv_ref_html() {
+function get_arXiv_ref_html()
+{
     global $request;
     return '<center>
                 <form method="get" action="' . $request->server('SCRIPT_NAME') . '" TARGET="_top">
@@ -863,27 +883,28 @@ function get_arXiv_ref_html() {
             <hr>';
 }
 
-function makeUrl($path, $qs = false, $qsAdd = false) {
+function makeUrl($path, $qs = false, $qsAdd = false)
+{
     $var_array = array();
     $varAdd_array = array();
     $url = $path;
 
-    if($qsAdd) {
+    if ($qsAdd) {
         $varAdd = explode('&', $qsAdd);
-        foreach($varAdd as $varOne) {
+        foreach ($varAdd as $varOne) {
             $name_value = explode('=', $varOne);
             $varAdd_array[$name_value[0]] = $name_value[1];
         }
     }
 
-    if($qs) {
+    if ($qs) {
         $var = explode('&', $qs);
-        foreach($var as $varOne) {
+        foreach ($var as $varOne) {
             $name_value = explode('=', $varOne);
 
             //remove duplicated vars
-            if($qsAdd) {
-                if(!array_key_exists($name_value[0], $varAdd_array)) {
+            if ($qsAdd) {
+                if (!array_key_exists($name_value[0], $varAdd_array)) {
                     $var_array[$name_value[0]] = $name_value[1];
                 }
             } else {
@@ -895,19 +916,15 @@ function makeUrl($path, $qs = false, $qsAdd = false) {
     //make url with querystring
     $delimiter = "?";
 
-    foreach($var_array as $key => $value) {
-        $url .= $delimiter.$key."=".$value;
+    foreach ($var_array as $key => $value) {
+        $url .= $delimiter . $key . "=" . $value;
         $delimiter = "&";
     }
 
-    foreach($varAdd_array as $key => $value) {
-        $url .= $delimiter.$key."=".$value;
+    foreach ($varAdd_array as $key => $value) {
+        $url .= $delimiter . $key . "=" . $value;
         $delimiter = "&";
     }
 
     return $url;
 }
-
-
-
-

@@ -343,6 +343,77 @@ class ArxivDatabase
     }
 
     /**
+     * Get paper details for bookmarks with efficient date filtering
+     * This method is optimized for bookmark queries that can now filter by paper_date in MySQL
+     * before fetching paper details from SQLite
+     */
+    public function getPaperDetailsForBookmarks($arxiv_tags, $date_start = null, $date_end = null)
+    {
+        if (empty($arxiv_tags)) {
+            return [];
+        }
+
+        $where_conditions = [];
+        $params = [];
+        $param_count = 0;
+
+        // Handle arxiv_tag list
+        $placeholders = str_repeat('?,', count($arxiv_tags) - 1) . '?';
+        $where_conditions[] = "arxiv_tag IN ($placeholders)";
+        foreach ($arxiv_tags as $arxiv_tag) {
+            $params[++$param_count] = $arxiv_tag;
+        }
+
+        // Handle date range if provided
+        if ($date_start && $date_end && $date_start === $date_end) {
+            // Single date
+            $where_conditions[] = "date = ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_start && $date_end) {
+            // Date range
+            $where_conditions[] = "date >= ? AND date <= ?";
+            $params[++$param_count] = $date_start;
+            $params[++$param_count] = $date_end;
+        } elseif ($date_start) {
+            // From date onwards
+            $where_conditions[] = "date >= ?";
+            $params[++$param_count] = $date_start;
+        } elseif ($date_end) {
+            // Up to date
+            $where_conditions[] = "date <= ?";
+            $params[++$param_count] = $date_end;
+        }
+
+        $where_clause = implode(' AND ', $where_conditions);
+        $sql = "SELECT arxiv_tag, date, arxiv, title, authors, comments, abstract
+                FROM ARXIV_NEW
+                WHERE $where_clause";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $index => $value) {
+                $stmt->bindValue($index, $value, SQLITE3_TEXT);
+            }
+
+            $result = $stmt->execute();
+            if (!$result) {
+                throw new Exception("Query failed: " . $this->db->lastErrorMsg());
+            }
+
+            $papers = [];
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $papers[$row['arxiv_tag']] = $row; // Index by arxiv_tag for easy lookup
+            }
+            $stmt->close();
+
+            return $papers;
+        } catch (Exception $e) {
+            error_log("ArxivDatabase getPaperDetailsForBookmarks error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
      * Execute a raw SQL query (for migration purposes)
      */
     public function exec($sql)
