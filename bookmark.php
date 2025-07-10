@@ -486,39 +486,52 @@ if($club >= 0) {
 
     if($paper_status > 0) {
         $status = "ps.status=$paper_status";
+    } else {
+        $status = '(ps.status is null || ps.status=0)';
     }
 
-    // Get bookmark data from MySQL first (without ARXIV_NEW join)
-    // Original query selected: notes,n.arxiv_tag,n.title,n.authors,n.date,ac,who, bookdate
+    // Get ALL bookmark data from MySQL first (without ARXIV_NEW join and without LIMIT)
+    // We need to get all data, merge with SQLite, sort, then paginate
     $bookmark_sql = "select temp.arxiv_tag, temp.ac, temp.who, temp.notes, temp.bookdate, temp.book_id from
     (select b.arxiv_tag, count(*) as ac,group_concat(u.username order by u.username SEPARATOR '\n') as who,
     group_concat(IFNULL(b.note,'') order by u.username SEPARATOR '\n') as notes, MAX(b.bookmarked_date) AS bookdate,MAX(b.bookmark_id) AS book_id from bookmarks b,club_members as c,
     phpbb_users as u where b.club_id=$club and u.user_id=c.user_id and c.user_id=b.user_id and c.club_id=$club
     group by b.arxiv_tag) as temp left join club_paper_status as ps on (ps.arxiv_tag=temp.arxiv_tag and ps.club_id=$club)
-    where $status LIMIT $startc,$maxrows";
+    where $status";
 
     $bookmark_result = $db->sql_query($bookmark_sql);
     $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
     $db->sql_freeresult($bookmark_result);
 
     // Merge with paper details from SQLite
-    $rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+    $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
 
-    // Sort the merged results
-    $sort_by_date = ($sort_by != 'bookmark_date');
-    usort($rows, function($a, $b) use ($sort_by_date) {
-        if ($sort_by_date) {
-            // Sort by paper date DESC, then bookmark date DESC
-            $date_cmp = strcmp($b['date'], $a['date']);
-            if ($date_cmp !== 0) return $date_cmp;
-            return strcmp($b['bookdate'], $a['bookdate']);
-        } else {
-            // Sort by bookmark date DESC, then paper date DESC
+    // Sort the merged results exactly like the original SQL
+    // Original: $sort = ($sort_by == 'bookmark_date') ? 'bookdate DESC, book_id DESC, n.date DESC' : 'n.date DESC, bookdate DESC, book_id DESC';
+    usort($all_rows, function($a, $b) use ($sort_by) {
+        if ($sort_by == 'bookmark_date') {
+            // bookdate DESC, book_id DESC, n.date DESC
             $bookdate_cmp = strcmp($b['bookdate'], $a['bookdate']);
             if ($bookdate_cmp !== 0) return $bookdate_cmp;
+
+            $book_id_cmp = ($b['book_id'] ?? 0) - ($a['book_id'] ?? 0);
+            if ($book_id_cmp !== 0) return $book_id_cmp;
+
             return strcmp($b['date'], $a['date']);
+        } else {
+            // n.date DESC, bookdate DESC, book_id DESC
+            $date_cmp = strcmp($b['date'], $a['date']);
+            if ($date_cmp !== 0) return $date_cmp;
+
+            $bookdate_cmp = strcmp($b['bookdate'], $a['bookdate']);
+            if ($bookdate_cmp !== 0) return $bookdate_cmp;
+
+            return ($b['book_id'] ?? 0) - ($a['book_id'] ?? 0);
         }
     });
+
+    // Apply pagination after sorting
+    $rows = array_slice($all_rows, $startc, $maxrows);
 
 } else {
     $text .= '<p class="genmed">';
@@ -528,16 +541,8 @@ if($club >= 0) {
         $usercond = '';
         $countcond = $request->variable('min_count', 0);
 
-        // For "all users" view, we need to handle date filtering differently
-        // since we can't do cross-database joins. We'll get more data and filter in PHP.
-        $having_clause = '';
-        if ($countcond) {
-            $having_clause = " having ac >= $countcond";
-        }
-
-        // Get a larger set of bookmark data to account for date filtering
-        $fetch_limit = $top_months ? ($startc + $maxrows) * 3 : $maxrows;
-        $bookmark_sql = "select b.arxiv_tag, count(*) as ac from bookmarks as b where 1=1 group by b.arxiv_tag $having_clause ORDER BY ac DESC LIMIT $fetch_limit";
+        // Get ALL bookmark data first (no LIMIT yet)
+        $bookmark_sql = "select b.arxiv_tag, count(*) as ac from bookmarks as b where 1=1 group by b.arxiv_tag";
         $bookmark_result = $db->sql_query($bookmark_sql);
         $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
         $db->sql_freeresult($bookmark_result);
@@ -545,7 +550,14 @@ if($club >= 0) {
         // Merge with paper details from SQLite
         $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
 
-        // Filter by date if needed
+        // Apply count filter if specified
+        if ($countcond) {
+            $all_rows = array_filter($all_rows, function($row) use ($countcond) {
+                return $row['ac'] >= $countcond;
+            });
+        }
+
+        // Filter by date if needed (replicating the original SQL date_cond)
         if($top_months) {
             $cutoff_date = date('Y-m-d', strtotime("-$top_months months"));
             $all_rows = array_filter($all_rows, function($row) use ($cutoff_date) {
@@ -553,16 +565,17 @@ if($club >= 0) {
             });
         }
 
-        // Sort results
+        // Sort results exactly like original SQL
+        // Original: $order = 'n.date DESC, ac DESC' or 'ac DESC,n.date DESC' for top_months
         if($top_months) {
-            // Sort by bookmark count DESC, then date DESC
+            // ac DESC, n.date DESC
             usort($all_rows, function($a, $b) {
                 $ac_cmp = $b['ac'] - $a['ac'];
                 if ($ac_cmp !== 0) return $ac_cmp;
                 return strcmp($b['date'], $a['date']);
             });
         } else {
-            // Sort by date DESC, then bookmark count DESC
+            // n.date DESC, ac DESC
             usort($all_rows, function($a, $b) {
                 $date_cmp = strcmp($b['date'], $a['date']);
                 if ($date_cmp !== 0) return $date_cmp;
@@ -585,30 +598,34 @@ if($club >= 0) {
             }
         }
 
-        // Get bookmark data from MySQL (without ARXIV_NEW join)
+        // Get ALL bookmark data from MySQL (without ARXIV_NEW join and without LIMIT)
         $bookmark_sql = "select group_concat(pbt.tag_id) as book_tags,b.bookmark_id,b.note,b.arxiv_tag,
         j.shortname,b.club_id, count(*) as ac from (bookmarks as b$othertab) left join journal_clubs as j on (b.club_id=j.club_id) left join paper_bookmark_tags as pbt on (pbt.bookmark_id=b.bookmark_id)
-        where $usercond $catcond 1=1 group by b.arxiv_tag,pbt.bookmark_id LIMIT $startc,$maxrows";
+        where $usercond $catcond 1=1 group by b.arxiv_tag,pbt.bookmark_id";
 
         $bookmark_result = $db->sql_query($bookmark_sql);
         $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
         $db->sql_freeresult($bookmark_result);
 
         // Merge with paper details from SQLite
-        $rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
+        $all_rows = ArxivDatabase::mergeBookmarkWithPaperData($bookmark_rows, $arxiv_db);
 
-        // Sort results
-        usort($rows, function($a, $b) use ($addref, $user_id) {
-            // Priority sort for newly added bookmark
+        // Sort results exactly like original SQL
+        // Original: $order = 'n.date DESC, ac DESC' with special case for addref
+        usort($all_rows, function($a, $b) use ($addref, $user_id) {
+            // Priority sort for newly added bookmark (original: "b.arxiv_tag='$addref' DESC")
             if(!empty($addref) && $user_id > 1) {
                 if ($a['arxiv_tag'] === $addref && $b['arxiv_tag'] !== $addref) return -1;
                 if ($b['arxiv_tag'] === $addref && $a['arxiv_tag'] !== $addref) return 1;
             }
-            // Then by date DESC, then by bookmark count DESC
+            // Then n.date DESC, ac DESC
             $date_cmp = strcmp($b['date'], $a['date']);
             if ($date_cmp !== 0) return $date_cmp;
             return $b['ac'] - $a['ac'];
         });
+
+        // Apply pagination after sorting
+        $rows = array_slice($all_rows, $startc, $maxrows);
 
     }
 }
