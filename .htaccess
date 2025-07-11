@@ -1,6 +1,6 @@
 Options -Indexes +FollowSymLinks
 
-Deny from 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192 
+Deny from 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192
 
 Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
 
@@ -67,50 +67,30 @@ RewriteRule ^(.*)$ app.php [QSA,L]
 #Options +FollowSymLinks
 </IfModule>
 
-# With Apache 2.4 the "Order, Deny" syntax has been deprecated and moved from
-# module mod_authz_host to a new module called mod_access_compat (which may be
-# disabled) and a new "Require" syntax has been introduced to mod_authz_host.
-# We could just conditionally provide both versions, but unfortunately Apache
-# does not explicitly tell us its version if the module mod_version is not
-# available. In this case, we check for the availability of module
-# mod_authz_core (which should be on 2.4 or higher only) as a best guess.
-<IfModule mod_version.c>
-	<IfVersion < 2.4>
-		<Files "config.php">
-			Order Allow,Deny
-			Deny from All
-		</Files>
-		<Files "common.php">
-			Order Allow,Deny
-			Deny from All
-		</Files>
-	</IfVersion>
-	<IfVersion >= 2.4>
-		<Files "config.php">
-			Require all denied
-		</Files>
-		<Files "common.php">
-			Require all denied
-		</Files>
-	</IfVersion>
-</IfModule>
-<IfModule !mod_version.c>
-	<IfModule !mod_authz_core.c>
-		<Files "config.php">
-			Order Allow,Deny
-			Deny from All
-		</Files>
-		<Files "common.php">
-			Order Allow,Deny
-			Deny from All
-		</Files>
-	</IfModule>
-	<IfModule mod_authz_core.c>
-		<Files "config.php">
-			Require all denied
-		</Files>
-		<Files "common.php">
-			Require all denied
-		</Files>
-	</IfModule>
-</IfModule>
+# Security: Block access to sensitive files and directories
+# Modern Apache 2.4+ syntax (most servers support this now)
+
+# Block access to sensitive PHP files
+<Files ~ "^(config|common)\.php$">
+	Require all denied
+</Files>
+
+# Block access to sensitive file extensions
+<FilesMatch "\.(md|ini|git.*|sql|gz|lock|json|yml|yaml)$">
+	Require all denied
+</FilesMatch>
+
+# Block access to sensitive directories
+<DirectoryMatch "^.*(scripts|vendor|phpbb|config|includes|\.git|bin|docs).*$">
+	Require all denied
+</DirectoryMatch>
+
+# Block access to hidden files (starting with .)
+<FilesMatch "^\.">
+	Require all denied
+</FilesMatch>
+
+# Block access to backup and temporary files
+<FilesMatch "\.(bak|backup|tmp|temp|log|old|orig|save|swp|swo)$">
+	Require all denied
+</FilesMatch>
