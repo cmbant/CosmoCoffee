@@ -39,12 +39,12 @@ try {
         }
         $db->sql_freeresult($result);
     }
-    }
-    catch (Exception $e) {
-        echo "\n❌ Error: " . $e->getMessage() . "\n";
-        exit(1);
-    }
+} catch (Exception $e) {
+    echo "\n❌ Error: " . $e->getMessage() . "\n";
+    exit(1);
+}
 
+try {
     // Step 2: Create index on paper_date for efficient filtering
     echo "\nStep 2: Creating index on paper_date column...\n";
 
