@@ -167,7 +167,7 @@ if ($user->data['user_id'] != ANONYMOUS  && $canchange) {
 if ($club < 0 && $request->is_set('user_id')) {
 
     $user_id = $request->variable('user_id', '');
-    if ($category != 'all') {
+    if ($user_id != 'all') {
         $user_id = $request->variable('user_id', 0);
     }
 
