@@ -1,11 +1,3 @@
-# Use Apache 2.4+ security settings
-<IfModule mod_authz_host.c>
-    # Block specific IP addresses
-    Require all granted
-    Require not ip 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235
-    Require not ip 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192
-    Require not ip 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192
-</IfModule>
 
 # Prevent directory listing and allow symbolic links for rewriting
 Options -Indexes +FollowSymLinks
@@ -56,17 +48,8 @@ Options -Indexes +FollowSymLinks
     Require all denied
 </Files>
 
-# Block access to common sensitive file extensions
-<FilesMatch "\.(md|ini|git.*|sql|gz|lock|json|yml|yaml)$">
-    Require all denied
-</FilesMatch>
-
-# Block access to hidden files (e.g. .htaccess, .git)
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-
 # Block access to backup and temporary files
-<FilesMatch "\.(bak|backup|tmp|temp|log|old|orig|save|swp|swo)$">
+
+<FilesMatch "^\.htaccess|^\.(?!well-known)|.*\.(git|env|log|ini|conf|md|config|bak|backup|old|tmp|temp|md|ps1|py)$">
     Require all denied
 </FilesMatch>
