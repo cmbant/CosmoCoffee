@@ -24,17 +24,8 @@ if (file_exists($db_path)) {
     echo "File size: " . number_format(filesize($db_path)) . " bytes\n";
     echo "File permissions: " . substr(sprintf('%o', fileperms($db_path)), -4) . "\n";
     echo "Is readable: " . (is_readable($db_path) ? "YES" : "NO") . "\n";
-    echo "Is writable: " . (is_writable($db_path) ? "YES" : "NO") . "\n";
-
-    // Owner/Group info (may not work on Windows)
-    if (function_exists('posix_getpwuid') && function_exists('fileowner')) {
-        $owner_info = posix_getpwuid(fileowner($db_path));
-        echo "Owner: " . ($owner_info ? $owner_info['name'] : 'Unknown') . "\n";
-    }
-    if (function_exists('posix_getgrgid') && function_exists('filegroup')) {
-        $group_info = posix_getgrgid(filegroup($db_path));
-        echo "Group: " . ($group_info ? $group_info['name'] : 'Unknown') . "\n";
-    }
+    echo "Owner: " . posix_getpwuid(fileowner($db_path))['name'] . "\n";
+    echo "Group: " . posix_getgrgid(filegroup($db_path))['name'] . "\n";
 } else {
     echo "❌ Database file does not exist!\n";
 }
@@ -44,7 +35,6 @@ echo "--------------------\n";
 $data_dir = dirname($db_path);
 echo "Data directory: $data_dir\n";
 echo "Directory exists: " . (is_dir($data_dir) ? "YES" : "NO") . "\n";
-echo "Directory writable: " . (is_writable($data_dir) ? "YES" : "NO") . "\n";
 
 echo "\n3. Database Connection Test:\n";
 echo "----------------------------\n";
@@ -102,8 +92,8 @@ echo "-------------------\n";
 
 if (!file_exists($db_path)) {
     echo "❌ Database file missing - restore from backup or re-migrate\n";
-} elseif (!is_readable($db_path) || !is_writable($db_path)) {
-    echo "❌ Permission issues - fix with: chmod 664 $db_path && chown www-data:www-data $db_path\n";
+} elseif (!is_readable($db_path)) {
+    echo "❌ Permission issues - fix with: chmod 644 $db_path && chown www-data:www-data $db_path\n";
 } elseif (filesize($db_path) < 100000) { // Less than 100KB suggests empty database
     echo "⚠️  Database appears to be empty or corrupted - consider restoring from backup\n";
 } else {

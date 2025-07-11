@@ -34,10 +34,6 @@ class ArxivDatabase
                 throw new Exception("ArXiv database file is not readable. Check permissions: " . $this->db_path);
             }
 
-            if (!is_writable($this->db_path)) {
-                throw new Exception("ArXiv database file is not writable. Check permissions: " . $this->db_path);
-            }
-
             $this->db = new SQLite3($this->db_path);
             $this->db->busyTimeout(60000);
             // Enable WAL mode for better concurrency
