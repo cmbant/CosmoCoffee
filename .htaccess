@@ -1,96 +1,72 @@
-Options -Indexes +FollowSymLinks
-
-Deny from 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192
-
-Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
-
-#AddType application/x-httpd-php56 .php
-#Action application/x-httpd-php56 /fcgi-bin/php56_wrapper.sh
-
-
-<IfModule mod_rewrite.c>
-RewriteEngine on
-
-SetEnvIfNoCase User-Agent "AspiegelBot" bad_user
-SetEnvIfNoCase User-Agent "SemrushBot" bad_user
-SetEnvIfNoCase User-Agent "AhrefsBot" bad_user
-#DDOS?
-SetEnvIfNoCase User-Agent "NT.*61.0.3163.100" bad_user
-Deny from env=bad_user
-
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=307]
-RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-RewriteRule ^ https://%1%{REQUEST_URI} [R=307,L]
-
-# Commented For testing
-RewriteCond %{HTTP_HOST} !^cosmocoffee.info [OR]
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://cosmocoffee.info/$1 [R=permanent,L]
-
-RewriteCond %{HTTP_REFERER} google.*testing [NC]
-RewriteRule .* - [F]
-
-
-#
-# Uncomment the statement below if URL rewriting doesn't
-# work properly. If you installed phpBB in a subdirectory
-# of your site, properly set the argument for the statement.
-# e.g.: if your domain is test.com and you installed phpBB
-# in http://www.test.com/phpBB/index.php you have to set
-# the statement RewriteBase /phpBB/
-#
-#RewriteBase /
-
-#
-# Uncomment the statement below if you want to make use of
-# HTTP authentication and it does not already work.
-# This could be required if you are for example using PHP via Apache CGI.
-#
-#RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
-
-#
-# The following 3 lines will rewrite URLs passed through the front controller
-# to not require app.php in the actual URL. In other words, a controller is
-# by default accessed at /app.php/my/controller, but can also be accessed at
-# /my/controller
-#
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ app.php [QSA,L]
-
-#
-# If symbolic links are not already being followed,
-# uncomment the line below.
-# http://anothersysadmin.wordpress.com/2008/06/10/mod_rewrite-forbidden-403-with-apache-228/
-#
-#Options +FollowSymLinks
+# Use Apache 2.4+ security settings
+<IfModule mod_authz_host.c>
+    # Block specific IP addresses
+    Require all granted
+    Require not ip 185.220.101.7 104.244.73.193 176.126.253.190 45.141.215.235
+    Require not ip 107.189.12.3 185.100.85.24 109.70.100.21 192.42.116.192
+    Require not ip 109.70.100.3 192.42.116.215 149.202.79.101 37.187.5.192
 </IfModule>
 
-# Security: Block access to sensitive files and directories
-# Modern Apache 2.4+ syntax (most servers support this now)
+# Prevent directory listing and allow symbolic links for rewriting
+Options -Indexes +FollowSymLinks
 
-# Block access to sensitive PHP files
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+
+    # Block bad bots by User-Agent
+    SetEnvIfNoCase User-Agent "AspiegelBot" bad_bot
+    SetEnvIfNoCase User-Agent "SemrushBot" bad_bot
+    SetEnvIfNoCase User-Agent "AhrefsBot" bad_bot
+    SetEnvIfNoCase User-Agent "NT.*61.0.3163.100" bad_bot
+    <RequireAll>
+        Require all granted
+        Require not env bad_bot
+    </RequireAll>
+
+    # --- EFFICIENT HTTPS & NON-WWW REDIRECT ---
+    # This single block forces HTTPS and removes www in one step
+    RewriteCond %{HTTPS} off [OR]
+    RewriteCond %{HTTP_HOST} ^www\. [NC]
+    RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+    # Your custom redirect (this is fine)
+    Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
+
+    # Block referrer spam (this is fine)
+    RewriteCond %{HTTP_REFERER} google.*testing [NC]
+    RewriteRule .* - [F]
+
+    # --- phpBB Front Controller (DO NOT CHANGE) ---
+    # This is required for phpBB's "pretty URLs" to work.
+    # It routes requests for non-existent files/dirs to app.php.
+    #
+    # If phpBB is in a subdirectory, e.g. /forum/, uncomment and set the line below
+    # RewriteBase /forum/
+    #
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ app.php [QSA,L]
+</IfModule>
+
+# --- FILE-LEVEL SECURITY (Safer than DirectoryMatch) ---
+
+# Block access to specific sensitive files
 <Files ~ "^(config|common)\.php$">
-	Require all denied
+    Require all denied
 </Files>
 
-# Block access to sensitive file extensions
+# Block access to common sensitive file extensions
 <FilesMatch "\.(md|ini|git.*|sql|gz|lock|json|yml|yaml)$">
-	Require all denied
+    Require all denied
 </FilesMatch>
 
-# Block access to sensitive directories
-<DirectoryMatch "^.*(scripts|vendor|phpbb|config|includes|\.git|bin|docs).*$">
-	Require all denied
-</DirectoryMatch>
-
-# Block access to hidden files (starting with .)
+# Block access to hidden files (e.g. .htaccess, .git)
 <FilesMatch "^\.">
-	Require all denied
+    Require all denied
 </FilesMatch>
 
 # Block access to backup and temporary files
 <FilesMatch "\.(bak|backup|tmp|temp|log|old|orig|save|swp|swo)$">
-	Require all denied
+    Require all denied
 </FilesMatch>
