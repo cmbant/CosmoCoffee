@@ -273,19 +273,12 @@ if (!empty($addref) && $user_id > 1) {
         if (!$row = $db->sql_fetchrow($result)) {
             $db->sql_freeresult($result);
 
-            // Check if paper exists in ArXiv SQLite database
+            // Check if paper exists in ArXiv SQLite database and get paper date
             try {
-                if ($arxiv_db->existsInArxivNew($addref)) {
-                    // Get the paper date from SQLite for efficient filtering
-                    $paper_details = $arxiv_db->getPaperDetailsByTags([$addref]);
-                    $paper_date = !empty($paper_details[$addref]) ? $paper_details[$addref]['date'] : null;
-
-                    if ($paper_date) {
-                        $sql = "insert into bookmarks (user_id, arxiv_tag, paper_date) values ($user_id, '$addref', '$paper_date')";
-                    } else {
-                        // Fallback if date not found
-                        $sql = "insert into bookmarks (user_id, arxiv_tag) values ($user_id, '$addref')";
-                    }
+                $paper_details = $arxiv_db->getPaperDetailsByTags([$addref]);
+                if (!empty($paper_details[$addref])) {
+                    $paper_date = $paper_details[$addref]['date'];
+                    $sql = "insert into bookmarks (user_id, arxiv_tag, paper_date) values ($user_id, '$addref', '$paper_date')";
 
                     if (!$result = $db->sql_query($sql)) {
                         trigger_error('Could not add bookmark');
@@ -558,51 +551,48 @@ if ($club >= 0) {
 
     if ($user_id == 'all') {
         $usercond = '';
+        $date_cond = '';
+        $order = 'b.paper_date DESC, ac DESC';
         $countcond = $request->variable('min_count', 0);
 
-        // OPTIMIZED: Recreate original master branch query pattern with paper_date
-        // Original master: "select b.arxiv_tag,n.title, n.authors,n.date, count(*) as ac from bookmarks as b, ARXIV_NEW as n where $usercond b.arxiv_tag=n.arxiv_tag $date_cond group by n.arxiv_tag order by $order LIMIT $startc, $maxrows"
-
-        $date_cond = '';
-        $order = 'b.paper_date DESC, ac DESC';  // Original: n.date DESC, ac DESC
-        $having_clause = '';
-
         if ($top_months) {
-            // Original: date_cond = " and n.date >= date_sub(CURDATE(),interval $top_months month) "
             $date_cond = " AND b.paper_date >= DATE_SUB(CURDATE(), INTERVAL $top_months MONTH) ";
-            $order = 'ac DESC, b.paper_date DESC';  // Original: ac DESC,n.date DESC
+            $order = 'ac DESC, b.paper_date DESC';
         } elseif ($countcond) {
-            // Original: order = 'having ac >='. $countcond . ' order by n.date DESC, ac DESC'
-            $having_clause = "HAVING ac >= $countcond";
+            $order = 'b.paper_date DESC, ac DESC';
         }
 
-        // Recreate the original efficient single query pattern
-        $bookmark_sql = "SELECT b.arxiv_tag, b.paper_date, COUNT(*) as ac
-                        FROM bookmarks as b
-                        WHERE b.paper_date IS NOT NULL $date_cond
-                        GROUP BY b.arxiv_tag
-                        $having_clause
-                        ORDER BY $order
-                        LIMIT $startc, $maxrows";
+        // Use the original approach but with paper_date from bookmarks table
+        $having_clause = $countcond ? "HAVING ac >= $countcond" : "";
 
-        $bookmark_result = $db->sql_query($bookmark_sql);
-        $bookmark_rows = $db->sql_fetchrowset($bookmark_result);
-        $db->sql_freeresult($bookmark_result);
+        $sql = "SELECT b.arxiv_tag, b.paper_date as date, COUNT(*) as ac
+                FROM bookmarks as b
+                WHERE 1=1 $date_cond
+                GROUP BY b.arxiv_tag
+                $having_clause
+                ORDER BY $order
+                LIMIT $startc, $maxrows";
 
-        // Fetch paper details only for paginated results (maintaining master branch efficiency)
+        if (!$result = $db->sql_query($sql)) {
+            trigger_error('Could not query existing bookmarks');
+        }
+
+        $bookmark_rows = $db->sql_fetchrowset($result);
+        $db->sql_freeresult($result);
+
+        // Get paper details from SQLite for the paginated results
         $arxiv_tags = array_column($bookmark_rows, 'arxiv_tag');
         if (!empty($arxiv_tags)) {
             try {
                 $paper_details = $arxiv_db->getPaperDetailsByTags($arxiv_tags);
 
-                // Merge results maintaining original structure
+                // Merge bookmark data with paper details
                 $rows = [];
                 foreach ($bookmark_rows as $bookmark) {
                     $arxiv_tag = $bookmark['arxiv_tag'];
                     if (isset($paper_details[$arxiv_tag])) {
-                        // Use paper_date from bookmarks (replaces n.date from original)
                         $merged_row = array_merge($bookmark, $paper_details[$arxiv_tag]);
-                        $merged_row['date'] = $bookmark['paper_date'];
+                        $merged_row['date'] = $bookmark['date']; // Keep the date from bookmarks
                         $rows[] = $merged_row;
                     }
                 }
