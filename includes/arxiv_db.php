@@ -25,6 +25,19 @@ class ArxivDatabase
     private function connect()
     {
         try {
+            // Check if database file exists and is readable before connecting
+            if (!file_exists($this->db_path)) {
+                throw new Exception("ArXiv database file does not exist: " . $this->db_path);
+            }
+
+            if (!is_readable($this->db_path)) {
+                throw new Exception("ArXiv database file is not readable. Check permissions: " . $this->db_path);
+            }
+
+            if (!is_writable($this->db_path)) {
+                throw new Exception("ArXiv database file is not writable. Check permissions: " . $this->db_path);
+            }
+
             $this->db = new SQLite3($this->db_path);
             $this->db->busyTimeout(60000);
             // Enable WAL mode for better concurrency
@@ -37,6 +50,17 @@ class ArxivDatabase
 
     private function createTables()
     {
+        // Check if tables already exist and have data - prevent accidental recreation
+        $check_data = $this->db->querySingle("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='ARXIV_NEW'");
+        if ($check_data > 0) {
+            // Table exists, check if it has data
+            $record_count = $this->db->querySingle("SELECT COUNT(*) FROM ARXIV_NEW");
+            if ($record_count > 0) {
+                // Database already has data, don't recreate tables
+                return;
+            }
+        }
+
         // Create ARXIV_NEW table
         $sql_new = "CREATE TABLE IF NOT EXISTS ARXIV_NEW (
             arxiv_tag VARCHAR(32) PRIMARY KEY,
@@ -427,6 +451,40 @@ class ArxivDatabase
     public function prepare($sql)
     {
         return $this->db->prepare($sql);
+    }
+
+    /**
+     * Get database diagnostics for troubleshooting
+     */
+    public function getDiagnostics()
+    {
+        $diagnostics = array();
+        $diagnostics['db_path'] = $this->db_path;
+        $diagnostics['file_exists'] = file_exists($this->db_path);
+        $diagnostics['file_size'] = file_exists($this->db_path) ? filesize($this->db_path) : 0;
+        $diagnostics['is_readable'] = is_readable($this->db_path);
+        $diagnostics['is_writable'] = is_writable($this->db_path);
+        $diagnostics['file_permissions'] = file_exists($this->db_path) ? substr(sprintf('%o', fileperms($this->db_path)), -4) : 'N/A';
+
+        if ($this->db) {
+            try {
+                $diagnostics['arxiv_new_count'] = $this->db->querySingle("SELECT COUNT(*) FROM ARXIV_NEW");
+                $diagnostics['arxiv_replace_count'] = $this->db->querySingle("SELECT COUNT(*) FROM ARXIV_REPLACE");
+                $diagnostics['journal_mode'] = $this->db->querySingle("PRAGMA journal_mode");
+
+                // Additional diagnostic queries
+                $diagnostics['recent_count'] = $this->db->querySingle("SELECT COUNT(*) FROM ARXIV_NEW WHERE date >= date('now', '-30 days')");
+
+                $date_result = $this->db->query("SELECT MIN(date) as min_date, MAX(date) as max_date FROM ARXIV_NEW");
+                $date_row = $date_result->fetchArray(SQLITE3_ASSOC);
+                $diagnostics['min_date'] = $date_row ? $date_row['min_date'] : null;
+                $diagnostics['max_date'] = $date_row ? $date_row['max_date'] : null;
+            } catch (Exception $e) {
+                $diagnostics['db_error'] = $e->getMessage();
+            }
+        }
+
+        return $diagnostics;
     }
 
     /**
