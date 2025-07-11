@@ -284,11 +284,31 @@ try {
                     $batch = array_slice($arxiv_tags, $i, $batch_size);
                     $paper_details = $arxiv_db->getPaperDetailsByTags($batch);
 
-                    foreach ($paper_details as $paper) {
-                        $sql = "UPDATE bookmarks SET paper_date = '" . $db->sql_escape($paper['date']) . "'
-                                WHERE arxiv_tag = '" . $db->sql_escape($paper['arxiv_tag']) . "' AND paper_date IS NULL";
-                        if ($db->sql_query($sql)) {
-                            $updated_count += $db->sql_affectedrows();
+                    if (!empty($paper_details)) {
+                        // Build batch UPDATE using CASE statement for efficiency
+                        $case_statements = [];
+                        $arxiv_tags_with_dates = [];
+
+                        foreach ($paper_details as $arxiv_tag => $paper) {
+                            $escaped_tag = $db->sql_escape($arxiv_tag);
+                            $escaped_date = $db->sql_escape($paper['date']);
+                            $case_statements[] = "WHEN '$escaped_tag' THEN '$escaped_date'";
+                            $arxiv_tags_with_dates[] = "'$escaped_tag'";
+                        }
+
+                        if (!empty($case_statements)) {
+                            $case_clause = implode(' ', $case_statements);
+                            $in_clause = implode(',', $arxiv_tags_with_dates);
+
+                            $sql = "UPDATE bookmarks
+                                    SET paper_date = CASE arxiv_tag
+                                        $case_clause
+                                    END
+                                    WHERE arxiv_tag IN ($in_clause) AND paper_date IS NULL";
+
+                            if ($db->sql_query($sql)) {
+                                $updated_count += $db->sql_affectedrows();
+                            }
                         }
                     }
                 }

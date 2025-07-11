@@ -278,7 +278,7 @@ if (!empty($addref) && $user_id > 1) {
                 if ($arxiv_db->existsInArxivNew($addref)) {
                     // Get the paper date from SQLite for efficient filtering
                     $paper_details = $arxiv_db->getPaperDetailsByTags([$addref]);
-                    $paper_date = !empty($paper_details) ? $paper_details[0]['date'] : null;
+                    $paper_date = !empty($paper_details[$addref]) ? $paper_details[$addref]['date'] : null;
 
                     if ($paper_date) {
                         $sql = "insert into bookmarks (user_id, arxiv_tag, paper_date) values ($user_id, '$addref', '$paper_date')";

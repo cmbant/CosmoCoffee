@@ -167,10 +167,6 @@ try {
     }
 
     echo "\n🎉 Successfully completed adding date column to bookmarks table!\n";
-    echo "\nNext steps:\n";
-    echo "1. Update bookmark.php to use paper_date for filtering\n";
-    echo "2. Update bookmark creation code to populate paper_date automatically\n";
-    echo "3. Test the new efficient filtering\n";
 } catch (Exception $e) {
     echo "\n❌ Error: " . $e->getMessage() . "\n";
     exit(1);
