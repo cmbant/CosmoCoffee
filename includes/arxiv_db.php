@@ -12,25 +12,33 @@ class ArxivDatabase
     private $db;
     private $db_path;
 
-    public function __construct($db_path = null)
+    public function __construct($db_path = null, $create_if_missing = false)
     {
         if ($db_path === null) {
             $db_path = dirname(__DIR__) . '/data/arxiv.db';
         }
         $this->db_path = $db_path;
-        $this->connect();
+        $this->connect($create_if_missing);
         $this->createTables();
     }
 
-    private function connect()
+    private function connect($create_if_missing = false)
     {
         try {
             // Check if database file exists and is readable before connecting
             if (!file_exists($this->db_path)) {
-                throw new Exception("ArXiv database file does not exist: " . $this->db_path);
+                if (!$create_if_missing) {
+                    throw new Exception("ArXiv database file does not exist: " . $this->db_path);
+                }
+                // For migration purposes, we'll create the database file
+                // Make sure the directory exists
+                $dir = dirname($this->db_path);
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
             }
 
-            if (!is_readable($this->db_path)) {
+            if (file_exists($this->db_path) && !is_readable($this->db_path)) {
                 throw new Exception("ArXiv database file is not readable. Check permissions: " . $this->db_path);
             }
 

@@ -54,7 +54,7 @@ if (file_exists($sqlite_path)) {
 try {
     // Initialize SQLite database
     echo "Initializing SQLite database at: $sqlite_path\n";
-    $arxiv_db = new ArxivDatabase($sqlite_path);
+    $arxiv_db = new ArxivDatabase($sqlite_path, true);
 
     // Check if ARXIV_NEW table exists first
     echo "\nChecking if ARXIV_NEW table exists...\n";
