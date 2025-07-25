@@ -1,0 +1,345 @@
+<?php
+
+/**
+ * Migration script to convert ARXIV_NEW and ARXIV_REPLACE tables from MySQL to SQLite
+ *
+ * Usage: php scripts/migrate_arxiv_to_sqlite.php
+ */
+
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Set up paths
+$phpbb_root_path = dirname(__DIR__) . '/';
+$phpEx = 'php';
+
+// Include phpBB common setup
+define('IN_PHPBB', true);
+include($phpbb_root_path . 'common.' . $phpEx);
+include($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
+
+// Create data directory if it doesn't exist
+$data_dir = $phpbb_root_path . 'data';
+if (!is_dir($data_dir)) {
+    mkdir($data_dir, 0755, true);
+}
+
+$sqlite_path = $data_dir . '/arxiv.db';
+
+echo "ArXiv MySQL to SQLite Migration Script\n";
+echo "=====================================\n\n";
+
+// Debug: Check database connection
+echo "Checking MySQL database connection...\n";
+if (!$db) {
+    throw new Exception("Failed to connect to MySQL database");
+}
+echo "✓ MySQL database connected successfully\n";
+
+// Increase memory limit for migration
+ini_set('memory_limit', '512M');
+echo "✓ Memory limit increased to 512M\n";
+
+// Set batch size for processing large datasets
+$batch_size = 10000;
+echo "✓ Using batch size of $batch_size records\n";
+
+// Remove existing SQLite database if it exists
+if (file_exists($sqlite_path)) {
+    echo "Removing existing SQLite database...\n";
+    unlink($sqlite_path);
+}
+
+try {
+    // Initialize SQLite database
+    echo "Initializing SQLite database at: $sqlite_path\n";
+    $arxiv_db = new ArxivDatabase($sqlite_path, true);
+
+    // Check if ARXIV_NEW table exists first
+    echo "\nChecking if ARXIV_NEW table exists...\n";
+    $table_check_sql = "SHOW TABLES LIKE 'ARXIV_NEW'";
+    $table_result = $db->sql_query($table_check_sql);
+
+    if (!$table_result) {
+        throw new Exception("Failed to check for ARXIV_NEW table: " . $db->sql_error());
+    }
+
+    $table_exists = $db->sql_fetchrow($table_result);
+    $db->sql_freeresult($table_result);
+
+    if (!$table_exists) {
+        echo "ARXIV_NEW table does not exist in MySQL database. Skipping...\n";
+        $count_new = 0;
+    } else {
+        echo "✓ ARXIV_NEW table found in MySQL database\n";
+
+        // First, get total count for progress tracking
+        $count_sql = "SELECT COUNT(*) as total FROM ARXIV_NEW";
+        $count_result = $db->sql_query($count_sql);
+        $count_row = $db->sql_fetchrow($count_result);
+        $total_records = $count_row['total'];
+        $db->sql_freeresult($count_result);
+
+        echo "Total records to migrate from ARXIV_NEW: $total_records\n";
+
+        // Migrate ARXIV_NEW table in batches
+        echo "\nMigrating ARXIV_NEW table in batches...\n";
+        $count_new = 0;
+        $offset = 0;
+
+        while ($offset < $total_records) {
+            $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments, abstract FROM ARXIV_NEW LIMIT $batch_size OFFSET $offset";
+            $result = $db->sql_query($sql);
+
+            if (!$result) {
+                throw new Exception("Failed to query ARXIV_NEW table: " . $db->sql_error());
+            }
+
+            $batch_count = 0;
+            while ($row = $db->sql_fetchrow($result)) {
+                $success = $arxiv_db->replaceArxivNew(
+                    $row['arxiv_tag'],
+                    $row['date'],
+                    $row['arxiv'],
+                    $row['number'],
+                    $row['title'],
+                    $row['authors'],
+                    $row['comments'],
+                    $row['abstract']
+                );
+
+                if ($success) {
+                    $count_new++;
+                    $batch_count++;
+                } else {
+                    echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
+                }
+            }
+            $db->sql_freeresult($result);
+
+            $offset += $batch_size;
+            echo "Migrated $count_new / $total_records records from ARXIV_NEW (batch of $batch_count)...\n";
+
+            // Force garbage collection after each batch
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+        }
+    }
+
+    echo "Successfully migrated $count_new records from ARXIV_NEW\n";
+
+    // Check if ARXIV_REPLACE table exists first
+    echo "\nChecking if ARXIV_REPLACE table exists...\n";
+    $table_check_sql = "SHOW TABLES LIKE 'ARXIV_REPLACE'";
+    $table_result = $db->sql_query($table_check_sql);
+
+    if (!$table_result) {
+        throw new Exception("Failed to check for ARXIV_REPLACE table: " . $db->sql_error());
+    }
+
+    $table_exists = $db->sql_fetchrow($table_result);
+    $db->sql_freeresult($table_result);
+
+    if (!$table_exists) {
+        echo "ARXIV_REPLACE table does not exist in MySQL database. Skipping...\n";
+        $count_replace = 0;
+    } else {
+        echo "✓ ARXIV_REPLACE table found in MySQL database\n";
+
+        // First, get total count for progress tracking
+        $count_sql = "SELECT COUNT(*) as total FROM ARXIV_REPLACE";
+        $count_result = $db->sql_query($count_sql);
+        $count_row = $db->sql_fetchrow($count_result);
+        $total_records = $count_row['total'];
+        $db->sql_freeresult($count_result);
+
+        echo "Total records to migrate from ARXIV_REPLACE: $total_records\n";
+
+        // Migrate ARXIV_REPLACE table in batches
+        echo "\nMigrating ARXIV_REPLACE table in batches...\n";
+        $count_replace = 0;
+        $offset = 0;
+
+        while ($offset < $total_records) {
+            $sql = "SELECT arxiv_tag, date, arxiv, number, title, authors, comments FROM ARXIV_REPLACE LIMIT $batch_size OFFSET $offset";
+            $result = $db->sql_query($sql);
+
+            if (!$result) {
+                throw new Exception("Failed to query ARXIV_REPLACE table: " . $db->sql_error());
+            }
+
+            $batch_count = 0;
+            while ($row = $db->sql_fetchrow($result)) {
+                $success = $arxiv_db->replaceArxivReplace(
+                    $row['arxiv_tag'],
+                    $row['date'],
+                    $row['arxiv'],
+                    $row['number'],
+                    $row['title'],
+                    $row['authors'],
+                    $row['comments']
+                );
+
+                if ($success) {
+                    $count_replace++;
+                    $batch_count++;
+                } else {
+                    echo "Failed to migrate record: " . $row['arxiv_tag'] . "\n";
+                }
+            }
+            $db->sql_freeresult($result);
+
+            $offset += $batch_size;
+            echo "Migrated $count_replace / $total_records records from ARXIV_REPLACE (batch of $batch_count)...\n";
+
+            // Force garbage collection after each batch
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+        }
+    }
+
+    echo "Successfully migrated $count_replace records from ARXIV_REPLACE\n";
+
+    // Verify migration
+    echo "\nVerifying migration...\n";
+
+    // Count records in SQLite
+    $sqlite_new_count = 0;
+    $sqlite_replace_count = 0;
+
+    $result = $arxiv_db->exec("SELECT COUNT(*) as count FROM ARXIV_NEW");
+    if ($result) {
+        $sqlite_result = $arxiv_db->prepare("SELECT COUNT(*) as count FROM ARXIV_NEW");
+        $sqlite_exec = $sqlite_result->execute();
+        $row = $sqlite_exec->fetchArray(SQLITE3_ASSOC);
+        $sqlite_new_count = $row['count'];
+        $sqlite_result->close();
+    }
+
+    $sqlite_result = $arxiv_db->prepare("SELECT COUNT(*) as count FROM ARXIV_REPLACE");
+    $sqlite_exec = $sqlite_result->execute();
+    $row = $sqlite_exec->fetchArray(SQLITE3_ASSOC);
+    $sqlite_replace_count = $row['count'];
+    $sqlite_result->close();
+
+    echo "SQLite ARXIV_NEW count: $sqlite_new_count\n";
+    echo "SQLite ARXIV_REPLACE count: $sqlite_replace_count\n";
+
+    if ($sqlite_new_count == $count_new && $sqlite_replace_count == $count_replace) {
+        echo "\n✓ Migration completed successfully!\n";
+        echo "Total records migrated: " . ($count_new + $count_replace) . "\n";
+
+        // Step 4: Update bookmarks table with paper_date column for efficient filtering
+        echo "\n" . str_repeat("-", 50) . "\n";
+        echo "Step 4: Updating bookmarks table with paper_date column\n";
+        echo str_repeat("-", 50) . "\n";
+
+        try {
+            // Add paper_date column to bookmarks table
+            echo "Adding paper_date column to bookmarks table...\n";
+            $sql = "ALTER TABLE bookmarks ADD COLUMN paper_date DATE DEFAULT NULL";
+            $result = $db->sql_query($sql);
+
+            if ($result) {
+                echo "✓ Successfully added paper_date column\n";
+            } else {
+                // Column might already exist
+                $sql = "SHOW COLUMNS FROM bookmarks LIKE 'paper_date'";
+                $result = $db->sql_query($sql);
+                if ($db->sql_fetchrow($result)) {
+                    echo "✓ paper_date column already exists\n";
+                } else {
+                    echo "⚠ Warning: Could not add paper_date column: " . $db->sql_error() . "\n";
+                }
+                $db->sql_freeresult($result);
+            }
+
+            // Create index on paper_date
+            echo "Creating index on paper_date...\n";
+            $sql = "CREATE INDEX idx_bookmarks_paper_date ON bookmarks(paper_date)";
+            $db->sql_query($sql); // Don't check result as index might already exist
+
+            // Populate paper_date for existing bookmarks
+            echo "Populating paper_date for existing bookmarks...\n";
+            $sql = "SELECT DISTINCT arxiv_tag FROM bookmarks WHERE paper_date IS NULL";
+            $result = $db->sql_query($sql);
+
+            $arxiv_tags = [];
+            while ($row = $db->sql_fetchrow($result)) {
+                $arxiv_tags[] = $row['arxiv_tag'];
+            }
+            $db->sql_freeresult($result);
+
+            if (count($arxiv_tags) > 0) {
+                echo "Found " . count($arxiv_tags) . " bookmarks to update with paper dates...\n";
+
+                // Update in batches
+                $batch_size = 100;
+                $updated_count = 0;
+
+                for ($i = 0; $i < count($arxiv_tags); $i += $batch_size) {
+                    $batch = array_slice($arxiv_tags, $i, $batch_size);
+                    $paper_details = $arxiv_db->getPaperDetailsByTags($batch);
+
+                    if (!empty($paper_details)) {
+                        // Build batch UPDATE using CASE statement for efficiency
+                        $case_statements = [];
+                        $arxiv_tags_with_dates = [];
+
+                        foreach ($paper_details as $arxiv_tag => $paper) {
+                            $escaped_tag = $db->sql_escape($arxiv_tag);
+                            $escaped_date = $db->sql_escape($paper['date']);
+                            $case_statements[] = "WHEN '$escaped_tag' THEN '$escaped_date'";
+                            $arxiv_tags_with_dates[] = "'$escaped_tag'";
+                        }
+
+                        if (!empty($case_statements)) {
+                            $case_clause = implode(' ', $case_statements);
+                            $in_clause = implode(',', $arxiv_tags_with_dates);
+
+                            $sql = "UPDATE bookmarks
+                                    SET paper_date = CASE arxiv_tag
+                                        $case_clause
+                                    END
+                                    WHERE arxiv_tag IN ($in_clause) AND paper_date IS NULL";
+
+                            if ($db->sql_query($sql)) {
+                                $updated_count += $db->sql_affectedrows();
+                            }
+                        }
+                    }
+                }
+
+                echo "✓ Updated $updated_count bookmark records with paper dates\n";
+            } else {
+                echo "✓ No bookmarks need paper_date updates\n";
+            }
+        } catch (Exception $e) {
+            echo "⚠ Warning: Could not update bookmarks table: " . $e->getMessage() . "\n";
+        }
+    } else {
+        echo "\n✗ Migration verification failed!\n";
+        echo "Expected: ARXIV_NEW=$count_new, ARXIV_REPLACE=$count_replace\n";
+        echo "Got: ARXIV_NEW=$sqlite_new_count, ARXIV_REPLACE=$sqlite_replace_count\n";
+    }
+
+    $arxiv_db->close();
+} catch (Exception $e) {
+    echo "Error during migration: " . $e->getMessage() . "\n";
+    exit(1);
+}
+
+echo "\nMigration script completed.\n";
+echo "SQLite database created at: $sqlite_path\n";
+echo "\nNext steps:\n";
+echo "1. Test the new SQLite database with your applications\n";
+echo "2. Update your applications to use the new ArxivDatabase class\n";
+echo "3. Update bookmark.php to use efficient paper_date filtering\n";
+echo "4. Once verified, you can drop the MySQL ARXIV_NEW and ARXIV_REPLACE tables\n";
+echo "\nOptimizations completed:\n";
+echo "✓ SQLite database with proper prepared statements\n";
+echo "✓ Bookmarks table enhanced with paper_date column for efficient filtering\n";
+echo "✓ Indexes created for optimal query performance\n";
