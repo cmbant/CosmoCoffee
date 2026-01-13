@@ -95,7 +95,7 @@ $text .= "<dt><hr><h3>Replacements</h3></dt>";
 $text .= get_replacements_html($replace_date_start, $replace_date_end, $keywords, $arxives);
 $text .= "</dl><hr>";
 
-if ($logged_in) { 
+if ($logged_in) {
     $links .= '<p>' . get_month_links($latestArxiv) . '</p>';
     $links .= "<p>";
 }
@@ -105,7 +105,7 @@ $links .= '<br><span class="gensmall">Papers matching: ' . htmlspecialchars(impl
 
 if ($user->data['user_id'] != ANONYMOUS) {
     $links .= '<p><span class ="genmed">';
-    $links .= '[<A HREF="/">CosmoCofee Home</A>] ';
+    $links .= '[<A HREF="/">CosmoCoffee Home</A>] ';
     $links .= '[<A HREF="' . BOOKMARK_LINK . '">Bookmarks</A>] ';
     $links .= '[<A HREF="/search.php?search_id=newposts">New posts</A>] ';
     $links .= '[<A HREF="/search.php?search_id=unanswered">Unanswered posts</A>]';
