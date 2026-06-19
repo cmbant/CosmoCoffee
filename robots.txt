@@ -1,3 +1,5 @@
+
+
 User-agent: *
 Crawl-Delay: 5
 Disallow: /faq.php
@@ -13,6 +15,7 @@ Disallow: /bookmark.php
 Disallow: /cache/
 Disallow: /adm/
 Disallow: /docs/
+Disallow: *sid=
 
 User-agent: AspiegelBot
 Disallow: /
@@ -28,5 +31,3 @@ Disallow: /
 
 User-agent: Yandex
 Disallow: /
-
-

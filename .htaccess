@@ -8,16 +8,6 @@ RedirectMatch 404 (^|/)\.(?!well-known(?:/|$))
 <IfModule mod_rewrite.c>
     RewriteEngine on
 
-    # Block bad bots by User-Agent
-    SetEnvIfNoCase User-Agent "AspiegelBot" bad_bot
-    SetEnvIfNoCase User-Agent "SemrushBot" bad_bot
-    SetEnvIfNoCase User-Agent "AhrefsBot" bad_bot
-    SetEnvIfNoCase User-Agent "NT.*61.0.3163.100" bad_bot
-    <RequireAll>
-        Require all granted
-        Require not env bad_bot
-    </RequireAll>
-
     # --- EFFICIENT HTTPS & NON-WWW REDIRECT ---
     # This single block forces HTTPS and removes www in one step
     RewriteCond %{HTTPS} off [OR]
@@ -25,8 +15,6 @@ RedirectMatch 404 (^|/)\.(?!well-known(?:/|$))
     RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
     RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 
-    # Your custom redirect (this is fine)
-    Redirect permanent /booking.html https://www.cosmocoffee.info/booking.php
 
     # Block referrer spam (this is fine)
     RewriteCond %{HTTP_REFERER} google.*testing [NC]
@@ -44,6 +32,51 @@ RedirectMatch 404 (^|/)\.(?!well-known(?:/|$))
     RewriteRule ^(.*)$ app.php [QSA,L]
 </IfModule>
 
+# https://networksdb.io/ip-addresses-of/alibaba-cloud-llc
+<IfModule mod_setenvif.c>
+    SetEnvIfNoCase User-Agent "AspiegelBot" bad_bot
+    SetEnvIfNoCase User-Agent "SemrushBot" bad_bot
+    SetEnvIfNoCase User-Agent "AhrefsBot" bad_bot
+    SetEnvIfNoCase User-Agent "NT.*61\.0\.3163\.100" bad_bot
+</IfModule>
+
+<RequireAll>
+    Require all granted
+    Require not env bad_bot
+
+    Require not ip 47.88.0.0/14
+    Require not ip 47.56.0.0/15
+    Require not ip 47.238.0.0/15
+    Require not ip 47.52.0.0/16
+    Require not ip 47.86.0.0/16
+    Require not ip 47.242.0.0/16
+    Require not ip 47.243.0.0/16
+    Require not ip 72.254.0.0/16
+    Require not ip 139.95.0.0/16
+    Require not ip 147.139.0.0/16
+    Require not ip 155.102.0.0/16
+    Require not ip 163.181.0.0/16
+    Require not ip 47.250.0.0/17
+    Require not ip 47.254.192.0/18
+    Require not ip 61.200.84.0/24
+    Require not ip 111.108.151.176/28
+
+    Require not ip 47.74.0.0/15
+    Require not ip 47.76.0.0/14
+    Require not ip 47.80.0.0/13
+
+    Require not ip 47.235.0.0/16
+    Require not ip 47.236.0.0/14
+    Require not ip 47.240.0.0/14
+    Require not ip 47.244.0.0/15
+    Require not ip 47.246.0.0/16
+
+    Require not ip 47.250.0.0/15
+    Require not ip 47.252.0.0/15
+    Require not ip 47.254.0.0/16
+</RequireAll>
+
+
 # --- FILE-LEVEL SECURITY (Safer than DirectoryMatch) ---
 
 # Block access to specific sensitive files
@@ -53,6 +86,6 @@ RedirectMatch 404 (^|/)\.(?!well-known(?:/|$))
 
 # Block access to backup, config, credential, and temporary files
 
-<FilesMatch "(?i)\.(log|gz|tgz|zip|tar|tar\.gz|bak|bak[0-9]+|backup|old|orig|save|swp|swo|sql|sqlite|db|dump|cnf|conf|ini|env|inc|key|pem|crt|p12|pfx|lock|yml|yaml|md|config|tmp|temp|ps1|py)$">
+<FilesMatch "(?i)\.(log|gz|tgz|zip|tar|tar\.gz|bak|bak[0-9]+|backup|old|orig|save|swp|swo|sql|sqlite|db|dump|cnf|conf|ini|env|inc|key|pem|crt|p12|pfx|lock|yml|yaml|md|config|tmp|temp|ps1|py|git)$">
     Require all denied
 </FilesMatch>
