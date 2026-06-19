@@ -2,6 +2,9 @@
 # Prevent directory listing and allow symbolic links for rewriting
 Options -Indexes +FollowSymLinks
 
+# Block dotfiles and dot-directories, but keep .well-known public.
+RedirectMatch 404 (^|/)\.(?!well-known(?:/|$))
+
 <IfModule mod_rewrite.c>
     RewriteEngine on
 
@@ -48,8 +51,8 @@ Options -Indexes +FollowSymLinks
     Require all denied
 </Files>
 
-# Block access to backup and temporary files
+# Block access to backup, config, credential, and temporary files
 
-<FilesMatch "^\.htaccess|^\.(?!well-known)|.*\.(git|env|log|ini|conf|md|config|bak|backup|old|tmp|temp|md|ps1|py)$">
+<FilesMatch "(?i)\.(log|gz|tgz|zip|tar|tar\.gz|bak|bak[0-9]+|backup|old|orig|save|swp|swo|sql|sqlite|db|dump|cnf|conf|ini|env|inc|key|pem|crt|p12|pfx|lock|yml|yaml|md|config|tmp|temp|ps1|py)$">
     Require all denied
 </FilesMatch>

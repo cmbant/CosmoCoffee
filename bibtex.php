@@ -21,6 +21,9 @@ $inner_page_title = null;
 $text = '';
 $bibtex = '';
 $bib = '';
+$ads_bib = '';
+$ads_tag = '';
+$ads_url = '';
 $ads_fields = array();
 $joint = 0;
 
@@ -61,7 +64,7 @@ function get_bibtex($bibcode) {
        curl_close($ch);
        if ($data) {
           $obj = json_decode($data);
-           if ($obj->export) {
+           if (!empty($obj->export)) {
                 return $obj->export;
             }
         }
@@ -74,7 +77,7 @@ function get_inspire($url) {
               curl_setopt($ch, CURLOPT_URL, $url);
               curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
               curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-                       
+
        $data = curl_exec($ch);
        curl_close($ch);
 return $data;
@@ -87,34 +90,37 @@ if (!empty($arxiv)) {
      #https://github.com/inspirehep/rest-api-doc
     $SPIRES_url = 'https://inspirehep.net/api/arxiv/'.$arxiv. '?format=bibtex';
     $bibtex = get_inspire($SPIRES_url);
- 
- 
+
+
 
     $result = get_data('https://api.adsabs.harvard.edu/v1/search/query?fl=bibcode&q=arXiv:'.$arxiv);
     if ($result){
        $obj = json_decode($result);
-       if ($obj->response) {
+       if (!empty($obj->response->docs[0]->bibcode)) {
 
           $bibcode = $obj->response->docs[0]->bibcode;
+          $ads_url = 'https://ui.adsabs.harvard.edu/abs/' . rawurlencode($bibcode) . '/abstract';
           $html = get_bibtex($bibcode);
 
-        if (preg_match('#(\@[a-zA-Z]*)(.*)#s', $html, $ads_bib)) {
+        if ($html && preg_match('#(\@[a-zA-Z]*)(.*)#s', $html, $ads_bib)) {
             $ads_tag = $ads_bib[1];
             $ads_bib = $ads_bib[0];
         } else
             $ads_bib = '';
 
-        $match_count = preg_match_all("#([a-z]+?) = (.*?)(,\n|\n)#is", $html, $matches);
+        if ($html) {
+            $match_count = preg_match_all("#([a-z]+?) = (.*?)(,\n|\n)#is", $html, $matches);
 
-        for ($i = 0; $i < $match_count; $i++) {
-            $ads_fields[$matches[1][$i]] = $matches[2][$i];
+            for ($i = 0; $i < $match_count; $i++) {
+                $ads_fields[$matches[1][$i]] = $matches[2][$i];
+            }
         }
      }
     }
 
     $bib = $bibtex;
 
-    if (!preg_match('#ArXiv#s', $ads_bib) && !preg_match('#journal#s', $bibtex)) {
+    if ($ads_bib && !preg_match('#ArXiv#s', $ads_bib) && !preg_match('#journal#s', $bibtex)) {
 
         if (preg_match('#(\@[a-zA-Z]*)(.*?author.*?=.*?title.*?=.*?,).*?(     eprint.*?=..*?,.*?SLACcitation.*?=.*?\".*?\")#s', $bibtex, $t)) {
             $joint = 1;
@@ -154,7 +160,9 @@ if (!empty($arxiv)) {
     }
 
 
-    $text .= '<span class="gen"><A HREF="' . $ads_url . '">ADS</A>:  [<button onclick="copyToClipboard(\'#bib3\')">Copy</button>] <pre id="bib3">' . $ads_bib . '</pre></span></p>';
+    if ($ads_bib) {
+        $text .= '<span class="gen"><A HREF="' . $ads_url . '">ADS</A>:  [<button onclick="copyToClipboard(\'#bib3\')">Copy</button>] <pre id="bib3">' . $ads_bib . '</pre></span></p>';
+    }
 }
 
 $text .= '<hr><p align="center" class="gen">Modified BibTex files for including arxiv eprint references in many paper styles are available <A HREF="http://arxiv.org/hypertex/bibstyles">here</A>; see also <A HREf="/viewtopic.php?t=304">this post</A>.</p>';
