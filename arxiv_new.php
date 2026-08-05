@@ -189,6 +189,7 @@ function get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords
 
     $scores = [];
     $items = [];
+    $match_strings = get_match_strings($keywords);
 
     // Query SQLite database using proper prepared statements
     $rows = $arxiv_db->queryArxivNew($date_start, $date_end, $arxives, $arxiv_tag_pattern);
@@ -196,7 +197,7 @@ function get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords
     foreach ($rows as $row) {
         // Set paper_id to null since we're not joining with phpbb_papers
         $row['paper_id'] = null;
-        $rowResult = print_relevant($row, false, $keywords, $arxives);
+        $rowResult = print_relevant($row, false, $keywords, $arxives, $match_strings);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
@@ -214,6 +215,7 @@ function get_replacements_html($date_start, $date_end, $keywords, $arxives)
 
     $scores = [];
     $items = [];
+    $match_strings = get_match_strings($keywords);
 
     // Query SQLite database using proper prepared statements
     $rows = $arxiv_db->queryArxivReplace($date_start, $date_end, $arxives);
@@ -221,7 +223,7 @@ function get_replacements_html($date_start, $date_end, $keywords, $arxives)
     foreach ($rows as $row) {
         // Set paper_id to null since we're not joining with phpbb_papers
         $row['paper_id'] = null;
-        $rowResult = print_relevant($row, true, $keywords, $arxives);
+        $rowResult = print_relevant($row, true, $keywords, $arxives, $match_strings);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
@@ -233,12 +235,32 @@ function get_replacements_html($date_start, $date_end, $keywords, $arxives)
     return implode('', $items);
 }
 
-function print_relevant($row, $replace, array $keywords, array $arxives)
+function print_relevant($row, $replace, array $keywords, array $arxives, array $match_strings = null)
 {
     global $user;
     $text = '';
 
-    $match_strings = get_match_strings($keywords);
+    if ($match_strings === null) {
+        $match_strings = get_match_strings($keywords);
+    }
+
+    if (empty($match_strings['match_str'])) {
+        return false;
+    }
+
+    $matchText = $row['title'] . ' ' . $row['authors'];
+    if (!$replace) {
+        $matchText .= ' ' . $row['abstract'];
+    }
+
+    if (!preg_match($match_strings['match_str'], $matchText)) {
+        return false;
+    }
+
+    if (!empty($match_strings['neg_match']) && preg_match($match_strings['neg_match'], $matchText)) {
+        return false;
+    }
+
     $mirror = 'arxiv.org';
 
     $title = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['title']);
@@ -252,12 +274,6 @@ function print_relevant($row, $replace, array $keywords, array $arxives)
     $abs_matches = ($replace) ? 0 : (strlen($abstract) - strlen($row['abstract'])) / $addlen;
 
     if ($tit_matches + $abs_matches > 0) {
-        if (!empty($match_strings['neg_match'])) {
-            if (preg_match($match_strings['neg_match'], "$title $abstract $authors")) {
-                return false;
-            }
-        }
-
         $arxivTag = $row['arxiv_tag'];
         $arxivSubject = isset($row['arxiv']) ? $row['arxiv'] : null;
 

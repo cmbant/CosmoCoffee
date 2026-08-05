@@ -19,7 +19,13 @@ class ArxivDatabase
         }
         $this->db_path = $db_path;
         $this->connect($create_if_missing);
-        $this->createTables();
+
+        // Normal web and cron requests use an existing database. Schema
+        // creation belongs to the migration/create path, rather than every
+        // request that opens the database.
+        if ($create_if_missing) {
+            $this->createTables();
+        }
     }
 
     private function connect($create_if_missing = false)
@@ -54,17 +60,6 @@ class ArxivDatabase
 
     private function createTables()
     {
-        // Check if tables already exist and have data - prevent accidental recreation
-        $check_data = $this->db->querySingle("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='ARXIV_NEW'");
-        if ($check_data > 0) {
-            // Table exists, check if it has data
-            $record_count = $this->db->querySingle("SELECT COUNT(*) FROM ARXIV_NEW");
-            if ($record_count > 0) {
-                // Database already has data, don't recreate tables
-                return;
-            }
-        }
-
         // Create ARXIV_NEW table
         $sql_new = "CREATE TABLE IF NOT EXISTS ARXIV_NEW (
             arxiv_tag VARCHAR(32) PRIMARY KEY,
@@ -93,6 +88,8 @@ class ArxivDatabase
         $index_replace_date = "CREATE INDEX IF NOT EXISTS idx_arxiv_replace_date ON ARXIV_REPLACE(date)";
         $index_new_arxiv = "CREATE INDEX IF NOT EXISTS idx_arxiv_new_arxiv ON ARXIV_NEW(arxiv)";
         $index_replace_arxiv = "CREATE INDEX IF NOT EXISTS idx_arxiv_replace_arxiv ON ARXIV_REPLACE(arxiv)";
+        $index_new_arxiv_date = "CREATE INDEX IF NOT EXISTS idx_arxiv_new_arxiv_date ON ARXIV_NEW(arxiv, date)";
+        $index_replace_arxiv_date = "CREATE INDEX IF NOT EXISTS idx_arxiv_replace_arxiv_date ON ARXIV_REPLACE(arxiv, date)";
 
         $this->db->exec($sql_new);
         $this->db->exec($sql_replace);
@@ -100,6 +97,8 @@ class ArxivDatabase
         $this->db->exec($index_replace_date);
         $this->db->exec($index_new_arxiv);
         $this->db->exec($index_replace_arxiv);
+        $this->db->exec($index_new_arxiv_date);
+        $this->db->exec($index_replace_arxiv_date);
     }
 
     /**
