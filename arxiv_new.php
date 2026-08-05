@@ -8,6 +8,7 @@ define('BOOKMARK_LINK', '/bookmark.php');
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
+include_once($phpbb_root_path . 'includes/arxiv_db.' . $phpEx);
 
 anti_hack($phpEx);
 
@@ -24,6 +25,9 @@ $template->set_filenames(array(
 ));
 
 $starttime = microtime_float();
+
+// Initialize ArXiv SQLite database
+$arxiv_db = new ArxivDatabase();
 
 $arxivesString = ($user->profile_fields['pf_user_arxives'] ?? '') ? $user->profile_fields['pf_user_arxives'] : $config['default_arxives'];
 $arxives = to_array($arxivesString);
@@ -54,25 +58,41 @@ if (!$logged_in) {
     $links = get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives);
 }
 $text .= $links;
+
 $text .= '<dl>';
 
+// Prepare query parameters for SQLite database
+$date_start = null;
+$date_end = null;
+$arxiv_tag_pattern = null;
+
 if (!empty($month)) {
-    $date_range = "arxiv_tag like '" . date("ym", strtotime("$year-$month-01")) . "%'";
-    $date_range_replace = "date >= '$year-$month-01' and date < date_add('$year-$month-01',interval 1 month)";
+    // Month-based query using arxiv_tag pattern
+    $arxiv_tag_pattern = date("ym", strtotime("$year-$month-01")) . "%";
+    // For replacements, use date range
+    $month_start = "$year-$month-01";
+    $month_end = date('Y-m-d', strtotime("$month_start +1 month"));
+    $replace_date_start = $month_start;
+    $replace_date_end = date('Y-m-d', strtotime("$month_end -1 day"));
 } elseif ($interval > 1) {
-    $date_range = "date <= '$new_date' and date > date_sub('$new_date',interval $interval day)";
-    $date_range_replace = $date_range;
+    // Date range for interval
+    $start_date = date('Y-m-d', strtotime("$new_date -$interval days"));
+    $date_start = $start_date;
+    $date_end = $new_date;
+    $replace_date_start = $date_start;
+    $replace_date_end = $date_end;
 } else {
-    $date_range = "date = '$new_date'";
-    $date_range_replace = $date_range;
+    // Single date
+    $date_start = $new_date;
+    $date_end = $new_date;
+    $replace_date_start = $date_start;
+    $replace_date_end = $date_end;
 }
-$arxiv_sql = $db->sql_in_set('arxiv', $arxives);
 
-
-$text .= get_archives_html($arxiv_sql, $date_range, $keywords, $arxives);
+$text .= get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords, $arxives);
 
 $text .= "<dt><hr><h3>Replacements</h3></dt>";
-$text .= get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives);
+$text .= get_replacements_html($replace_date_start, $replace_date_end, $keywords, $arxives);
 $text .= "</dl><hr>";
 
 if ($logged_in) {
@@ -85,7 +105,7 @@ $links .= '<br><span class="gensmall">Papers matching: ' . htmlspecialchars(impl
 
 if ($user->data['user_id'] != ANONYMOUS) {
     $links .= '<p><span class ="genmed">';
-    $links .= '[<A HREF="/">CosmoCofee Home</A>] ';
+    $links .= '[<A HREF="/">CosmoCoffee Home</A>] ';
     $links .= '[<A HREF="' . BOOKMARK_LINK . '">Bookmarks</A>] ';
     $links .= '[<A HREF="/search.php?search_id=newposts">New posts</A>] ';
     $links .= '[<A HREF="/search.php?search_id=unanswered">Unanswered posts</A>]';
@@ -163,80 +183,84 @@ function get_links_html($new_date, $interval, $latestArxiv, $newDate, $arxives)
     return $linksHtml;
 }
 
-function get_archives_html($arxiv_sql, $date_range, $keywords, $arxives)
+function get_archives_html($date_start, $date_end, $arxiv_tag_pattern, $keywords, $arxives)
 {
-    global $db;
+    global $arxiv_db;
 
     $scores = [];
     $items = [];
+    $match_strings = get_match_strings($keywords);
 
-    $sql = "SELECT
-                phpbb_papers.paper_id, a.arxiv_tag, a.arxiv, a.title, a.authors, a.comments, a.abstract
-            FROM
-                ARXIV_NEW as a
-            LEFT JOIN
-                phpbb_papers using(arxiv_tag)
-            WHERE
-                $date_range
-            AND
-                $arxiv_sql
-            ";
+    // Query SQLite database using proper prepared statements
+    $rows = $arxiv_db->queryArxivNew($date_start, $date_end, $arxives, $arxiv_tag_pattern);
 
-    $result = $db->sql_query($sql);
-
-    while ($row = $db->sql_fetchrow($result)) {
-        $rowResult = print_relevant($row, false, $keywords, $arxives);
+    foreach ($rows as $row) {
+        // Set paper_id to null since we're not joining with phpbb_papers
+        $row['paper_id'] = null;
+        $rowResult = print_relevant($row, false, $keywords, $arxives, $match_strings);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
     }
-    $db->sql_freeresult($result);
+
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);
 }
 
-function get_replacements_html($arxiv_sql, $date_range_replace, $keywords, $arxives)
+function get_replacements_html($date_start, $date_end, $keywords, $arxives)
 {
-    global $db;
+    global $arxiv_db;
 
     $scores = [];
     $items = [];
+    $match_strings = get_match_strings($keywords);
 
-    $sql = "SELECT
-                phpbb_papers.paper_id, a.arxiv_tag, a.title, a.authors, a.comments
-            FROM
-                ARXIV_REPLACE as a
-            LEFT JOIN
-                phpbb_papers using(arxiv_tag)
-            WHERE
-                $date_range_replace
-            AND
-                $arxiv_sql
-            ";
+    // Query SQLite database using proper prepared statements
+    $rows = $arxiv_db->queryArxivReplace($date_start, $date_end, $arxives);
 
-    $result = $db->sql_query($sql);
-
-    while ($row = $db->sql_fetchrow($result)) {
-        $rowResult = print_relevant($row, true, $keywords, $arxives);
+    foreach ($rows as $row) {
+        // Set paper_id to null since we're not joining with phpbb_papers
+        $row['paper_id'] = null;
+        $rowResult = print_relevant($row, true, $keywords, $arxives, $match_strings);
         if ($rowResult) {
             $scores[] = $rowResult['score'];
             $items[] = $rowResult['item'];
         }
     }
-    $db->sql_freeresult($result);
+
     array_multisort($scores, SORT_NUMERIC, SORT_DESC, $items, SORT_STRING);
 
     return implode('', $items);
 }
 
-function print_relevant($row, $replace, array $keywords, array $arxives)
+function print_relevant($row, $replace, array $keywords, array $arxives, array $match_strings = null)
 {
     global $user;
     $text = '';
 
-    $match_strings = get_match_strings($keywords);
+    if ($match_strings === null) {
+        $match_strings = get_match_strings($keywords);
+    }
+
+    if (empty($match_strings['match_str'])) {
+        return false;
+    }
+
+    $matchText = $row['title'] . ' ' . $row['authors'];
+    if (!$replace) {
+        $matchText .= ' ' . $row['abstract'];
+    }
+
+    if (!preg_match($match_strings['match_str'], $matchText)) {
+        return false;
+    }
+
+    if (!empty($match_strings['neg_match']) && preg_match($match_strings['neg_match'], $matchText)) {
+        return false;
+    }
+
     $mirror = 'arxiv.org';
 
     $title = preg_replace($match_strings['match_str'], '<span class="key">\\0</span>', $row['title']);
@@ -250,12 +274,6 @@ function print_relevant($row, $replace, array $keywords, array $arxives)
     $abs_matches = ($replace) ? 0 : (strlen($abstract) - strlen($row['abstract'])) / $addlen;
 
     if ($tit_matches + $abs_matches > 0) {
-        if (!empty($match_strings['neg_match'])) {
-            if (preg_match($match_strings['neg_match'], "$title $abstract $authors")) {
-                return false;
-            }
-        }
-
         $arxivTag = $row['arxiv_tag'];
         $arxivSubject = isset($row['arxiv']) ? $row['arxiv'] : null;
 

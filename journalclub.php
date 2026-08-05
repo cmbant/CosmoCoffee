@@ -17,7 +17,7 @@ $user->get_profile_fields($user->data['user_id']);
 $username = $user->data['username'];
 $user_id = $user->data['user_id'];
 
-if($request->is_set('test_id')) {
+if ($request->is_set('test_id')) {
     $user_id = $request->variable('test_id', 0);
 }
 
@@ -83,7 +83,7 @@ if ($user->data['user_id'] != ANONYMOUS) {
             if (empty($rows)) {
                 $error = 'No CosmoCoffee profile found for username ' . $add;
             } else {
-                foreach($rows as $row) {
+                foreach ($rows as $row) {
                     $in_user_id = $row['user_id'];
 
                     if ($result = $db->sql_query("select * from club_members where user_id=$in_user_id and club_id=$club_id")) {
@@ -257,14 +257,15 @@ $template->set_filenames(array(
 ));
 
 $template->assign_vars(array(
-    'MESSAGE_TEXT'	=> $text,
-    'MESSAGE_TITLE'	=> $inner_page_title
+    'MESSAGE_TEXT'    => $text,
+    'MESSAGE_TITLE'    => $inner_page_title
 ));
 
 make_jumpbox(append_sid("{$phpbb_root_path}viewforum.$phpEx"));
 page_footer();
 
-function get_new_club_called_html() {
+function get_new_club_called_html()
+{
     global $request;
     return '<center>
                 <form method="get" action="' . $request->server('SCRIPT_NAME') . '" TARGET="_top">

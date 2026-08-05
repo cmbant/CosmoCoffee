@@ -5,3 +5,4 @@ SQL.txt
 .vscode
 Pair_*
 *_database_files/
+*.db

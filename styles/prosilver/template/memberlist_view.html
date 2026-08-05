@@ -70,28 +70,33 @@
             <h3>Papers</h3>
             <div style="text-align: center">
                 <br>
-                <form action="https://arxiv.org/find" name="search" method="POST">
-                    <input type="hidden" name="group" value="grp_physics">
-                    <input type="hidden" name="archive" value="astro-ph">
-                    <input type="hidden" name="field_1" value='au'>
-                    <input type="hidden" name="query_1" value="{SEARCHNAME}">
-                    <input type="hidden" name="per_page" value=100>
+                <form action="https://arxiv.org/search/advanced" name="search" method="GET">
+                    <input type="hidden" name="advanced" value="">
+                    <input type="hidden" name="classification-physics" value="y">
+                    <input type="hidden" name="classification-physics_archives" value="astro-ph">
+                    <input type="hidden" name="terms-0-term" value="{SEARCHNAME}">
+                    <input type="hidden" name="terms-0-field" value="author">
+                    <input type="hidden" name="abstracts" value="show">
+                    <input type="hidden" name="order" value="-announced_date_first">
+                    <input type="hidden" name="size" value="50">
                     <input type="submit" value="astro-ph papers">
                 </form>
 
                 <br>
-                <form action="https://arxiv.org/find" name="search" method="POST">
-                    <input type="hidden" name="group" value="grp_physics">
-                    <input type="hidden" name="archive" value="grp_physics">
-                    <input type="hidden" name="field_1" value='au'>
-                    <input type="hidden" name="query_1" value="{SEARCHNAME}">
-                    <input type="hidden" name="per_page" value=100>
+                <form action="https://arxiv.org/search/advanced" name="search" method="GET">
+                    <input type="hidden" name="advanced" value="">
+                    <input type="hidden" name="classification-physics" value="y">
+                    <input type="hidden" name="terms-0-term" value="{SEARCHNAME}">
+                    <input type="hidden" name="terms-0-field" value="author">
+                    <input type="hidden" name="abstracts" value="show">
+                    <input type="hidden" name="order" value="-announced_date_first">
+                    <input type="hidden" name="size" value="50">
                     <input type="submit" value="all physics papers">
                 </form>
                 <br>
 
                 <span class="gen">
-                    <a href="http://www.slac.stanford.edu/spires/find/wwwhepau/wwwscan?rawcmd=fin+{LAST},+{FIRST}">SPIRES</a>
+                    <a href="https://inspirehep.net/literature?q=exactauthor:{LAST},+{FIRST}">INSPIRE</a>
                 </span>
                 <br>
             </div>

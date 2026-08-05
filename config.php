@@ -2,12 +2,12 @@
 // phpBB 3.2.x auto-generated configuration file
 // Do not change anything in this file!
 $dbms = 'phpbb\\db\\driver\\mysqli';
-$dbhost = 'db179.pair.com';
+$dbhost = 'vdb5.pit.pair.com';
 #$dbhost = 'db85a.pair.com';
 $dbport = '';
-$dbname = 'cosmocoffee_cosmocoffee2024';
-$dbuser = '1015824_25';
-$dbpasswd = '473W6XnByeUEvG9X';
+$dbname = 'cosmocoffee_cosmocoffee2025';
+$dbuser = '1015824_26';
+$dbpasswd = 'D3GMtGdTkgqTAWM4';
 $table_prefix = 'phpbb_';
 $phpbb_adm_relative_path = 'adm/';
 $acm_type = 'phpbb\\cache\\driver\\file';

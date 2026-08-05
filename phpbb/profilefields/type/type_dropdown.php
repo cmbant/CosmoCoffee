@@ -1,52 +1,53 @@
 <?php
+
 /**
-*
-* This file is part of the phpBB Forum Software package.
-*
-* @copyright (c) phpBB Limited <https://www.phpbb.com>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-* For full copyright and license information, please see
-* the docs/CREDITS.txt file.
-*
-*/
+ *
+ * This file is part of the phpBB Forum Software package.
+ *
+ * @copyright (c) phpBB Limited <https://www.phpbb.com>
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ * For full copyright and license information, please see
+ * the docs/CREDITS.txt file.
+ *
+ */
 
 namespace phpbb\profilefields\type;
 
 class type_dropdown extends type_base
 {
 	/**
-	* Profile fields language helper
-	* @var \phpbb\profilefields\lang_helper
-	*/
+	 * Profile fields language helper
+	 * @var \phpbb\profilefields\lang_helper
+	 */
 	protected $lang_helper;
 
 	/**
-	* Request object
-	* @var \phpbb\request\request
-	*/
+	 * Request object
+	 * @var \phpbb\request\request
+	 */
 	protected $request;
 
 	/**
-	* Template object
-	* @var \phpbb\template\template
-	*/
+	 * Template object
+	 * @var \phpbb\template\template
+	 */
 	protected $template;
 
 	/**
-	* User object
-	* @var \phpbb\user
-	*/
+	 * User object
+	 * @var \phpbb\user
+	 */
 	protected $user;
 
 	/**
-	* Construct
-	*
-	* @param	\phpbb\profilefields\lang_helper		$lang_helper	Profile fields language helper
-	* @param	\phpbb\request\request		$request	Request object
-	* @param	\phpbb\template\template	$template	Template object
-	* @param	\phpbb\user					$user		User object
-	*/
+	 * Construct
+	 *
+	 * @param	\phpbb\profilefields\lang_helper		$lang_helper	Profile fields language helper
+	 * @param	\phpbb\request\request		$request	Request object
+	 * @param	\phpbb\template\template	$template	Template object
+	 * @param	\phpbb\user					$user		User object
+	 */
 	public function __construct(\phpbb\profilefields\lang_helper $lang_helper, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user)
 	{
 		$this->lang_helper = $lang_helper;
@@ -56,16 +57,16 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_name_short()
 	{
 		return 'dropdown';
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_options($default_lang_id, $field_data)
 	{
 		$profile_row[0] = array(
@@ -94,8 +95,8 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_default_option_values()
 	{
 		return array(
@@ -109,47 +110,44 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_default_field_value($field_data)
 	{
 		return $field_data['field_default_value'];
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_profile_field($profile_row)
 	{
 		$var_name = 'pf_' . $profile_row['field_ident'];
 		return $this->request->variable($var_name, $profile_row['field_default_value']);
-		//CosmoCofee
+		//CosmoCoffee
 		//return $this->request->variable($var_name, (int) $profile_row['field_default_value']);
-		//CosmoCofee
+		//CosmoCoffee
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function validate_profile_field(&$field_value, $field_data)
 	{
 		$field_value = (int) $field_value;
 
 		// retrieve option lang data if necessary
-		if (!$this->lang_helper->is_set($field_data['field_id'], $field_data['lang_id'], 1))
-		{
+		if (!$this->lang_helper->is_set($field_data['field_id'], $field_data['lang_id'], 1)) {
 			$this->lang_helper->load_option_lang($field_data['lang_id']);
 		}
 
-		if (!$this->lang_helper->is_set($field_data['field_id'], $field_data['lang_id'], $field_value))
-		{
-			//CosmoCofee
+		if (!$this->lang_helper->is_set($field_data['field_id'], $field_data['lang_id'], $field_value)) {
+			//CosmoCoffee
 			// return $this->user->lang('FIELD_INVALID_VALUE', $this->get_field_name($field_data['lang_name']));
-			//CosmoCofee
+			//CosmoCoffee
 		}
 
-		if ($field_value == $field_data['field_novalue'] && $field_data['field_required'])
-		{
+		if ($field_value == $field_data['field_novalue'] && $field_data['field_required']) {
 			return $this->user->lang('FIELD_REQUIRED', $this->get_field_name($field_data['lang_name']));
 		}
 
@@ -157,33 +155,27 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_profile_value($field_value, $field_data)
 	{
 		$field_id = $field_data['field_id'];
 		$lang_id = $field_data['lang_id'];
-		if (!$this->lang_helper->is_set($field_id, $lang_id))
-		{
+		if (!$this->lang_helper->is_set($field_id, $lang_id)) {
 			$this->lang_helper->load_option_lang($lang_id);
 		}
 
-		if ($field_value == $field_data['field_novalue'] && !$field_data['field_show_novalue'])
-		{
+		if ($field_value == $field_data['field_novalue'] && !$field_data['field_show_novalue']) {
 			return null;
 		}
 
 		$field_value = (int) $field_value;
 
 		// User not having a value assigned
-		if (!$this->lang_helper->is_set($field_id, $lang_id, $field_value))
-		{
-			if ($field_data['field_show_novalue'])
-			{
+		if (!$this->lang_helper->is_set($field_id, $lang_id, $field_value)) {
+			if ($field_data['field_show_novalue']) {
 				$field_value = $field_data['field_novalue'];
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		}
@@ -192,17 +184,15 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_profile_value_raw($field_value, $field_data)
 	{
-		if ($field_value == $field_data['field_novalue'] && !$field_data['field_show_novalue'])
-		{
+		if ($field_value == $field_data['field_novalue'] && !$field_data['field_show_novalue']) {
 			return null;
 		}
 
-		if (!$field_value && $field_data['field_show_novalue'])
-		{
+		if (!$field_value && $field_data['field_show_novalue']) {
 			$field_value = $field_data['field_novalue'];
 		}
 
@@ -210,8 +200,8 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function generate_field($profile_row, $preview_options = false)
 	{
 		$profile_row['field_ident'] = (isset($profile_row['var_name'])) ? $profile_row['var_name'] : 'pf_' . $profile_row['field_ident'];
@@ -220,14 +210,10 @@ class type_dropdown extends type_base
 
 		$value = ($this->request->is_set($field_ident)) ? $this->request->variable($field_ident, $default_value) : ((!isset($this->user->profile_fields[$field_ident]) || $preview_options !== false) ? $default_value : $this->user->profile_fields[$field_ident]);
 
-		if (!$this->lang_helper->is_set($profile_row['field_id'], $profile_row['lang_id'], 1))
-		{
-			if ($preview_options)
-			{
+		if (!$this->lang_helper->is_set($profile_row['field_id'], $profile_row['lang_id'], 1)) {
+			if ($preview_options) {
 				$this->lang_helper->load_preview_options($profile_row['field_id'], $profile_row['lang_id'], $preview_options);
-			}
-			else
-			{
+			} else {
 				$this->lang_helper->load_option_lang($profile_row['lang_id']);
 			}
 		}
@@ -236,8 +222,7 @@ class type_dropdown extends type_base
 		$this->template->assign_block_vars('dropdown', array_change_key_case($profile_row, CASE_UPPER));
 
 		$options = $this->lang_helper->get($profile_row['field_id'], $profile_row['lang_id']);
-		foreach ($options as $option_id => $option_value)
-		{
+		foreach ($options as $option_id => $option_value) {
 			$this->template->assign_block_vars('dropdown.options', array(
 				'OPTION_ID'	=> $option_id,
 				'SELECTED'	=> ($value == $option_id) ? ' selected="selected"' : '',
@@ -247,16 +232,16 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_database_column_type()
 	{
 		return 'UINT';
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_language_options($field_data)
 	{
 		$options = array(
@@ -264,8 +249,7 @@ class type_dropdown extends type_base
 			'lang_options'	=> 'optionfield',
 		);
 
-		if ($field_data['lang_explain'])
-		{
+		if ($field_data['lang_explain']) {
 			$options['lang_explain'] = 'text';
 		}
 
@@ -273,8 +257,8 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function prepare_options_form(&$exclude_options, &$visibility_options)
 	{
 		$exclude_options[1][] = 'lang_options';
@@ -283,12 +267,11 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function validate_options_on_submit($error, $field_data)
 	{
-		if (!count($field_data['lang_options']))
-		{
+		if (!count($field_data['lang_options'])) {
 			$error[] = $this->user->lang['NO_FIELD_ENTRIES'];
 		}
 
@@ -296,12 +279,11 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function get_excluded_options($key, $action, $current_value, &$field_data, $step)
 	{
-		if ($step == 2 && $key == 'field_maxlen')
-		{
+		if ($step == 2 && $key == 'field_maxlen') {
 			// Get the number of options if this key is 'field_maxlen'
 			return count(explode("\n", $this->request->variable('lang_options', '', true)));
 		}
@@ -310,13 +292,12 @@ class type_dropdown extends type_base
 	}
 
 	/**
-	* {@inheritDoc}
-	*/
+	 * {@inheritDoc}
+	 */
 	public function display_options(&$template_vars, &$field_data)
 	{
 		// Initialize these array elements if we are creating a new field
-		if (!count($field_data['lang_options']))
-		{
+		if (!count($field_data['lang_options'])) {
 			// No options have been defined for the dropdown menu
 			$field_data['lang_options'] = array();
 		}

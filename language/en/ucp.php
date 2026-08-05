@@ -1,26 +1,25 @@
 <?php
-/**
-*
-* This file is part of the phpBB Forum Software package.
-*
-* @copyright (c) phpBB Limited <https://www.phpbb.com>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-* For full copyright and license information, please see
-* the docs/CREDITS.txt file.
-*
-*/
 
 /**
-* DO NOT CHANGE
-*/
-if (!defined('IN_PHPBB'))
-{
+ *
+ * This file is part of the phpBB Forum Software package.
+ *
+ * @copyright (c) phpBB Limited <https://www.phpbb.com>
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ * For full copyright and license information, please see
+ * the docs/CREDITS.txt file.
+ *
+ */
+
+/**
+ * DO NOT CHANGE
+ */
+if (!defined('IN_PHPBB')) {
 	exit;
 }
 
-if (empty($lang) || !is_array($lang))
-{
+if (empty($lang) || !is_array($lang)) {
 	$lang = array();
 }
 
@@ -93,10 +92,10 @@ $lang = array_merge($lang, array(
 	'ATTACHMENTS_DELETED'			=> 'Attachments successfully deleted.',
 	'ATTACHMENT_DELETED'			=> 'Attachment successfully deleted.',
 	'ATTACHMENT_LOCKED'				=> 'This topic is locked, you cannot delete the attachment.',
-	'AUTOLOGIN_SESSION_KEYS_DELETED'=> 'The selected "Remember Me" login keys were successfully deleted.',
+	'AUTOLOGIN_SESSION_KEYS_DELETED' => 'The selected "Remember Me" login keys were successfully deleted.',
 	'AVATAR_CATEGORY'				=> 'Category',
 	'AVATAR_DRIVER_GRAVATAR_TITLE'	=> 'Gravatar',
-	'AVATAR_DRIVER_GRAVATAR_EXPLAIN'=> 'Gravatar is a service that allows you to maintain the same avatar across multiple websites. Visit <a href="http://www.gravatar.com/">Gravatar</a> for more information.',
+	'AVATAR_DRIVER_GRAVATAR_EXPLAIN' => 'Gravatar is a service that allows you to maintain the same avatar across multiple websites. Visit <a href="http://www.gravatar.com/">Gravatar</a> for more information.',
 	'AVATAR_DRIVER_LOCAL_TITLE'		=> 'Gallery avatar',
 	'AVATAR_DRIVER_LOCAL_EXPLAIN'	=> 'You can choose your avatar from a locally available set of avatars.',
 	'AVATAR_DRIVER_REMOTE_TITLE'	=> 'Remote avatar',
@@ -129,7 +128,7 @@ $lang = array_merge($lang, array(
 	'BOOKMARKS_REMOVED'			=> 'Bookmarks removed successfully.',
 
 	'CANNOT_EDIT_MESSAGE_TIME'	=> 'You can no longer edit or delete that message.',
-	'CANNOT_MOVE_TO_SAME_FOLDER'=> 'Messages cannot be moved to the folder you want to remove.',
+	'CANNOT_MOVE_TO_SAME_FOLDER' => 'Messages cannot be moved to the folder you want to remove.',
 	'CANNOT_MOVE_FROM_SPECIAL'	=> 'Messages cannot be moved from the outbox.',
 	'CANNOT_RENAME_FOLDER'		=> 'This folder cannot be renamed.',
 	'CANNOT_REMOVE_FOLDER'		=> 'This folder cannot be removed.',
@@ -168,7 +167,7 @@ $lang = array_merge($lang, array(
 	'DELETE_ATTACHMENT'			=> 'Delete attachment',
 	'DELETE_ATTACHMENTS'		=> 'Delete attachments',
 	'DELETE_ATTACHMENT_CONFIRM'	=> 'Are you sure you want to delete this attachment?',
-	'DELETE_ATTACHMENTS_CONFIRM'=> 'Are you sure you want to delete these attachments?',
+	'DELETE_ATTACHMENTS_CONFIRM' => 'Are you sure you want to delete these attachments?',
 	'DELETE_AVATAR'				=> 'Delete image',
 	'DELETE_COOKIES_CONFIRM'	=> 'Are you sure you want to delete all cookies set by this board?',
 	'DELETE_MARKED_PM'			=> 'Delete marked messages',
@@ -252,7 +251,7 @@ $lang = array_merge($lang, array(
 	'FRIENDS_OFFLINE'			=> 'Offline',
 	'FRIENDS_ONLINE'			=> 'Online',
 	'FRIENDS_UPDATED'			=> 'Your friends list has been updated successfully.',
-	'FULL_FOLDER_OPTION_CHANGED'=> 'The action to take when a folder is full has been changed successfully.',
+	'FULL_FOLDER_OPTION_CHANGED' => 'The action to take when a folder is full has been changed successfully.',
 	'FWD_ORIGINAL_MESSAGE'		=> '-------- Original Message --------',
 	'FWD_SUBJECT'				=> 'Subject: %s',
 	'FWD_DATE'					=> 'Date: %s',
@@ -274,16 +273,16 @@ $lang = array_merge($lang, array(
 	'IF_FOLDER_FULL'			=> 'If folder is full',
 	'IMPORTANT_NEWS'			=> 'Important announcements',
 	'INVALID_USER_BIRTHDAY'			=> 'The entered birthday is not a valid date.',
-	'INVALID_CHARS_USERNAME'	=> 'The username contains forbidden characters.',
-	'INVALID_EMOJIS_USERNAME'	=> 'The username contains forbidden characters (Emoji).',
-	'INVALID_CHARS_NEW_PASSWORD'=> 'The password does not contain the required characters.',
+	'INVALID_CHARS_USERNAME'	=> 'The username contains forbidden characters. Please use your full name (e.g. First Last).',
+	'INVALID_EMOJIS_USERNAME'	=> 'The username contains forbidden characters (Emoji). Please use your full name (e.g. First Last).',
+	'INVALID_CHARS_NEW_PASSWORD' => 'The password does not contain the required characters.',
 	'ITEMS_REQUIRED'			=> 'The items marked with * are required profile fields and need to be filled out.',
 
 	'JOIN_SELECTED'				=> 'Join selected',
 
 	'LANGUAGE'					=> 'Language',
 	'LINK_REMOTE_AVATAR'		=> 'Link off-site',
-	'LINK_REMOTE_AVATAR_EXPLAIN'=> 'Enter the URL of the location containing the avatar image you wish to link to.',
+	'LINK_REMOTE_AVATAR_EXPLAIN' => 'Enter the URL of the location containing the avatar image you wish to link to.',
 	'LINK_REMOTE_SIZE'			=> 'Avatar dimensions',
 	'LINK_REMOTE_SIZE_EXPLAIN'	=> 'Specify the width and height of the avatar, leave blank to attempt automatic verification.',
 	'LOGIN_EXPLAIN_UCP'			=> 'Please login in order to access the User Control Panel.',
@@ -563,7 +562,7 @@ $lang = array_merge($lang, array(
 	'UCP_PROFILE_PROFILE_INFO'	=> 'Edit profile',
 	'UCP_PROFILE_REG_DETAILS'	=> 'Edit account settings',
 	'UCP_PROFILE_SIGNATURE'		=> 'Edit signature',
-	'UCP_PROFILE_AUTOLOGIN_KEYS'=> 'Manage “Remember Me” login keys',
+	'UCP_PROFILE_AUTOLOGIN_KEYS' => 'Manage “Remember Me” login keys',
 
 	'UCP_USERGROUPS'			=> 'Usergroups',
 	'UCP_USERGROUPS_MEMBER'		=> 'Edit memberships',
@@ -583,13 +582,13 @@ $lang = array_merge($lang, array(
 	'UPLOAD_AVATAR_URL'				=> 'Upload from a URL',
 	'UPLOAD_AVATAR_URL_EXPLAIN'		=> 'Enter the URL of the location containing the image. The image will be copied to this site.',
 	'USERNAME_ALPHA_ONLY_EXPLAIN'	=> 'Username must be between %1$s and %2$s long and use only alphanumeric characters.',
-	'USERNAME_ALPHA_SPACERS_EXPLAIN'=> 'Username must be between %1$s and %2$s long and use alphanumeric, space or -+_[] characters.',
+	'USERNAME_ALPHA_SPACERS_EXPLAIN' => 'Username must be between %1$s and %2$s long and use alphanumeric, space or -+_[] characters.',
 	'USERNAME_ASCII_EXPLAIN'		=> 'Username must be between %1$s and %2$s long and use only ASCII characters, so no special symbols.',
 	'USERNAME_LETTER_NUM_EXPLAIN'	=> 'Username must be between %1$s and %2$s long and use only letter or number characters.',
-	'USERNAME_LETTER_NUM_SPACERS_EXPLAIN'=> 'Username must be between %1$s and %2$s long and use letter, number, space or -+_[] characters.',
+	'USERNAME_LETTER_NUM_SPACERS_EXPLAIN' => 'Username must be between %1$s and %2$s long and use letter, number, space or -+_[] characters.',
 	'USERNAME_CHARS_ANY_EXPLAIN'	=> 'Length must be between %1$s and %2$s.',
-	'USERNAME_TAKEN_USERNAME'		=> 'The username you entered is already in use, please select an alternative.',
-	'USERNAME_DISALLOWED_USERNAME'	=> 'The username you entered has been disallowed or contains a disallowed word. Please choose a different name.',
+	'USERNAME_TAKEN_USERNAME'		=> 'The username you entered is already in use, please select an alternative. Your username should be your full name (e.g. First Last).',
+	'USERNAME_DISALLOWED_USERNAME'	=> 'The username you entered has been disallowed or contains a disallowed word. Please choose a different name. Your username should be your full name (e.g. First Last).',
 	'USER_NOT_FOUND_OR_INACTIVE'	=> 'The usernames you specified could either not be found or are not activated users.',
 
 	'VIEW_AVATARS'				=> 'Display avatars',

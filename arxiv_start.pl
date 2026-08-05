@@ -25,15 +25,12 @@ if ($data =~ m/new/){
 
 use DBI;
 
-$database = "cosmocoffee_cosmocoffee2024";
-$username = "1015824_25_r";
-$password = "usAp2CGzrHTK4eB4";
-$hostname = "db179.pair.com";
-
-$db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password); 
-    $sql = "select arxiv from ARXIV_NEW where arxiv_tag = '$data'";
+# Connect to SQLite database
+$db_path = "./data/arxiv.db";
+$db = DBI->connect("DBI:SQLite:dbname=$db_path", "", "");
+    $sql = "select arxiv from ARXIV_NEW where arxiv_tag = ?";
   $query = $db->prepare($sql);
-  $query->execute;
+  $query->execute($data);
    if ($query->rows > 0) {
 
       ($arxiv) = $query->fetchrow;
